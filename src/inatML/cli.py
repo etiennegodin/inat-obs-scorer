@@ -10,8 +10,10 @@ from .utils.logger import init_logger
 
 def ingest_cmd(args: Namespace, app: ApplicationService):
     try:
-        # app.ingest_download_data()
-        app.ingest_inat_api_data()
+        if args.step == "download":
+            app.ingest_downloads()
+        elif args.step == "api":
+            app.ingest_api_data()
 
     except Exception as e:
         print(e)
@@ -39,9 +41,9 @@ def create_parser() -> argparse.ArgumentParser:
     )
 
     # Ingest command
-    publish_parser = subparsers.add_parser("ingest", help="NotImplemented")
-
-    publish_parser.set_defaults(func=ingest_cmd)
+    ingest_parser = subparsers.add_parser("ingest", help="NotImplemented")
+    ingest_parser.add_argument("step", choices=["download", "api"])
+    ingest_parser.set_defaults(func=ingest_cmd)
 
     # Process command
     process_parser = subparsers.add_parser("process", help="NotImplemented")

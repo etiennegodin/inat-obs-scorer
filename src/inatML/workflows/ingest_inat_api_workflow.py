@@ -1,37 +1,26 @@
 import asyncio
 import logging
+from pathlib import Path
 
 from duckdb import CatalogException
 
-from ..app.container import Dependencies
 from ..pipeline.ingest.api import inatApiClient
 from ..utils.db import _open_connection
 
 logger = logging.getLogger(__name__)
 
 
-def execute(deps: Dependencies):
+def execute(db_path: Path):
     TABLE_NAME = "ina_api"
     CHUNK_SIZE = 5
     last_id = None
-    con = _open_connection(deps.RAW_DB_PATH)
+
+    con = _open_connection(db_path)
 
     fields = {"id": True}
-
-    # get list
-
-    items = [
-        "886f032e-7fa8-44ef-bd9c-826597a6ce3c",
-        "7a61472f-9828-436e-a6b0-4b93e79fc66d",
-        "0f0e9fab-0477-480d-ad45-72db63806d48",
-        "43ab2dd1-12ab-4722-a1a7-1b44780ead90",
-        "ab04b53d-4656-4653-a763-11981ddcb312",
-        "22e7add9-d886-4e00-8cc9-2b341ae81aaf",
-        "60a6b4f1-db82-4f7d-8de0-07a8d8c5419e",
-        "6ee8ec42-f924-4707-a7a9-eedb2f30973e",
-        "b10af847-a156-4a01-842c-6fae691f6cad",
-        "2f1f05eb-642a-44d3-9663-55f2a6ce9867",
-    ]
+    items = []
+    # print(items)
+    quit()
 
     items_count = len(items)
 
@@ -49,7 +38,8 @@ def execute(deps: Dependencies):
     try:
         max_id = con.execute(f"SELECT MAX(item_key) FROM {TABLE_NAME}").fetchone()[0]
         min_id = con.execute(f"SELECT MIN(item_key) FROM {TABLE_NAME}").fetchone()[0]
-
+        print(min_id)
+        print(max_id)
         if max_id is not None and min_id is not None:
             max_id = int(max_id)
             min_id = int(min_id)

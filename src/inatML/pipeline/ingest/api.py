@@ -139,7 +139,7 @@ class inatApiClient:
                         results = data["results"]
 
                         async def _put_in_queue(result_to_add):
-                            item_key = result_to_add["id"]
+                            item_key = result_to_add["uuid"]
                             try:
                                 await self.queue.put(
                                     (chunk_idx, item_key, result_to_add)

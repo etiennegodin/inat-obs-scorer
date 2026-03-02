@@ -35,20 +35,18 @@ class ApplicationService:
             deps: Application dependencies
         """
         self.deps = deps
-        self.logger = deps.logger
 
-    def ingest_download_data(self):
-        self.logger.info("Starting ingest workflow")
+    def ingest_downloads(self):
+        logger.info("Starting ingest downloads workflow")
 
         try:
             ingest_downloads_workflow.execute(self.deps)
         except Exception as e:
-            self.logger.exception(e)
+            logger.exception(e)
 
-    def ingest_inat_api_data(self):
-        self.logger.info("Starting ingest workflow")
-
+    def ingest_api_data(self):
+        logger.info("Starting ingest api workflow")
         try:
-            ingest_inat_api_workflow.execute(self.deps)
+            ingest_inat_api_workflow.execute(self.deps.RAW_DB_PATH)
         except Exception as e:
-            self.logger.exception(e)
+            logger.exception(e)
