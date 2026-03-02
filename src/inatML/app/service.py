@@ -47,6 +47,6 @@ class ApplicationService:
     def ingest_api_data(self):
         logger.info("Starting ingest api workflow")
         try:
-            ingest_inat_api_workflow.execute(self.deps.RAW_DB_PATH)
+            ingest_inat_api_workflow.execute(self.deps)
         except Exception as e:
             logger.exception(e)

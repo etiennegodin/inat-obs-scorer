@@ -39,8 +39,6 @@ class inatApiClient:
         self.table_name = f"raw.{name}"
 
     async def execute(self, items_chunks: list[str], con: duckdb.DuckDBPyConnection):
-        print(items_chunks)
-
         # Store count of observers (for logger)
         async with aiohttp.ClientSession() as session:
             writer_task = asyncio.create_task(self._write_data(con))
@@ -151,10 +149,7 @@ class inatApiClient:
                             for result in data["results"]:  # iterate list of dicts
                                 await _put_in_queue(result)
 
-                        logger.info(
-                            f"Fetched {len(data['results'])}\n"
-                            f"results for IDs: {item_key}"
-                        )
+                        logger.info(f"Fetched {len(data['results'])} observations")
                     else:
                         logger.warning(f"No results found for IDs {item_key}")
             except Exception as e:

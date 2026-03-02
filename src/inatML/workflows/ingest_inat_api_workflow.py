@@ -1,28 +1,22 @@
 import asyncio
 import logging
-from pathlib import Path
+from typing import Union
 
 from duckdb import CatalogException
 
+from ..app.container import Dependencies
 from ..pipeline.ingest.api import inatApiClient
 from ..utils.db import _open_connection
 
 logger = logging.getLogger(__name__)
 
 
-def execute(db_path: Path):
+def execute(deps: Dependencies, limit: Union[None, int] = 200):
     TABLE_NAME = "ina_api"
-    CHUNK_SIZE = 5
+    CHUNK_SIZE = 100
     last_id = None
 
-    con = _open_connection(db_path)
-
-    fields = {"id": True}
-    items = []
-    # print(items)
-    quit()
-
-    items_count = len(items)
+    con = _open_connection(deps.RAW_DB_PATH)
 
     # Create table
     try:
@@ -34,19 +28,15 @@ def execute(db_path: Path):
     except CatalogException:
         pass
 
+    df = con.execute(
+        f"SELECT * FROM obs_sample {f'LIMIT {limit}' if limit is not None else ''}"
+    ).df()
+    items_df = df.set_index("uuid")
+    print(items_df)
+
     # Get last_id from table
     try:
-        max_id = con.execute(f"SELECT MAX(item_key) FROM {TABLE_NAME}").fetchone()[0]
-        min_id = con.execute(f"SELECT MIN(item_key) FROM {TABLE_NAME}").fetchone()[0]
-        print(min_id)
-        print(max_id)
-        if max_id is not None and min_id is not None:
-            max_id = int(max_id)
-            min_id = int(min_id)
-            if max_id > min_id:
-                last_id = max_id
-            else:
-                last_id = min_id
+        last_id = con.execute(f"SELECT MIN(item_key) FROM {TABLE_NAME}").fetchone()[0]
     except Exception as e:
         logger.error(e)
 
@@ -54,9 +44,18 @@ def execute(db_path: Path):
     if last_id is not None:
         logger.info(f"Resuming from last processed ID: {last_id}")
         # Filter items: keep only those > last_id (since ordered ASC)
-        items = [item for item in items if item >= last_id]
+        new_items_df = items_df.loc[last_id:]
+        items = new_items_df.index.to_list()
         if not items:
             logger.info("All items already processed")
+    else:
+        items = items_df.index.to_list()
+
+    if not items:
+        return
+
+    items_count = len(items)
+    print(items_count)
 
     # Chunk items for batch processing
     items_chunks = [items[i : i + CHUNK_SIZE] for i in range(0, len(items), CHUNK_SIZE)]
@@ -64,6 +63,8 @@ def execute(db_path: Path):
     logger.info(
         f"Processing {items_count} items in {len(items_chunks)} chunks of {CHUNK_SIZE}"
     )
+
+    fields = {"id": True}
 
     # Set up api
     api = inatApiClient(TABLE_NAME, fields=fields, limiter=30, per_page=CHUNK_SIZE)
