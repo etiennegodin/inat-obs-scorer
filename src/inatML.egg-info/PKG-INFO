@@ -1,0 +1,12 @@
+Metadata-Version: 2.4
+Name: inatML
+Version: 0.0.1
+Summary: inatML
+Author-email: Etienne Godin <etiennegodin@duck.com>
+Requires-Dist: pandas
+Provides-Extra: dev
+Requires-Dist: pytest; extra == "dev"
+Requires-Dist: pytest-cov; extra == "dev"
+Requires-Dist: pytest-dependency; extra == "dev"
+Requires-Dist: black; extra == "dev"
+Requires-Dist: ruff; extra == "dev"

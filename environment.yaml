@@ -1,0 +1,29 @@
+name: inatML
+channels:
+  - conda-forge
+  - defaults
+
+dependencies:
+  # ---- Core Python ----
+  - python=3.12
+  - pip
+  - ipykernel
+  - jupyterlab
+  - numpy
+  - pandas
+  - matplotlib
+  - seaborn
+
+  - pip:
+      - fastapi
+      - uvicorn
+      - duckdb
+      - duckdb-extensions
+      - duckdb-extension-spatial
+      - shapely
+      - requests
+      - folium
+      - jinja2
+      - aiohttp
+      - aiofiles
+      - aiolimiter

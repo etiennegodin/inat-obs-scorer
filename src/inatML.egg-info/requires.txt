@@ -1,0 +1,8 @@
+pandas
+
+[dev]
+pytest
+pytest-cov
+pytest-dependency
+black
+ruff
