@@ -9,8 +9,8 @@ def _open_connection(db_path: str) -> duckdb.DuckDBPyConnection:
     # always create a fresh connection; use context manager where possible
     try:
         con = duckdb.connect(database=db_path)
-        if _load_spatial_extension(con):
-            return con
+        _load_spatial_extension(con)
+        return con
 
     except Exception as e:
         logger.error(f"Error connection to duckdb {db_path} : \n ", e)

@@ -25,7 +25,7 @@ dev = [
 ]
 
 [project.scripts]   # <-- entry point CLI
-#inatML = "inatML.cli:main"
+inatML = "inatML.cli:main"
 
 
 [tool.black]

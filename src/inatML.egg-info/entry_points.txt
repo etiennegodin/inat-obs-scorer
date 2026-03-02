@@ -1,0 +1,2 @@
+[console_scripts]
+inatML = inatML.cli:main

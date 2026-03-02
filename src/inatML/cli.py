@@ -1,13 +1,18 @@
 import argparse
 import logging
 import sys
+from argparse import Namespace
 from pathlib import Path
 
+from .app import ApplicationService, Dependencies
 from .utils.logger import init_logger
 
 
-def ingest_cmd(args):
-    pass
+def ingest_cmd(args: Namespace, app: ApplicationService):
+    try:
+        app.ingest_data()
+    except Exception as e:
+        print(e)
 
 
 def process_cmd(args):
@@ -21,9 +26,7 @@ def create_parser() -> argparse.ArgumentParser:
     Returns:
         Configured ArgumentParser with subcommands for publish, install, and scan.
     """
-    parser = argparse.ArgumentParser(
-        prog="nukekit", description="Nuke asset management system"
-    )
+    parser = argparse.ArgumentParser(prog="inatML", description="Inat ML features")
 
     parser.add_argument(
         "--verbose", "-v", action="store_true", help="Enable verbose logging"
@@ -38,7 +41,7 @@ def create_parser() -> argparse.ArgumentParser:
 
     publish_parser.set_defaults(func=ingest_cmd)
 
-    # Ingest command
+    # Process command
     process_parser = subparsers.add_parser("process", help="NotImplemented")
 
     process_parser.set_defaults(func=process_cmd)
@@ -51,14 +54,23 @@ def main():
     args = parser.parse_args()
 
     # Setup logging
-    logger = init_logger(
-        Path.cwd(), level=logging.DEBUG if args.verbose else logging.INFO
-    )
+    logger = init_logger(Path.cwd() / "log.log", logging.INFO)
+
+    # Create dependencies
+    try:
+        deps = Dependencies(logger=logger, root=Path(__file__).parents[2])
+        print(deps.root)
+    except Exception as e:
+        print(f"[red]Configuration error: {e}[/red]")
+        sys.exit(1)
+
+    # Create application service
+    app = ApplicationService(deps)
 
     try:
         # Execute command
         if hasattr(args, "func"):
-            exit_code = args.func(args)
+            exit_code = args.func(args, app)
             sys.exit(exit_code)
         else:
             parser.print_help()

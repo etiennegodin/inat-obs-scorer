@@ -1,26 +1,23 @@
-import logging
 from pathlib import Path
+
+from duckdb import CatalogException
 
 from ...utils.db import _open_connection
 
-ROOT_FOLDER = Path(__file__).parents[4]
-RAW_DATA_FOLDER = ROOT_FOLDER / "data" / "raw"
-DOWNLOADS_FOLDER = RAW_DATA_FOLDER / "downloads"
-RAW_DB_PATH = RAW_DATA_FOLDER / "raw.duckdb"
 
-logger = logging.getLogger(__name__)
-
-
-def ingest_downloads():
-    con = _open_connection()
+def ingest_downloads(db_path: Path, downloads_path: Path) -> list[Path]:
+    con = _open_connection(db_path)
+    create_query = f"""CREATE TABLE downloads AS 
+            SELECT *
+            FROM read_csv_auto('{downloads_path}/*.csv')"""
+    files = [file for file in downloads_path.rglob("*.csv")]
     try:
-        con.execute(
-            f"""CREATE IF NO EXISTS TABLE AS 
-            SELECT * FROM read_csv_auto('{DOWNLOADS_FOLDER}*.csv')"""
-        )
-    except Exception as e:
-        logger.exception(e)
-
-
-if __name__ == "main":
-    ingest_downloads()
+        con.execute(create_query)
+        return files
+    except CatalogException:
+        con.execute("DROP TABLE IF EXISTS downloads")
+        try:
+            con.execute(create_query)
+            return files
+        except Exception as e:
+            raise e

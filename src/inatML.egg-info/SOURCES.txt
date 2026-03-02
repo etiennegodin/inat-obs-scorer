@@ -1,13 +1,13 @@
 README.md
 pyproject.toml
+src/inatML/cli.py
 src/inatML.egg-info/PKG-INFO
 src/inatML.egg-info/SOURCES.txt
 src/inatML.egg-info/dependency_links.txt
+src/inatML.egg-info/entry_points.txt
 src/inatML.egg-info/requires.txt
 src/inatML.egg-info/top_level.txt
 src/inatML/pipeline/ingest/downloads.py
-src/inatML/pipeline/ingest/inat/__init__.py
-src/inatML/pipeline/ingest/inat/api.py
 src/inatML/utils/__init__.py
 src/inatML/utils/db.py
 src/inatML/utils/logger.py
