@@ -5,9 +5,9 @@ src/inatML.egg-info/SOURCES.txt
 src/inatML.egg-info/dependency_links.txt
 src/inatML.egg-info/requires.txt
 src/inatML.egg-info/top_level.txt
-src/pipeline/ingest/downloads.py
-src/pipeline/ingest/inat/__init__.py
-src/pipeline/ingest/inat/api.py
-src/utils/db/__init__.py
-src/utils/db/functions.py
-src/utils/db/module.py
+src/inatML/pipeline/ingest/downloads.py
+src/inatML/pipeline/ingest/inat/__init__.py
+src/inatML/pipeline/ingest/inat/api.py
+src/inatML/utils/__init__.py
+src/inatML/utils/db.py
+src/inatML/utils/logger.py
