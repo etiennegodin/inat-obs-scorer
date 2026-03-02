@@ -12,7 +12,8 @@ description = "inatML"
 authors = [{ name="Etienne Godin", email="etiennegodin@duck.com" }]
 
 dependencies = [
-    "pandas"
+    "pandas",
+    "scikit-learn"
 ]
 
 [project.optional-dependencies]
