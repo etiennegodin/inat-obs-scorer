@@ -8,8 +8,12 @@ This is the entry point for all use cases. It handles:
 - Transaction management
 """
 
-from ..workflows import ingest_workflow
+import logging
+
+from ..workflows import ingest_downloads_workflow, ingest_inat_api_workflow
 from .container import Dependencies
+
+logger = logging.getLogger(__name__)
 
 
 class ApplicationService:
@@ -33,10 +37,18 @@ class ApplicationService:
         self.deps = deps
         self.logger = deps.logger
 
-    def ingest_data(self):
+    def ingest_download_data(self):
         self.logger.info("Starting ingest workflow")
 
         try:
-            ingest_workflow.execute(self.deps)
+            ingest_downloads_workflow.execute(self.deps)
         except Exception as e:
-            self.logger.error(e)
+            self.logger.exception(e)
+
+    def ingest_inat_api_data(self):
+        self.logger.info("Starting ingest workflow")
+
+        try:
+            ingest_inat_api_workflow.execute(self.deps)
+        except Exception as e:
+            self.logger.exception(e)

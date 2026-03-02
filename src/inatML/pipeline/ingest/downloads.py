@@ -1,8 +1,11 @@
+import logging
 from pathlib import Path
 
 from duckdb import CatalogException
 
 from ...utils.db import _open_connection
+
+logger = logging.getLogger(__name__)
 
 
 def ingest_downloads(db_path: Path, downloads_path: Path) -> list[Path]:

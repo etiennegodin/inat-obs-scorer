@@ -10,7 +10,9 @@ from .utils.logger import init_logger
 
 def ingest_cmd(args: Namespace, app: ApplicationService):
     try:
-        app.ingest_data()
+        # app.ingest_download_data()
+        app.ingest_inat_api_data()
+
     except Exception as e:
         print(e)
 
