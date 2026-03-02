@@ -24,7 +24,7 @@ def init_logger(log_file: Path, level: int = logging.DEBUG) -> logging.Logger:
     console_handler.setFormatter(console_formatter)
 
     # Root logger
-    rootlogger = logging.getLogger("nukekit")
+    rootlogger = logging.getLogger("inatML")
     rootlogger.setLevel(logging.DEBUG)
     rootlogger.addHandler(file_handler)
     rootlogger.addHandler(console_handler)
