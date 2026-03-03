@@ -20,3 +20,4 @@ class Dependencies:
         self.RAW_DATA_FOLDER = self.root / "data" / "raw"
         self.DOWNLOADS_FOLDER = self.RAW_DATA_FOLDER / "downloads"
         self.RAW_DB_PATH = self.RAW_DATA_FOLDER / "raw.duckdb"
+        self.QUERY_FOLDER = self.root / "queries"

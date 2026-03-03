@@ -49,7 +49,7 @@ fields = {
 }
 
 
-def execute(deps: Dependencies, limit: Union[None, int] = 200):
+def execute(deps: Dependencies, limit: Union[None, int] = 200) -> None:
     TABLE_NAME = "ina_api"
     CHUNK_SIZE = 200
     last_id = None
@@ -86,14 +86,11 @@ def execute(deps: Dependencies, limit: Union[None, int] = 200):
         items = new_items_df.index.to_list()
         if not items:
             logger.info("All items already processed")
+            return
     else:
         items = items_df.index.to_list()
 
-    if not items:
-        return
-
     items_count = len(items)
-    print(items_count)
 
     # Chunk items for batch processing
     items_chunks = [items[i : i + CHUNK_SIZE] for i in range(0, len(items), CHUNK_SIZE)]
@@ -106,3 +103,5 @@ def execute(deps: Dependencies, limit: Union[None, int] = 200):
     api = inatApiClient(TABLE_NAME, fields=fields, limiter=30, per_page=CHUNK_SIZE)
 
     asyncio.run(api.execute(items_chunks, con))
+
+    # execute_sql(deps.QUERY_FOLDER)
