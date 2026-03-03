@@ -9,15 +9,15 @@ logger = logging.getLogger(__name__)
 
 def execute(deps: Dependencies):
     con = _open_connection(deps.DB_PATH)
-    con.execute("CREATE SCHEMA raw")
-    # Ingest csv files t db
-    try:
-        ingested = ingest_downloads(con, deps.DOWNLOADS_FOLDER)
-        logger.info(f"Ingested {len(ingested)} files ")
-        ###
-        # clean
-    except Exception as e:
-        logger.exception(e)
+    con.execute("CREATE SCHEMA IF NOT EXISTS raw")
+
+    # Ingest csv files to db
+    ingested = ingest_downloads(con, "downloads", deps.DOWNLOADS_FOLDER)
+    logger.info(f"Ingested {len(ingested)} files ")
+
+    # Ingest taxa
+    ingested = ingest_downloads(con, "taxa", deps._RAW_DATA_FOLDER / "taxa")
+    logger.info(f"Ingested {len(ingested)} files ")
 
     # Select observations to sample
     try:

@@ -54,7 +54,6 @@ WITH unpacked AS (
 )
 
 SELECT DISTINCT u.* EXCLUDE(u.'description',
-                            u."owners_identification_from_vision",
                             u.tags,
                             u.community_taxon_id,
                             u.taxon_geoprivacy),
@@ -64,7 +63,11 @@ COALESCE(
         try_strptime(d.observed_on_string, '%Y-%m-%d %H:%M:%S %Z'), -- Handles UTC
         try_cast(d.observed_on_string AS TIMESTAMPTZ)               -- Fallback to default
     ) AS observed_on_string,
-d.created_at,
+COALESCE(
+        try_strptime(d.created_at, '%Y-%m-%d %H:%M:%S %z'), -- Handles -0400
+        try_strptime(d.created_at, '%Y-%m-%d %H:%M:%S %Z'), -- Handles UTC
+        try_cast(d.created_at AS TIMESTAMPTZ)               -- Fallback to default
+    ) AS created_at,
 d.quality_grade,
 d.tag_list,
 d.description,
@@ -75,6 +78,7 @@ d.latitude,
 d.longitude,
 d.positional_accuracy,
 d.geoprivacy,
+d.place_guess,
 d.taxon_geoprivacy,
 d.coordinates_obscured,
 d.positioning_method,

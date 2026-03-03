@@ -12,17 +12,13 @@ CASE
     ELSE FALSE
 END AS label,
 observed_on,
-COALESCE(
-        try_strptime(created_at, '%Y-%m-%d %H:%M:%S %z'), -- Handles -0400
-        try_strptime(created_at, '%Y-%m-%d %H:%M:%S %Z'), -- Handles UTC
-        try_cast(created_at AS TIMESTAMPTZ)               -- Fallback to default
-    ) AS created_at_ts,
-created_at_ts - observed_on AS obs_to_submit_lag_days,
+created_at,
+created_at - observed_on AS obs_to_submit_lag_days,
 MONTH(observed_on) AS observed_month,
 WEEK(observed_on) AS observed_week,
 HOUR(observed_on_string) AS observed_hour,
-HOUR(created_at_ts) AS submitted_hour,
-YEAR(created_at_ts) AS submitted_year,
+HOUR(created_at) AS submitted_hour,
+YEAR(created_at) AS submitted_year,
 
 LENGTH(observation_photos) AS photo_count,
 CASE
@@ -49,16 +45,19 @@ positional_accuracy as positional_accuracy_m,
 CASE WHEN coordinates_obscured is not Null THEN TRUE ELSE FALSE END AS obscured,
 geoprivacy,
 taxon_geoprivacy,
-CASE WHEN captive_cultivated IS NOT NULL THEN TRUE ELSE NULL END AS captive
-
-
-
-
-
-
-
-
-
-
+CASE WHEN captive_cultivated IS NOT NULL THEN TRUE ELSE NULL END AS captive,
+oauth_application_id,
+CASE WHEN user.orcid IS NOT NULL THEN TRUE ELSE FALSE END AS has_orcid,
+identifications_count,
+comments_count,
+faves_count,
+LENGTH(reviewed_by) as reviewed_by_count,
+owners_identification_from_vision as owners_id_from_vision,
+LENGTH(identifications) as id_count_total,
+CASE WHEN outlinks is not NULL THEN TRUE ELSE FALSE END AS had_outlink,
+latitude,
+longitude,
+place_guess,
+taxon_id
 
 FROM staged.observations,

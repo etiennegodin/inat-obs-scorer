@@ -21,7 +21,7 @@ class Dependencies:
         self._RAW_DATA_FOLDER = self._DATA_FOLDER / "raw"
         self._PROCESSED_DATA_FOLDER = self._DATA_FOLDER / "processed"
 
-        self.DOWNLOADS_FOLDER = self.RAW_DATA_FOLDER / "downloads"
+        self.DOWNLOADS_FOLDER = self._RAW_DATA_FOLDER / "downloads"
         self.DB_PATH = self._DATA_FOLDER / "inat.duckdb"
 
         self._QUERY_FOLDER = self.root / "queries"

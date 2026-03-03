@@ -3,29 +3,23 @@ from pathlib import Path
 
 import duckdb
 import pandas as pd
-from duckdb import CatalogException
 from sklearn.model_selection import train_test_split
 
 logger = logging.getLogger(__name__)
 
 
 def ingest_downloads(
-    con: duckdb.DuckDBPyConnection, downloads_path: Path
+    con: duckdb.DuckDBPyConnection, table_name: str, downloads_path: Path
 ) -> list[Path]:
-    create_query = f"""CREATE TABLE raw.downloads AS 
+    create_query = f"""CREATE OR REPLACE TABLE raw.{table_name} AS 
             SELECT *
-            FROM read_csv_auto('{downloads_path}/*.csv')"""
+            FROM read_csv_auto('{downloads_path}/*.csv', ignore_errors=true)"""
     files = [file for file in downloads_path.rglob("*.csv")]
     try:
         con.execute(create_query)
         return files
-    except CatalogException:
-        con.execute("DROP TABLE IF EXISTS raw.downloads")
-        try:
-            con.execute(create_query)
-            return files
-        except Exception as e:
-            raise e
+    except Exception as e:
+        raise e
 
 
 def select_sample_observations(
@@ -118,7 +112,7 @@ def select_sample_observations(
     logger.info(f"Selected {df_out.shape[0]} observations")
     try:
         con.execute(
-            """CREATE TABLE OR REPLACE raw.obs_sample AS
+            """CREATE OR REPLACE TABLE raw.obs_sample AS
                     SELECT * 
                     FROM df_out
                     ORDER BY uuid ASC"""
