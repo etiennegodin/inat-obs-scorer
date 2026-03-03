@@ -1,11 +1,6 @@
-2026-03-03 11:18:00 - inatML.app.service - ingest_downloads - INFO - Starting ingest downloads workflow
-2026-03-03 11:18:07 - inatML.workflows.ingest_downloads_workflow - execute - INFO - Ingested 5 files 
-2026-03-03 11:18:12 - inatML.workflows.ingest_downloads_workflow - execute - INFO - Ingested 1 files 
-2026-03-03 11:18:15 - inatML.pipeline.ingest.downloads - select_sample_observations - DEBUG - Raw import 860273
-2026-03-03 11:18:19 - inatML.pipeline.ingest.downloads - select_sample_observations - DEBUG - After cleanup 858661
-2026-03-03 11:18:19 - inatML.pipeline.ingest.downloads - select_sample_observations - DEBUG - After old obs 853619
-2026-03-03 11:18:20 - inatML.pipeline.ingest.downloads - select_sample_observations - DEBUG - After obs count filter 5103 users
-2026-03-03 11:18:20 - inatML.pipeline.ingest.downloads - select_sample_observations - DEBUG - After obs count filter 703 users
-2026-03-03 11:18:20 - inatML.pipeline.ingest.downloads - select_sample_observations - DEBUG - 20062 observations from 374 low user
-2026-03-03 11:18:21 - inatML.pipeline.ingest.downloads - select_sample_observations - DEBUG - 20000 observations from329 high user
-2026-03-03 11:18:21 - inatML.pipeline.ingest.downloads - select_sample_observations - INFO - Selected 40062 observations
+2026-03-03 13:06:34 - inatML.app.service - process_features - INFO - Starting process_features workflow
+2026-03-03 13:06:34 - inatML.utils.db - execute - INFO - Running /home/etienne/projects/inatML/queries/features/observations.sql 
+2026-03-03 13:06:34 - inatML.utils.db - execute - INFO - Running /home/etienne/projects/inatML/queries/features/identifications.sql 
+2026-03-03 13:06:35 - inatML.utils.db - execute - INFO - Running /home/etienne/projects/inatML/queries/features/identifiers.sql 
+2026-03-03 13:06:35 - inatML.utils.db - execute - INFO - Running /home/etienne/projects/inatML/queries/features/taxon.sql 
+2026-03-03 13:06:35 - inatML.utils.db - execute - INFO - Running /home/etienne/projects/inatML/queries/features/training.sql 

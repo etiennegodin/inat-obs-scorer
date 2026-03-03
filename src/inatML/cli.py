@@ -19,8 +19,11 @@ def ingest_cmd(args: Namespace, app: ApplicationService):
         print(e)
 
 
-def process_cmd(args):
-    pass
+def process_cmd(args: Namespace, app: ApplicationService):
+    try:
+        app.process_features()
+    except Exception as e:
+        print(e)
 
 
 def create_parser() -> argparse.ArgumentParser:
