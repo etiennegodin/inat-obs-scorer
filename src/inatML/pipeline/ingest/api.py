@@ -3,6 +3,7 @@ import json
 import logging
 from asyncio import Queue
 from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime
 
 import aiohttp
 import duckdb
@@ -87,8 +88,9 @@ class inatApiClient:
                     for chunk_idx, item_key, data in batch:
                         logger.debug(f"Saved item {item_key}")
                         con.execute(
-                            f"INSERT INTO {self.table_name} VALUES (?, ?, ?)",
+                            f"INSERT INTO {self.table_name} VALUES (?, ?, ?, ?)",
                             (chunk_idx, item_key, json.dumps(data)),
+                            datetime.now(),
                         )
                     con.commit()  # Commit batch
 

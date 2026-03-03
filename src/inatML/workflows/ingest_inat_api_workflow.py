@@ -60,7 +60,7 @@ def execute(deps: Dependencies, limit: Union[None, int] = 200) -> None:
     try:
         con.execute(
             f"""CREATE TABLE IF NOT EXISTS {TABLE_NAME}
-            ( chunk_idx INT, item_key VARCHAR, json JSON)"""
+            ( chunk_idx INT, item_key VARCHAR, json JSON, time VARCHAR)"""
         )
         logger.info(f"Created table {TABLE_NAME}")
     except CatalogException:
