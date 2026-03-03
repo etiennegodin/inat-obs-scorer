@@ -17,7 +17,13 @@ class Dependencies:
     root: Path
 
     def __post_init__(self):
-        self.RAW_DATA_FOLDER = self.root / "data" / "raw"
+        self._DATA_FOLDER = self.root / "data"
+        self._RAW_DATA_FOLDER = self._DATA_FOLDER / "raw"
+        self._PROCESSED_DATA_FOLDER = self._DATA_FOLDER / "processed"
+
         self.DOWNLOADS_FOLDER = self.RAW_DATA_FOLDER / "downloads"
-        self.RAW_DB_PATH = self.RAW_DATA_FOLDER / "raw.duckdb"
-        self.QUERY_FOLDER = self.root / "queries"
+        self.DB_PATH = self._DATA_FOLDER / "inat.duckdb"
+
+        self._QUERY_FOLDER = self.root / "queries"
+        self.RAW_QUERY_FOLDER = self._QUERY_FOLDER / "raw"
+        self.FEATURES_QUERY_FOLDER = self._QUERY_FOLDER / "features"

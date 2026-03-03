@@ -6,7 +6,7 @@ from duckdb import CatalogException
 
 from ..app.container import Dependencies
 from ..pipeline.ingest.api import inatApiClient
-from ..utils.db import _open_connection
+from ..utils.db import SQL_Engine, _open_connection
 
 logger = logging.getLogger(__name__)
 
@@ -50,11 +50,11 @@ fields = {
 
 
 def execute(deps: Dependencies, limit: Union[None, int] = 200) -> None:
-    TABLE_NAME = "ina_api"
+    TABLE_NAME = "raw.inat_api"
     CHUNK_SIZE = 200
     last_id = None
 
-    con = _open_connection(deps.RAW_DB_PATH)
+    con = _open_connection(deps.DB_PATH)
 
     # Create table
     try:
@@ -84,24 +84,31 @@ def execute(deps: Dependencies, limit: Union[None, int] = 200) -> None:
         # Filter items: keep only those > last_id (since ordered ASC)
         new_items_df = items_df.loc[last_id:]
         items = new_items_df.index.to_list()
-        if not items:
-            logger.info("All items already processed")
-            return
+
     else:
         items = items_df.index.to_list()
 
-    items_count = len(items)
+    if items:
+        items_count = len(items)
 
-    # Chunk items for batch processing
-    items_chunks = [items[i : i + CHUNK_SIZE] for i in range(0, len(items), CHUNK_SIZE)]
+        # Chunk items for batch processing
+        items_chunks = [
+            items[i : i + CHUNK_SIZE] for i in range(0, len(items), CHUNK_SIZE)
+        ]
 
-    logger.info(
-        f"Processing {items_count} items in {len(items_chunks)} chunks of {CHUNK_SIZE}"
-    )
+        logger.info(
+            f"Processing {items_count} items in"
+            f"{len(items_chunks)} chunks of {CHUNK_SIZE}"
+        )
 
-    # Set up api
-    api = inatApiClient(TABLE_NAME, fields=fields, limiter=30, per_page=CHUNK_SIZE)
+        # Set up api
+        api = inatApiClient(TABLE_NAME, fields=fields, limiter=30, per_page=CHUNK_SIZE)
 
-    asyncio.run(api.execute(items_chunks, con))
+        asyncio.run(api.execute(items_chunks, con))
+    else:
+        logger.info("All items already processed")
 
-    # execute_sql(deps.QUERY_FOLDER)
+    sql = SQL_Engine(con, deps.RAW_QUERY_FOLDER)
+    sql.execute("unpack_observations")
+    sql.execute("unpack_relative")
+    con.execute()

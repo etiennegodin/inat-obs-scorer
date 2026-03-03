@@ -8,8 +8,8 @@ logger = logging.getLogger(__name__)
 
 
 def execute(deps: Dependencies):
-    con = _open_connection(deps.RAW_DB_PATH)
-
+    con = _open_connection(deps.DB_PATH)
+    con.execute("CREATE SCHEMA raw")
     # Ingest csv files t db
     try:
         ingested = ingest_downloads(con, deps.DOWNLOADS_FOLDER)

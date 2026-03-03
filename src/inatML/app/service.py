@@ -10,7 +10,11 @@ This is the entry point for all use cases. It handles:
 
 import logging
 
-from ..workflows import ingest_downloads_workflow, ingest_inat_api_workflow
+from ..workflows import (
+    ingest_downloads_workflow,
+    ingest_inat_api_workflow,
+    process_features_workflow,
+)
 from .container import Dependencies
 
 logger = logging.getLogger(__name__)
@@ -48,5 +52,12 @@ class ApplicationService:
         logger.info("Starting ingest api workflow")
         try:
             ingest_inat_api_workflow.execute(self.deps, limit=limit)
+        except Exception as e:
+            logger.exception(e)
+
+    def process_features(self):
+        logger.info("Starting process_features workflow")
+        try:
+            process_features_workflow.execute(self.deps)
         except Exception as e:
             logger.exception(e)

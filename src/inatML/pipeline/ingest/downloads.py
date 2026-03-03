@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 def ingest_downloads(
     con: duckdb.DuckDBPyConnection, downloads_path: Path
 ) -> list[Path]:
-    create_query = f"""CREATE TABLE downloads AS 
+    create_query = f"""CREATE TABLE raw.downloads AS 
             SELECT *
             FROM read_csv_auto('{downloads_path}/*.csv')"""
     files = [file for file in downloads_path.rglob("*.csv")]
@@ -20,7 +20,7 @@ def ingest_downloads(
         con.execute(create_query)
         return files
     except CatalogException:
-        con.execute("DROP TABLE IF EXISTS downloads")
+        con.execute("DROP TABLE IF EXISTS raw.downloads")
         try:
             con.execute(create_query)
             return files
@@ -33,7 +33,7 @@ def select_sample_observations(
     target_count: int = 40000,
     filters: dict = {"user_obs": 20, "old": "2020-01-01", "new": "2024-01-01"},
 ) -> None:
-    df = con.execute("SELECT * FROM downloads").df()
+    df = con.execute("SELECT * FROM raw.downloads").df()
     logger.debug(f"Raw import {df.shape[0]}")
 
     # Drop columns NaNs
@@ -116,15 +116,12 @@ def select_sample_observations(
 
     df_out = pd.concat([df_low, df_high_sample])
     logger.info(f"Selected {df_out.shape[0]} observations")
-    create_query = """CREATE TABLE obs_sample AS
+    try:
+        con.execute(
+            """CREATE TABLE OR REPLACE raw.obs_sample AS
                     SELECT * 
                     FROM df_out
                     ORDER BY uuid ASC"""
-    try:
-        con.execute(create_query)
-    except CatalogException:
-        con.execute("DROP TABLE obs_sample")
-        try:
-            con.execute(create_query)
-        except Exception as e:
-            raise e
+        )
+    except Exception as e:
+        raise e

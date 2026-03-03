@@ -1,4 +1,8 @@
-2026-03-02 21:57:14 - inatML.app.service - ingest_api_data - INFO - Starting ingest api workflow
-2026-03-02 21:57:14 - inatML.workflows.ingest_inat_api_workflow - execute - INFO - Created table ina_api
-2026-03-02 21:57:14 - inatML.workflows.ingest_inat_api_workflow - execute - INFO - Resuming from last processed ID: fffd7983-bb38-4203-9f7d-6ea4e5ac3f15
-2026-03-02 21:57:14 - inatML.workflows.ingest_inat_api_workflow - execute - INFO - All items already processed
+2026-03-02 22:16:59 - inatML.app.service - ingest_api_data - INFO - Starting ingest api workflow
+2026-03-02 22:16:59 - inatML.workflows.ingest_inat_api_workflow - execute - INFO - Created table ina_api
+2026-03-02 22:16:59 - inatML.workflows.ingest_inat_api_workflow - execute - INFO - Resuming from last processed ID: fffd7983-bb38-4203-9f7d-6ea4e5ac3f15
+2026-03-02 22:16:59 - inatML.workflows.ingest_inat_api_workflow - execute - INFO - All items already processed
+2026-03-02 22:16:59 - inatML.utils.db - execute - INFO - Running /home/etienne/projects/inatML/queries/unpack_observations.sql 
+2026-03-02 22:17:00 - inatML.utils.db - execute - INFO - Done
+2026-03-02 22:17:00 - inatML.utils.db - execute - INFO - Running /home/etienne/projects/inatML/queries/unpack_relative.sql 
+2026-03-02 22:17:01 - inatML.utils.db - execute - INFO - Done

@@ -1,7 +1,6 @@
-INSTALL json;
-LOAD json;
+CREATE SCHEMA IF NOT EXISTS staged;
 
-CREATE OR REPLACE TABLE observations AS
+CREATE OR REPLACE TABLE staged.observations AS
 
 WITH unpacked AS (
     SELECT obs.*
@@ -50,10 +49,38 @@ WITH unpacked AS (
                 }]
             }'
             ) AS obs
-            FROM ina_api
+            FROM raw.inat_api
         )
 )
 
-SELECT DISTINCT * 
-FROM unpacked
+SELECT DISTINCT u.* EXCLUDE(u.'description',
+                            u."owners_identification_from_vision",
+                            u.tags,
+                            u.community_taxon_id,
+                            u.taxon_geoprivacy),
+d.observed_on,
+COALESCE(
+        try_strptime(d.observed_on_string, '%Y-%m-%d %H:%M:%S %z'), -- Handles -0400
+        try_strptime(d.observed_on_string, '%Y-%m-%d %H:%M:%S %Z'), -- Handles UTC
+        try_cast(d.observed_on_string AS TIMESTAMPTZ)               -- Fallback to default
+    ) AS observed_on_string,
+d.created_at,
+d.quality_grade,
+d.tag_list,
+d.description,
+d.license,
+d.captive_cultivated,
+d.oauth_application_id,
+d.latitude,
+d.longitude,
+d.positional_accuracy,
+d.geoprivacy,
+d.taxon_geoprivacy,
+d.coordinates_obscured,
+d.positioning_method,
+d.taxon_id
+
+FROM unpacked u
+JOIN raw.downloads d ON u.id = d.id 
 ;
+
