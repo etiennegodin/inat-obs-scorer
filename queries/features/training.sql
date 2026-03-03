@@ -1,4 +1,4 @@
-CREATE OR REPLACE TABLE training_features AS
+CREATE OR REPLACE TABLE features.training AS
 SELECT
     -- Identity
     o.observation_id,
@@ -19,7 +19,6 @@ SELECT
     o.geoprivacy IS NOT NULL                AS geoprivacy_set,
     o.captive,                              -- should be FALSE for all training rows
     o.oauth_application_id,
-    o.owners_id_from_vision,
 
     -- Temporal features
     o.obs_to_submit_lag_days,
@@ -63,3 +62,4 @@ LEFT JOIN features.observers ob ON o.user_id = ob.user_id
 LEFT JOIN features.identifications i ON o.observation_id = i.observation_id
 LEFT JOIN features.identifiers id ON o.user_id = id.user_id
 LEFT JOIN features.taxon t ON o.taxon_id = t.taxon_id
+WHERE o.label IS NOT NULL
