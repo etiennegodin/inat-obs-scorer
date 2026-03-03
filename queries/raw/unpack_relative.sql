@@ -3,8 +3,16 @@
 CREATE OR REPLACE TABLE staged.identifications AS
 SELECT 
     o.id AS observation_id,
-    UNNEST(o.identifications, RECURSIVE := true)
-FROM staged.observations o;
+    UNNEST(o.identifications, RECURSIVE := true),
+    t.phylum_id,
+    t.class_id,
+    t.order_id,
+    t.family_id,
+    t.genus_id,
+    t.species_id
+
+FROM staged.observations o
+JOIN staged.taxonomy_encoded t ON o.taxon_id = t.taxon_id;
 
 ALTER TABLE staged.identifications 
 RENAME id_1 TO user_id;

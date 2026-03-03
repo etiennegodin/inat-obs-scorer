@@ -83,9 +83,17 @@ d.place_guess,
 d.taxon_geoprivacy,
 d.coordinates_obscured,
 d.positioning_method,
-d.taxon_id
+d.taxon_id,
+t.phylum_id,
+t.class_id,
+t.order_id,
+t.family_id,
+t.genus_id,
+t.species_id,
+t."taxonRank"
 
 FROM unpacked u
 JOIN raw.downloads d ON u.id = d.id 
+JOIN staged.taxonomy_encoded t on d.taxon_id = t.taxon_id
 ;
 

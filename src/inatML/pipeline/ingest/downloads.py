@@ -88,6 +88,7 @@ def select_sample_observations(
         count += row["obs_count"]
 
     df_low = df[df["user_id"].isin(low_users)]
+    df_low["sampling_pool"] = "broad"
     logger.debug(f"{df_low.shape[0]} observations from {len(low_users)} low user")
 
     # Second half with high count user sampled
@@ -102,10 +103,10 @@ def select_sample_observations(
         stratify=df_user_high_obs["user_id"],
         random_state=43,
     )
-
+    df_high_sample["sampling_pool"] = "power_user"
     logger.debug(
         f"{df_high_sample.shape[0]} observations from"
-        f"{df_high_sample['user_id'].nunique()} high user"
+        f" {df_high_sample['user_id'].nunique()} high user"
     )
 
     df_out = pd.concat([df_low, df_high_sample])

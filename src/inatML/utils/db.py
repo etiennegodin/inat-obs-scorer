@@ -14,7 +14,7 @@ def _open_connection(db_path: str) -> duckdb.DuckDBPyConnection:
         return con
 
     except Exception as e:
-        logger.error(f"Error connection to duckdb {db_path} : \n ", e)
+        logger.exception(f"Error connection to duckdb {db_path} : \n ", e)
         raise IOError(f"Error connecting : {e}")
 
 

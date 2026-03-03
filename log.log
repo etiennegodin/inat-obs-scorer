@@ -1,30 +1,11 @@
-2026-03-03 00:36:51 - inatML.app.service - ingest_downloads - INFO - Starting ingest downloads workflow
-2026-03-03 00:36:58 - inatML.workflows.ingest_downloads_workflow - execute - INFO - Ingested 5 files 
-2026-03-03 00:37:03 - inatML.workflows.ingest_downloads_workflow - execute - INFO - Ingested 1 files 
-2026-03-03 00:37:07 - inatML.pipeline.ingest.downloads - select_sample_observations - DEBUG - Raw import 860273
-2026-03-03 00:37:11 - inatML.pipeline.ingest.downloads - select_sample_observations - DEBUG - After cleanup 858661
-2026-03-03 00:37:12 - inatML.pipeline.ingest.downloads - select_sample_observations - DEBUG - After old obs 853619
-2026-03-03 00:37:13 - inatML.pipeline.ingest.downloads - select_sample_observations - DEBUG - After obs count filter 5103 users
-2026-03-03 00:37:13 - inatML.pipeline.ingest.downloads - select_sample_observations - DEBUG - After obs count filter 703 users
-2026-03-03 00:37:13 - inatML.pipeline.ingest.downloads - select_sample_observations - DEBUG - 20062 observations from 374 low user
-2026-03-03 00:37:14 - inatML.pipeline.ingest.downloads - select_sample_observations - DEBUG - 20000 observations from329 high user
-2026-03-03 00:37:14 - inatML.pipeline.ingest.downloads - select_sample_observations - INFO - Selected 40062 observations
-2026-03-03 00:37:15 - inatML.app.service - ingest_downloads - ERROR - Parser Error: syntax error at or near "OR"
-
-LINE 1: CREATE TABLE OR REPLACE raw.obs_sample AS
-                     ^
-Traceback (most recent call last):
-  File "/home/etienne/projects/inatML/src/inatML/app/service.py", line 47, in ingest_downloads
-    ingest_downloads_workflow.execute(self.deps)
-  File "/home/etienne/projects/inatML/src/inatML/workflows/ingest_downloads_workflow.py", line 27, in execute
-    raise e
-  File "/home/etienne/projects/inatML/src/inatML/workflows/ingest_downloads_workflow.py", line 25, in execute
-    select_sample_observations(con)
-  File "/home/etienne/projects/inatML/src/inatML/pipeline/ingest/downloads.py", line 122, in select_sample_observations
-    raise e
-  File "/home/etienne/projects/inatML/src/inatML/pipeline/ingest/downloads.py", line 115, in select_sample_observations
-    con.execute(
-_duckdb.ParserException: Parser Error: syntax error at or near "OR"
-
-LINE 1: CREATE TABLE OR REPLACE raw.obs_sample AS
-                     ^
+2026-03-03 11:18:00 - inatML.app.service - ingest_downloads - INFO - Starting ingest downloads workflow
+2026-03-03 11:18:07 - inatML.workflows.ingest_downloads_workflow - execute - INFO - Ingested 5 files 
+2026-03-03 11:18:12 - inatML.workflows.ingest_downloads_workflow - execute - INFO - Ingested 1 files 
+2026-03-03 11:18:15 - inatML.pipeline.ingest.downloads - select_sample_observations - DEBUG - Raw import 860273
+2026-03-03 11:18:19 - inatML.pipeline.ingest.downloads - select_sample_observations - DEBUG - After cleanup 858661
+2026-03-03 11:18:19 - inatML.pipeline.ingest.downloads - select_sample_observations - DEBUG - After old obs 853619
+2026-03-03 11:18:20 - inatML.pipeline.ingest.downloads - select_sample_observations - DEBUG - After obs count filter 5103 users
+2026-03-03 11:18:20 - inatML.pipeline.ingest.downloads - select_sample_observations - DEBUG - After obs count filter 703 users
+2026-03-03 11:18:20 - inatML.pipeline.ingest.downloads - select_sample_observations - DEBUG - 20062 observations from 374 low user
+2026-03-03 11:18:21 - inatML.pipeline.ingest.downloads - select_sample_observations - DEBUG - 20000 observations from329 high user
+2026-03-03 11:18:21 - inatML.pipeline.ingest.downloads - select_sample_observations - INFO - Selected 40062 observations
