@@ -13,11 +13,11 @@ LOG(taxon_obs_count) AS taxon_popularity_rank,
 --    is_difficult_group          BOOLEAN,    -- fungi, lichens, bryophytes, micro-invertebrates
 
 -- ID convergence tendency
-AVG(LENGTH(o.identifications)) FILTER (WHERE o.quality_grade = 'research' ) AS taxon_avg_ids_to_rg
+AVG(LENGTH(o.identifications)) FILTER (WHERE o.quality_grade = 'research' ) AS taxon_avg_ids_to_rg,
 --    taxon_pct_needs_community   FLOAT       -- pct that require >1 identifier
 
-
 FROM staged.observations o
+LEFT JOIN features.identifications i ON i.observation_id = o.id
 GROUP BY o.taxon_id
 
 )

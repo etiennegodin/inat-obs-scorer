@@ -1,5 +1,15 @@
 CREATE OR REPLACE TABLE features.observers AS
 
+WITH user_taxon_exposure AS(
+    SELECT
+        o.user_id,
+        AVG(t.taxon_rg_rate) AS expected_rg_rate  -- weighted by their actual obs distribution
+    FROM staged.observations o
+    JOIN features.taxon t ON o.taxon_id = t.taxon_id
+    --WHERE o.created_at < :as_of_date
+    GROUP BY o.user_id
+)
+
 SELECT o.user_id,
 
 -- Volume & tenure
@@ -22,11 +32,15 @@ COUNT(DISTINCT(o.id)) FILTER (
     AND o.observed_on >= now() - INTERVAL '12 months'
     ) AS rg_count_rolling,
 rg_count_rolling / obs_count_last_12m AS rg_rate_last_12m,
+obs_count_total AS obs_count_for_rg_rate,
+obs_count_for_rg_rate >= 20 AS rg_rate_is_reliable,
+
 
 -- Observer reputation score (v0.2 definition)
---expected_rg_rate                FLOAT,      -- from taxon/region baseline (joined from taxon_features)
---observer_reputation_raw         FLOAT,      -- rg_rate_lifetime / expected_rg_rate
---observer_reputation_score       FLOAT,      -- normalized 0-100
+ut.expected_rg_rate as expected_rg_rate,
+rg_rate_lifetime / expected_rg_rate as observer_reputation_raw,
+(observer_reputation_raw - MIN(observer_reputation_raw) OVER ()) * 1.0 /
+    NULLIF(MAX(observer_reputation_raw) OVER() - MIN(observer_reputation_raw) OVER (),0 ) AS observer_reputation_score,
 
 -- Taxonomic behaviour
 COUNT(DISTINCT(o.order_id)) FILTER (WHERE o.order_id > 0) as taxon_diversity_order,
@@ -49,9 +63,5 @@ mode(o.sampling_pool) AS sampling_pool,
 
 FROM staged.observations o 
 JOIN staged.users u ON u.user_id = o.user_id
-GROUP BY o.user_id, u.created_at, u.orcid;
-
-
-
-
---572540
+JOIN user_taxon_exposure ut on o.user_id = ut.user_id 
+GROUP BY o.user_id, u.created_at, u.orcid, ut.expected_rg_rate;
