@@ -44,12 +44,14 @@ COUNT(DISTINCT(o.id)) FILTER (
     ) / obs_count_total AS pct_obs_from_mobile,
 
 
+mode(o.sampling_pool) AS sampling_pool,
 
 
 FROM staged.observations o 
 JOIN staged.users u ON u.user_id = o.user_id
-LEFT JOIN staged.identifications i on o.user_id = i.user_id
-GROUP BY o.user_id, u.created_at, u.orcid
+GROUP BY o.user_id, u.created_at, u.orcid;
+
+
 
 
 --572540

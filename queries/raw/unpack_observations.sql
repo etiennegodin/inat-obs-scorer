@@ -90,10 +90,12 @@ t.order_id,
 t.family_id,
 t.genus_id,
 t.species_id,
-t."taxonRank"
+t."taxonRank",
+s.sampling_pool
 
 FROM unpacked u
 JOIN raw.downloads d ON u.id = d.id 
 JOIN staged.taxonomy_encoded t on d.taxon_id = t.taxon_id
+LEFT JOIN raw.obs_sample s ON u.uuid = s.uuid
 ;
 
