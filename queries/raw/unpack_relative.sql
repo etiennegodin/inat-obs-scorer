@@ -47,3 +47,13 @@ FROM staged.observations o;
 
 ALTER TABLE staged.users
 RENAME id TO user_id;
+
+ALTER TABLE staged.users
+ALTER COLUMN created_at 
+SET DATA TYPE TIMESTAMPTZ 
+USING COALESCE(
+    try_strptime(created_at, '%Y-%m-%d %H:%M:%S %z'), -- Handles -0400
+    try_strptime(created_at, '%Y-%m-%d %H:%M:%S %Z'), -- Handles UTC
+    try_cast(created_at AS TIMESTAMPTZ)               -- Fallback to default
+);
+

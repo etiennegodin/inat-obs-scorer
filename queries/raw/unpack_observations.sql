@@ -57,6 +57,7 @@ SELECT DISTINCT u.* EXCLUDE(u.'description',
                             u.tags,
                             u.community_taxon_id,
                             u.taxon_geoprivacy),
+u.user.id as user_id,
 d.observed_on,
 COALESCE(
         try_strptime(d.observed_on_string, '%Y-%m-%d %H:%M:%S %z'), -- Handles -0400
