@@ -13,7 +13,7 @@ def ingest_cmd(args: Namespace, app: ApplicationService):
         if args.step == "download":
             app.ingest_downloads()
         elif args.step == "api":
-            app.ingest_api_data()
+            app.ingest_api_data(args.limit)
 
     except Exception as e:
         print(e)
@@ -43,6 +43,8 @@ def create_parser() -> argparse.ArgumentParser:
     # Ingest command
     ingest_parser = subparsers.add_parser("ingest", help="NotImplemented")
     ingest_parser.add_argument("step", choices=["download", "api"])
+    ingest_parser.add_argument("--limit", "-l", default=None)
+
     ingest_parser.set_defaults(func=ingest_cmd)
 
     # Process command

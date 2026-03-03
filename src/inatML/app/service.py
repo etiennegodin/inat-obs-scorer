@@ -44,9 +44,9 @@ class ApplicationService:
         except Exception as e:
             logger.exception(e)
 
-    def ingest_api_data(self):
+    def ingest_api_data(self, limit):
         logger.info("Starting ingest api workflow")
         try:
-            ingest_inat_api_workflow.execute(self.deps)
+            ingest_inat_api_workflow.execute(self.deps, limit=limit)
         except Exception as e:
             logger.exception(e)

@@ -10,10 +10,48 @@ from ..utils.db import _open_connection
 
 logger = logging.getLogger(__name__)
 
+# params = {'place_id': place_id['id'] }
+
+fields = {
+    "id": True,
+    "reviewed_by": True,
+    "owners_identification_from_vision": True,
+    "identifications_count": True,
+    "user": {"id": True, "created_at": True, "orcid": True},
+    "description": True,
+    "tags": True,
+    "observation_photos": True,
+    "comments_count": True,
+    "faves_count": True,
+    "outlinks": True,
+    "community_taxon_id": True,
+    "taxon_geoprivacy": True,
+    "place_ids": True,
+    "identifications": {
+        "uuid": True,
+        "created_at": True,
+        "user": {
+            "id": True,
+            "login": True,
+            "observations_count": True,
+            "identifications_count": True,
+            "species_count": True,
+        },
+        "body": True,
+        "category": True,
+        "current": True,
+        "own_observation": True,
+        "vision": True,
+        "disagreement": True,
+        "previous_observation_taxon_id": True,
+        "taxon_id": True,
+    },
+}
+
 
 def execute(deps: Dependencies, limit: Union[None, int] = 200):
     TABLE_NAME = "ina_api"
-    CHUNK_SIZE = 100
+    CHUNK_SIZE = 200
     last_id = None
 
     con = _open_connection(deps.RAW_DB_PATH)
@@ -36,7 +74,7 @@ def execute(deps: Dependencies, limit: Union[None, int] = 200):
 
     # Get last_id from table
     try:
-        last_id = con.execute(f"SELECT MIN(item_key) FROM {TABLE_NAME}").fetchone()[0]
+        last_id = con.execute(f"SELECT MAX(item_key) FROM {TABLE_NAME}").fetchone()[0]
     except Exception as e:
         logger.error(e)
 
@@ -63,8 +101,6 @@ def execute(deps: Dependencies, limit: Union[None, int] = 200):
     logger.info(
         f"Processing {items_count} items in {len(items_chunks)} chunks of {CHUNK_SIZE}"
     )
-
-    fields = {"id": True}
 
     # Set up api
     api = inatApiClient(TABLE_NAME, fields=fields, limiter=30, per_page=CHUNK_SIZE)
