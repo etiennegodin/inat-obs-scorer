@@ -60,8 +60,12 @@ SELECT
     UNNEST(o.user)
 FROM staged.observations o;
 
-ALTER TABLE staged.users
-RENAME id TO user_id;
+CREATE OR REPLACE TABLE staged.users AS
+SELECT DISTINCT(u.id) AS user_id,
+u.* EXCLUDE(id),
+
+FROM staged.users u;
+
 
 ALTER TABLE staged.users
 ALTER COLUMN created_at 
