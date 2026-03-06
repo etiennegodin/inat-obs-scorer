@@ -1,25 +1,27 @@
 
-WITH community_taxon AS
-(
-    SELECT id,
 
+SELECT o.id as observation_id,
 
-    FROM staged.identifications
+COUNT(DISTINCT(i.user_id)) FILTER (WHERE i.own_observation IS FALSE) AS n_identifiers,
 
-)
-
-SELECT o.id
-
-COUNT(DISTINCT(i.user_id)) as n_identifiers
+CASE 
+    WHEN n_identifiers > 0 THEN TRUE
+    ELSE FALSE
+END AS label  
 
 
 FROM staged.observations o 
 JOIN staged.identifications i ON o.id = i.observation_id
-GROUP BY o.id
+JOIN features.community_taxon t ON o.id = t.observation_id
 
 WHERE o.created_at IS NOT NULL
 AND o.latitude IS NOT NULL
 AND LENGTH(o.observation_photos) > 0
 AND o.captive_cultivated is FALSE
+AND t.community_taxon = o.taxon_id
+AND t.consensus_level_rg IS TRUE
+
+GROUP BY o.id
+
 
 

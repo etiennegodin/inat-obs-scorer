@@ -53,10 +53,12 @@ CASE consensus_level
     WHEN 'order'   THEN order_id_map
     ELSE class_id_map
 END AS consensus_level_histogram,
+
+CASE consensus_level
+    WHEN 'species' THEN TRUE
+    ELSE FALSE
+END AS consensus_level_rg,
 unnest(map_keys(consensus_level_histogram))                                          AS community_taxon,
-
-
-
 
 FROM staged.identifications i
 WHERE i."current" IS TRUE
