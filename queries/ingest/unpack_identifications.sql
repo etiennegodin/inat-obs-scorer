@@ -44,35 +44,3 @@ USING COALESCE(
     try_strptime(created_at, '%Y-%m-%d %H:%M:%S %Z'), -- Handles UTC
     try_cast(created_at AS TIMESTAMPTZ)               -- Fallback to default
 );
-
--- photos -- 
-
-CREATE OR REPLACE TABLE staged.photos AS
-SELECT 
-    o.id AS observation_id,
-    UNNEST(o.observation_photos, RECURSIVE := true)
-FROM staged.observations o;
-ALTER TABLE staged.photos
-RENAME id TO photo_id;
-
-CREATE OR REPLACE TABLE staged.users AS
-SELECT 
-    UNNEST(o.user)
-FROM staged.observations o;
-
-CREATE OR REPLACE TABLE staged.users AS
-SELECT DISTINCT(u.id) AS user_id,
-u.* EXCLUDE(id),
-
-FROM staged.users u;
-
-
-ALTER TABLE staged.users
-ALTER COLUMN created_at 
-SET DATA TYPE TIMESTAMPTZ 
-USING COALESCE(
-    try_strptime(created_at, '%Y-%m-%d %H:%M:%S %z'), -- Handles -0400
-    try_strptime(created_at, '%Y-%m-%d %H:%M:%S %Z'), -- Handles UTC
-    try_cast(created_at AS TIMESTAMPTZ)               -- Fallback to default
-);
-

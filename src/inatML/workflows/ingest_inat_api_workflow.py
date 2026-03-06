@@ -108,5 +108,7 @@ def execute(deps: Dependencies, limit: Union[None, int] = 200) -> None:
     sql = SQL_Engine(con, deps.INGEST_QUERY_FOLDER)
     # sql.execute("clean_inat_api")
     sql.execute("unpack_observations")
-    sql.execute("unpack_relative")
+    sql.execute("unpack_identifications")
+    sql.execute("unpack_photos")
+    sql.execute("unpack_users")
     sql.execute("unpack_taxa")
