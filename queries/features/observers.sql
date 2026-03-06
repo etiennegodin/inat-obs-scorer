@@ -1,5 +1,9 @@
 CREATE OR REPLACE TABLE features.observers AS
+
+
 SELECT
+
+-- Keys
     o.id AS observation_id,
     o.user_id,
     o.taxon_id,
@@ -17,11 +21,11 @@ COALESCE(
     ) AS observer_obs_count_at_t,
 
 COALESCE(
-    SUM(CASE WHEN quality_grade = 'research' THEN 1 ELSE 0 END) OVER observer_history, 0
+    SUM(CASE WHEN o.quality_grade = 'research' THEN 1 ELSE 0 END) OVER observer_history, 0
     ) AS observer_rg_count_at_t,
 
 COALESCE(
-    AVG(CASE WHEN quality_grade = 'research' THEN 1.0 ELSE 0 END) OVER observer_history, 0
+    AVG(CASE WHEN o.quality_grade = 'research' THEN 1.0 ELSE 0 END) OVER observer_history, 0
     ) AS observer_rg_rate_at_t,
 
 observer_obs_count_at_t >= 20 AS rg_rate_is_reliable,
@@ -32,7 +36,7 @@ COALESCE(
     ) AS observer_obs_count_12m,
 
 COALESCE(
-    SUM(CASE WHEN quality_grade = 'research' THEN 1.0 ELSE 0 END) OVER observer_12m, 0
+    SUM(CASE WHEN o.quality_grade = 'research' THEN 1.0 ELSE 0 END) OVER observer_12m, 0
     )
     AS observer_rg_count_12m,
 
@@ -41,13 +45,19 @@ COALESCE(
     / NULLIF(COUNT(*) OVER observer_12m, 0), 0
     )AS observer_rg_rate_12m,
 
+
+-- Observer reputation score (v0.2 definition)
+t.taxon_rg_rate as expected_rg_rate,
+observer_rg_rate_at_t / expected_rg_rate as observer_reputation_raw,
+-- (observer_reputation_raw - MIN(observer_reputation_raw) OVER ()) * 1.0 / NULLIF(MAX(observer_reputation_raw) OVER() - MIN(observer_reputation_raw) OVER (),0 ) AS observer_reputation_score,
+
 -- Taxonomic behaviour
 COUNT(DISTINCT(o.order)) FILTER (WHERE o.order IS NOT NULL) OVER observer_history AS taxon_diversity_order,
 COUNT(DISTINCT(o.family)) FILTER (WHERE o.family IS NOT NULL) OVER observer_history AS taxon_diversity_family,
 COUNT(DISTINCT(o.genus)) FILTER (WHERE o.genus IS NOT NULL) OVER observer_history AS taxon_diversity_genus,
 COALESCE(COUNT(DISTINCT(o.species)) FILTER (WHERE o.species IS NOT NULL) OVER observer_history,0) AS taxon_diversity_species,
 
--- Documentation
+-- Documentation records 
 AVG(LENGTH(o.observation_photos)) OVER observer_history AS avg_photo_count,
 COUNT(DISTINCT(o.id)) FILTER (
     WHERE o.description IS NOT NULL
@@ -63,6 +73,7 @@ COUNT(DISTINCT(o.id)) FILTER (
 
 FROM staged.observations o
 JOIN staged.users u ON o.user_id = u.user_id
+JOIN features.taxon t on t.observation_id = o.id
 
 WINDOW
     observer_history AS (

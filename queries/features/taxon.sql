@@ -2,7 +2,7 @@ CREATE OR REPLACE TABLE features.taxon AS
 
 WITH aggregates AS(
 
-    SELECT o.id,
+    SELECT o.id AS observation_id,
     o.taxon_id,
     COALESCE(
         COUNT(*) OVER taxon_history, 0
@@ -10,10 +10,13 @@ WITH aggregates AS(
 
     -- Baseline rates
     COALESCE(
-        SUM(DISTINCT(o.id)) FILTER (
-            CASE WHEN quality_grade = 'research' THEN 1.0 ELSE 0 END
-            ) OVER taxon_history / taxon_obs_count, 0
-        ) AS taxon_rg_rate,
+        COUNT(*) FILTER (
+            WHERE o.quality_grade = 'research'
+            ) OVER taxon_history, 0
+        ) AS taxon_rg_obs,
+    
+    taxon_rg_obs / taxon_obs_count AS taxon_rg_rate_raw,
+    CASE WHEN isnan(taxon_rg_rate_raw) THEN 0 ELSE taxon_rg_rate_raw END AS taxon_rg_rate,
 
     LOG(taxon_obs_count + 1) AS taxon_popularity_rank,
 

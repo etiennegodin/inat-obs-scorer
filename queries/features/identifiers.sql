@@ -1,6 +1,7 @@
 CREATE OR REPLACE TABLE features.identifiers AS
 
-SELECT i.user_id,
+SELECT i.observation_id
+i.user_id,
 
 -- Volume 
 COUNT(DISTINCT(i.id)) AS total_id_count,
