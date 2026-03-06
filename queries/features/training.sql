@@ -29,12 +29,12 @@ SELECT
     o.submitted_year,
 
     -- Observer features (from observer_features, computed pre-split)
-    ob.tenure_days AS obv_tenure_days,
-    ob.obs_count_total AS obv_obs_count_total,
-    ob.rg_rate_lifetime AS obv_rg_rate_lifetime,
-    ob.rg_rate_last_12m AS obv_rg_rate_last_12m,
+    ob.observer_tenure_days AS obv_tenure_days,
+    ob.observer_obs_count_at_t AS obv_obs_count_total,
+    ob.observer_rg_rate_at_t AS obv_rg_rate_lifetime,
+    ob.observer_rg_rate_12m AS obv_rg_rate_last_12m,
     ob.rg_rate_is_reliable AS obv_rg_rate_is_reliable,
-    ob.observer_reputation_score AS obv_reputation_score,
+    --ob.observer_reputation_score AS obv_reputation_score,
     ob.taxon_diversity_family AS obv_taxon_diversity_family,
     ob.taxon_diversity_genus AS obv_taxon_diversity_genus,
     ob.taxon_diversity_species AS obv_taxon_diversity_species,
@@ -43,7 +43,7 @@ SELECT
     ob.pct_obs_with_license AS obv_pct_obs_with_license,
     ob.pct_obs_from_mobile AS obv_pct_obs_from_mobile,
     ob.has_orcid AS obv_has_orcid,
-    ob.sampling_pool AS obv_sampling_pool,
+    --ob.sampling_pool AS obv_sampling_pool,
 
 
     id.ids_given_count,
@@ -58,7 +58,7 @@ SELECT
     t.taxonRank
 
 FROM features.observations o
-LEFT JOIN features.observers ob ON o.user_id = ob.user_id
+LEFT JOIN features.observers ob ON o.observation_id = ob.observation_id
 LEFT JOIN features.identifications i ON o.observation_id = i.observation_id
 LEFT JOIN features.identifiers id ON o.user_id = id.user_id
 LEFT JOIN features.taxon t ON o.taxon_id = t.taxon_id

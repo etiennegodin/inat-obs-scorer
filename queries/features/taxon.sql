@@ -20,6 +20,13 @@ FROM staged.observations o
 LEFT JOIN features.identifications i ON i.observation_id = o.id
 GROUP BY o.taxon_id
 
+WINDOW
+    taxon_history AS (
+        PARTITION BY o.user_id
+        ORDER BY o.created_at
+        ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING
+    )
+
 )
 
 SELECT a.*,
@@ -31,7 +38,8 @@ t.genus,
 t.species,
 t."taxonRank"
 
-
-
 FROM aggregates a 
 LEFT JOIN staged.taxa t on a.taxon_id = t.id
+
+
+
