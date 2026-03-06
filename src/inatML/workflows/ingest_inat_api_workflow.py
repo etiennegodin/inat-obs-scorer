@@ -50,61 +50,46 @@ fields = {
 
 
 def execute(deps: Dependencies, limit: Union[None, int] = 200) -> None:
-    TABLE_NAME = "raw.inat_api"
+    SOURCE_TABLE_NAME = "raw.obs_sample"
+    TARGET_TABLE_NAME = "raw.inat_api"
     CHUNK_SIZE = 200
-    last_id = None
 
     con = _open_connection(deps.DB_PATH)
 
-    # Create table
+    # Create table to receive api data
     try:
         con.execute(
-            f"""CREATE TABLE IF NOT EXISTS {TABLE_NAME}
+            f"""CREATE TABLE IF NOT EXISTS {TARGET_TABLE_NAME}
             ( chunk_idx INT, item_key VARCHAR, json JSON, time VARCHAR)"""
         )
-        logger.info(f"Created table {TABLE_NAME}")
+        logger.info(f"Created table {TARGET_TABLE_NAME}")
     except CatalogException:
         pass
 
-    df = con.execute(
-        f"SELECT * FROM obs_sample {f'LIMIT {limit}' if limit is not None else ''}"
-    ).df()
-    items_df = df.set_index("uuid")
-    print(items_df)
-
-    # Get last_id from table
+    # Get observations from sample table that are not already collected
     try:
-        last_id = con.execute(f"SELECT MAX(item_key) FROM {TABLE_NAME}").fetchone()[0]
-    except Exception as e:
-        logger.error(e)
+        df_samples = con.execute(
+            f"""
+            SELECT s.uuid
+            FROM {SOURCE_TABLE_NAME} s
+            LEFT JOIN {TARGET_TABLE_NAME} t ON s.uuid  = t.item_key
+            WHERE t.item_key IS NULL
+            {f'LIMIT {limit}' if limit is not None else ''}"""
+        ).df()
+    except CatalogException:
+        raise
 
-    # Filter items based on last processed ID (idempotent resume)
-    if last_id is not None:
-        logger.info(f"Resuming from last processed ID: {last_id}")
-        # Filter items: keep only those > last_id (since ordered ASC)
-        new_items_df = items_df.loc[last_id:]
-        items = new_items_df.index.to_list()
-
-    else:
-        items = items_df.index.to_list()
+    # Convert to list
+    items = df_samples["uuid"].to_list()
 
     if items:
-        items_count = len(items)
-
-        # Chunk items for batch processing
-        items_chunks = [
-            items[i : i + CHUNK_SIZE] for i in range(0, len(items), CHUNK_SIZE)
-        ]
-
-        logger.info(
-            f"Processing {items_count} items in"
-            f"{len(items_chunks)} chunks of {CHUNK_SIZE}"
+        # Set up api
+        api = inatApiClient(
+            TARGET_TABLE_NAME, fields=fields, limiter=30, per_page=CHUNK_SIZE
         )
 
-        # Set up api
-        api = inatApiClient(TABLE_NAME, fields=fields, limiter=30, per_page=CHUNK_SIZE)
-
-        asyncio.run(api.execute(items_chunks, con))
+        # Run api
+        asyncio.run(api.execute(items, con))
     else:
         logger.info("All items already processed")
 

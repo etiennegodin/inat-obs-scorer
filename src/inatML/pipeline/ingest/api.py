@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 class inatApiClient:
     def __init__(
         self,
-        name: str,
+        table_name: str,
         explicit_params: dict = None,
         fields: dict = None,
         limiter: int = 60,
@@ -37,9 +37,26 @@ class inatApiClient:
 
         # Init writer
         self.queue = Queue()
-        self.table_name = f"raw.{name}"
+        self.table_name = table_name
 
-    async def execute(self, items_chunks: list[str], con: duckdb.DuckDBPyConnection):
+    def chunk_items(self, items: list[str]) -> list[str]:
+        items_count = len(items)
+
+        # Chunk items for batch processing
+        items_chunks = [
+            items[i : i + self.per_page] for i in range(0, len(items), self.per_page)
+        ]
+
+        logger.info(
+            f"Processing {items_count} items in "
+            f"{len(items_chunks)} chunks of {self.per_page}"
+        )
+        return items_chunks
+
+    async def execute(self, items: list[str], con: duckdb.DuckDBPyConnection):
+        # Chunk items per page
+        items_chunks = self.chunk_items(items)
+
         # Store count of observers (for logger)
         async with aiohttp.ClientSession() as session:
             writer_task = asyncio.create_task(self._write_data(con))
@@ -84,13 +101,29 @@ class inatApiClient:
 
             try:
                 # Run blocking database batch insert in thread pool
-                def batch_insert():
+
+                def batch_insert_v2():
+                    """With datetime metadata"""
                     for chunk_idx, item_key, data in batch:
                         logger.debug(f"Saved item {item_key}")
                         con.execute(
                             f"INSERT INTO {self.table_name} VALUES (?, ?, ?, ?)",
+                            (
+                                chunk_idx,
+                                item_key,
+                                json.dumps(data),
+                                str(datetime.now()),
+                            ),
+                        )
+                    con.commit()  # Commit batch
+
+                def batch_insert():
+                    """Original query"""
+                    for chunk_idx, item_key, data in batch:
+                        logger.debug(f"Saved item {item_key}")
+                        con.execute(
+                            f"INSERT INTO {self.table_name} VALUES (?, ?, ?)",
                             (chunk_idx, item_key, json.dumps(data)),
-                            datetime.now(),
                         )
                     con.commit()  # Commit batch
 
