@@ -24,6 +24,13 @@ HISTOGRAM(i.family)         AS family_map,
 HISTOGRAM(i.genus)          AS genus_map,
 HISTOGRAM(i.species)        AS species_map,
 
+-- Full distribution with taxon_id
+HISTOGRAM(CASE WHEN "taxonRank" = 'class' THEN taxon_id END) AS class_id_map,
+HISTOGRAM(CASE WHEN "taxonRank" = 'order' THEN taxon_id END) AS order_id_map,
+HISTOGRAM(CASE WHEN "taxonRank" = 'family' THEN taxon_id END) AS family_id_map,
+HISTOGRAM(CASE WHEN "taxonRank" = 'genus' THEN taxon_id END) AS genus_id_map,
+HISTOGRAM(CASE WHEN "taxonRank" = 'species' THEN taxon_id END) AS species_id_map,
+
 
 list_max(map_values(class_map))::FLOAT / class_count::FLOAT AS class_top_proportion,
 list_max(map_values(order_map))::FLOAT / order_count::FLOAT AS order_top_proportion,
@@ -40,11 +47,11 @@ CASE
 END AS consensus_level,
 
 CASE consensus_level
-    WHEN 'species' THEN species_map
-    WHEN 'genus'   THEN genus_map
-    WHEN 'family'  THEN family_map
-    WHEN 'order'   THEN order_map
-    ELSE class_map
+    WHEN 'species' THEN species_id_map
+    WHEN 'genus'   THEN genus_id_map
+    WHEN 'family'  THEN family_id_map
+    WHEN 'order'   THEN order_id_map
+    ELSE class_id_map
 END AS consensus_level_histogram,
 unnest(map_keys(consensus_level_histogram))                                          AS community_taxon,
 
