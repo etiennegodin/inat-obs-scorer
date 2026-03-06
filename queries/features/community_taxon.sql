@@ -25,11 +25,11 @@ HISTOGRAM(i.genus)          AS genus_map,
 HISTOGRAM(i.species)        AS species_map,
 
 -- Full distribution with taxon_id
-HISTOGRAM(CASE WHEN "taxonRank" = 'class' THEN taxon_id END) AS class_id_map,
-HISTOGRAM(CASE WHEN "taxonRank" = 'order' THEN taxon_id END) AS order_id_map,
-HISTOGRAM(CASE WHEN "taxonRank" = 'family' THEN taxon_id END) AS family_id_map,
-HISTOGRAM(CASE WHEN "taxonRank" = 'genus' THEN taxon_id END) AS genus_id_map,
-HISTOGRAM(CASE WHEN "taxonRank" = 'species' THEN taxon_id END) AS species_id_map,
+HISTOGRAM(CASE WHEN i."taxonRank" = 'class' THEN i.taxon_id END) AS class_id_map,
+HISTOGRAM(CASE WHEN i."taxonRank" = 'order' THEN i.taxon_id END) AS order_id_map,
+HISTOGRAM(CASE WHEN i."taxonRank" = 'family' THEN i.taxon_id END) AS family_id_map,
+HISTOGRAM(CASE WHEN i."taxonRank" = 'genus' THEN i.taxon_id END) AS genus_id_map,
+HISTOGRAM(CASE WHEN i."taxonRank" = 'species' THEN i.taxon_id END) AS species_id_map,
 
 
 list_max(map_values(class_map))::FLOAT / class_count::FLOAT AS class_top_proportion,
@@ -61,5 +61,11 @@ END AS consensus_level_rg,
 unnest(map_keys(consensus_level_histogram))                                          AS community_taxon,
 
 FROM staged.identifications i
+JOIN staged.observations o ON i.observation_id = o.id
+
+-- non-deleted identfications
 WHERE i."current" IS TRUE
+-- time filter
+AND o.created_at - i.created_at < INTERVAL '90 days'
+
 GROUP BY i.observation_id;

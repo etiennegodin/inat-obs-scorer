@@ -2,26 +2,6 @@ CREATE SCHEMA IF NOT EXISTS features;
 
 CREATE OR REPLACE TABLE features.observations AS 
 
-
-WITH labeled AS(
-
-    SELECT o.id,
-
-    COUNT(i.id) FILTER (
-        WHERE o.created_at - i.created_at < INTERVAL '90 days'  
-        AND o.species IS NOT NULL   
-    ) ids_before,
-
-
-    CASE WHEN ids_before > 0 THEN TRUE ELSE FALSE END AS label,
-
-
-    FROM staged.observations o
-    JOIN staged.identifications i ON o.id = i.observation_id
-    GROUP BY o.id
-
-)
-
 SELECT 
 -- Primary keys & joins
 o.id AS observation_id,
@@ -30,7 +10,6 @@ o.user.id AS user_id,
 
 -- Label (the thing you're predicting)
 l.label,
-l.ids_before,
 o.quality_grade as final_grade,
 
 -- Temporal (submission-time signals)
@@ -99,4 +78,4 @@ o.taxon_id
 -- Metadata
 
 FROM staged.observations o
-JOIN labeled l ON o.id = l.id
+JOIN features.label l ON o.id = l.observation_id
