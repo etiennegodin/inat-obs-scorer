@@ -38,13 +38,23 @@ list_max(map_values(family_map))::FLOAT / family_count::FLOAT AS family_top_prop
 list_max(map_values(genus_map))::FLOAT / genus_count::FLOAT AS genus_top_proportion,
 list_max(map_values(species_map))::FLOAT / specie_count::FLOAT AS species_top_proportion,
 
+
+-- Option A: stop where distinct values = 1 (full agreement)
 CASE
     WHEN species_top_proportion >= (2/3) THEN 'species'
     WHEN genus_top_proportion   >= (2/3)  THEN 'genus'
     WHEN family_top_proportion  >= (2/3) THEN 'family'
     WHEN "order_top_proportion" >= (2/3) THEN 'order'
     ELSE 'class'
+END AS consensus_level_old,
+
+CASE
+    WHEN specie_count = genus_count  THEN 'species'
+    WHEN genus_count   = family_count THEN 'genus'
+    WHEN family_count  = order_count  THEN 'family'
+    ELSE 'order'
 END AS consensus_level,
+
 
 CASE consensus_level
     WHEN 'species' THEN species_id_map

@@ -9,7 +9,11 @@ o.uuid,
 o.user.id AS user_id,
 
 -- Label (the thing you're predicting)
-l.label,
+CASE 
+    WHEN l.label IS TRUE THEN TRUE
+    WHEN l.label IS NULL THEN FALSE
+    ELSE FALSE
+END AS label,  
 o.quality_grade as final_grade,
 
 -- Temporal (submission-time signals)
@@ -78,4 +82,4 @@ o.taxon_id
 -- Metadata
 
 FROM staged.observations o
-JOIN features.label l ON o.id = l.observation_id
+LEFT JOIN features.label l ON o.id = l.observation_id

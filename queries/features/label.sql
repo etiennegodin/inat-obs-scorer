@@ -23,7 +23,7 @@ AND t.consensus_level_rg IS TRUE
 --added time filter
 AND o.created_at - i.created_at < INTERVAL '90 days'
 
-GROUP BY o.id
+GROUP BY o.id;
 
 
 
