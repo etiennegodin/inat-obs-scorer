@@ -45,9 +45,8 @@ SELECT
     ob.has_orcid AS obv_has_orcid,
     --ob.sampling_pool AS obv_sampling_pool,
 
-
-    id.ids_given_count,
-
+    -- v2 identifiers scores 
+    --id.ids_given_count,
 
     -- Taxon features (fixed lookup)
     t.taxon_rg_rate,
@@ -60,6 +59,6 @@ SELECT
 FROM features.observations o
 LEFT JOIN features.observers ob ON o.observation_id = ob.observation_id
 LEFT JOIN features.identifications i ON o.observation_id = i.observation_id
-LEFT JOIN features.identifiers id ON o.user_id = id.user_id
-LEFT JOIN features.taxon t ON o.taxon_id = t.taxon_id
+--LEFT JOIN features.identifiers id ON o.observation_id = id.observation_id
+LEFT JOIN features.taxon t ON o.observation_id = t.observation_id
 WHERE o.label IS NOT NULL

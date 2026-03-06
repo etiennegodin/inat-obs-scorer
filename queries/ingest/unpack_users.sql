@@ -79,7 +79,7 @@ END AS observer_only,
 CASE 
     WHEN a.identifier IS TRUE AND a.observer IS FALSE THEN TRUE
     ELSE FALSE
-END AS identifer_only
+END AS identifier_only
 FROM agg a
 
 
