@@ -10,7 +10,8 @@ WITH user_taxon_exposure AS(
     GROUP BY o.user_id
 )
 
-SELECT o.user_id,
+SELECT o.id,
+o.user_id,
 
 -- Volume & tenure
 current_date as computed_as_of,
