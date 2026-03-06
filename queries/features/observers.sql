@@ -12,33 +12,40 @@ CASE WHEN observer_tenure_days > INTERVAL '730 days' THEN TRUE ELSE FALSE END AS
 CASE WHEN u.orcid IS NOT NULL THEN TRUE ELSE FALSE END AS has_orcid,
 
 -- Observer stats at time T (excluding current observation)
-COUNT(*) OVER observer_history
-    AS observer_obs_count_at_t,
+COALESCE(
+    COUNT(*) OVER observer_history, 0
+    ) AS observer_obs_count_at_t,
 
-SUM(CASE WHEN quality_grade = 'research' THEN 1 ELSE 0 END) OVER observer_history
-    AS observer_rg_count_at_t,
+COALESCE(
+    SUM(CASE WHEN quality_grade = 'research' THEN 1 ELSE 0 END) OVER observer_history, 0
+    ) AS observer_rg_count_at_t,
 
-AVG(CASE WHEN quality_grade = 'research' THEN 1.0 ELSE 0 END) OVER observer_history
-    AS observer_rg_rate_at_t,
+COALESCE(
+    AVG(CASE WHEN quality_grade = 'research' THEN 1.0 ELSE 0 END) OVER observer_history, 0
+    ) AS observer_rg_rate_at_t,
 
 observer_obs_count_at_t >= 20 AS rg_rate_is_reliable,
 
 -- Observer 12months stats at time T 
-COUNT(*) OVER observer_12m
-        AS observer_obs_count_12m,
+COALESCE(
+    COUNT(*) OVER observer_12m, 0
+    ) AS observer_obs_count_12m,
 
-SUM(CASE WHEN quality_grade = 'research' THEN 1.0 ELSE 0 END) OVER observer_12m
+COALESCE(
+    SUM(CASE WHEN quality_grade = 'research' THEN 1.0 ELSE 0 END) OVER observer_12m, 0
+    )
     AS observer_rg_count_12m,
 
-SUM(CASE WHEN quality_grade = 'research' THEN 1.0 ELSE 0 END) OVER observer_12m
-/ NULLIF(COUNT(*) OVER observer_12m, 0)
-    AS observer_rg_rate_12m,
+COALESCE(
+    SUM(CASE WHEN quality_grade = 'research' THEN 1.0 ELSE 0 END) OVER observer_12m
+    / NULLIF(COUNT(*) OVER observer_12m, 0), 0
+    )AS observer_rg_rate_12m,
 
 -- Taxonomic behaviour
 COUNT(DISTINCT(o.order)) FILTER (WHERE o.order IS NOT NULL) OVER observer_history AS taxon_diversity_order,
 COUNT(DISTINCT(o.family)) FILTER (WHERE o.family IS NOT NULL) OVER observer_history AS taxon_diversity_family,
 COUNT(DISTINCT(o.genus)) FILTER (WHERE o.genus IS NOT NULL) OVER observer_history AS taxon_diversity_genus,
-COUNT(DISTINCT(o.species)) FILTER (WHERE o.species IS NOT NULL) OVER observer_history AS taxon_diversity_species,
+COALESCE(COUNT(DISTINCT(o.species)) FILTER (WHERE o.species IS NOT NULL) OVER observer_history,0) AS taxon_diversity_species,
 
 -- Documentation
 AVG(LENGTH(o.observation_photos)) OVER observer_history AS avg_photo_count,
