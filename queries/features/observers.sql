@@ -7,7 +7,7 @@ SELECT
     o.quality_grade,
 
 -- Temporal & status
-o.created_at - u.created_at as observer_tenure_days,
+o.created_at - u.created_at AS observer_tenure_days,
 CASE WHEN observer_tenure_days > INTERVAL '730 days' THEN TRUE ELSE FALSE END AS is_veteran,
 CASE WHEN u.orcid IS NOT NULL THEN TRUE ELSE FALSE END AS has_orcid,
 

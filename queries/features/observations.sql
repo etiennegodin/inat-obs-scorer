@@ -14,7 +14,7 @@ CASE
     WHEN l.label IS NULL THEN FALSE
     ELSE FALSE
 END AS label,  
-o.quality_grade as final_grade,
+o.quality_grade AS final_grade,
 
 -- Temporal (submission-time signals)
 
@@ -32,15 +32,15 @@ LENGTH(o.observation_photos) AS photo_count,
 CASE
     WHEN o.description is not NULL THEN TRUE
     ELSE FALSE
-END as has_description,
+END AS has_description,
 CASE
     WHEN o.tag_list is not NULL THEN TRUE
     ELSE FALSE
-END as has_tags,
+END AS has_tags,
 CASE
     WHEN o.tag_list is not NULL THEN LENGTH(tag_list)
     ELSE FALSE
-END as tag_count,
+END AS tag_count,
 CASE 
     WHEN o.license IS NOT NULL THEN license
     ELSE NULL
@@ -49,7 +49,7 @@ CASE
     WHEN o.license IS NOT NULL THEN TRUE
     ELSE FALSE
 END AS has_license,
-o.positional_accuracy as positional_accuracy_m,
+o.positional_accuracy AS positional_accuracy_m,
 CASE WHEN o.coordinates_obscured is not Null THEN TRUE ELSE FALSE END AS obscured,
 o.geoprivacy,
 o.taxon_geoprivacy,
@@ -59,15 +59,15 @@ COALESCE(
 ) AS captive,
 o.oauth_application_id,
 CASE WHEN o.user.orcid IS NOT NULL THEN TRUE ELSE FALSE END AS has_orcid,
-o.owners_identification_from_vision as owners_id_from_vision,
+o.owners_identification_from_vision AS owners_id_from_vision,
 
 
 -- Community engagement (post-submission signals — use carefully, see notes)
 --identifications_count,
 --comments_count,
 --faves_count,
---LENGTH(reviewed_by) as reviewed_by_count,
---LENGTH(identifications) as id_count_total,
+--LENGTH(reviewed_by) AS reviewed_by_count,
+--LENGTH(identifications) AS id_count_total,
 --CASE WHEN outlinks is not NULL THEN TRUE ELSE FALSE END AS had_outlink,
 
 

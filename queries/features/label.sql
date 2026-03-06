@@ -1,6 +1,6 @@
 CREATE OR REPLACE TABLE features.label AS
 
-SELECT o.id as observation_id,
+SELECT o.id AS observation_id,
 
 COUNT(DISTINCT(i.user_id)) FILTER (WHERE i.own_observation IS FALSE) AS n_identifiers,
 

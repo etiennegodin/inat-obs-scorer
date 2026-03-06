@@ -21,10 +21,10 @@ COUNT(DISTINCT(i.id)) FILTER (
 
 
 -- Taxonomic behaviour
-COUNT(DISTINCT(i.order)) FILTER (WHERE i.order IS NOT NULL) as taxon_diversity_order,
-COUNT(DISTINCT(i.family)) FILTER (WHERE i.family IS NOT NULL) as taxon_diversity_family,
-COUNT(DISTINCT(i.genus)) FILTER (WHERE i.genus IS NOT NULL) as taxon_diversity_genus,
-COUNT(DISTINCT(i.species)) FILTER (WHERE i.species IS NOT NULL) as taxon_diversity_species,
+COUNT(DISTINCT(i.order)) FILTER (WHERE i.order IS NOT NULL) AS taxon_diversity_order,
+COUNT(DISTINCT(i.family)) FILTER (WHERE i.family IS NOT NULL) AS taxon_diversity_family,
+COUNT(DISTINCT(i.genus)) FILTER (WHERE i.genus IS NOT NULL) AS taxon_diversity_genus,
+COUNT(DISTINCT(i.species)) FILTER (WHERE i.species IS NOT NULL) AS taxon_diversity_species,
 
 FROM staged.identifications i
 GROUP BY i.user_id

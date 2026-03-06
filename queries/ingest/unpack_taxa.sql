@@ -6,7 +6,7 @@ class,
 "order",
 family,
 genus,
-specificEpithet as species,
+specificEpithet AS species,
 taxonRank
 
 FROM raw.taxa
@@ -16,7 +16,7 @@ WHERE kingdom = 'Plantae';
 -- 1. Create the lookup table
 CREATE OR REPLACE TABLE staged.taxonomy_encoded AS
 SELECT 
-    id as taxon_id,
+    id AS taxon_id,
     "taxonRank",
     printf('%02d-%03d-%04d-%04d-%06d-%06d', 
         DENSE_RANK() OVER (ORDER BY phylum),
