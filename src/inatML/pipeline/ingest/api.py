@@ -9,6 +9,7 @@ from datetime import datetime
 import aiohttp
 import duckdb
 from aiolimiter import AsyncLimiter
+from tqdm.asyncio import tqdm_asyncio
 
 from ...utils.git import get_git_hash
 
@@ -55,23 +56,9 @@ class inatApiClient:
         # Get git has for version
         self.version = get_git_hash(short=True)
 
-    def chunk_items(self, items: list[str]) -> list[str]:
-        items_count = len(items)
-
-        # Chunk items for batch processing
-        items_chunks = [
-            items[i : i + self.per_page] for i in range(0, len(items), self.per_page)
-        ]
-
-        logger.info(
-            f"Processing {items_count} items in "
-            f"{len(items_chunks)} chunks of {self.per_page}"
-        )
-        return items_chunks
-
     async def execute(self, items: list[str], con: duckdb.DuckDBPyConnection):
         # Chunk items per page
-        items_chunks = self.chunk_items(items)
+        items_chunks = self._chunk_items(items)
 
         # Store count of observers (for logger)
         async with aiohttp.ClientSession() as session:
@@ -86,7 +73,7 @@ class inatApiClient:
                     asyncio.create_task(self._fetch_data(session, items_key, chunk_idx))
                 )
 
-            await asyncio.gather(*fetchers)
+            await tqdm_asyncio.gather(*fetchers)
             await self.queue.join()
             await self.queue.put(None)
             await writer_task
@@ -169,8 +156,6 @@ class inatApiClient:
                     r.raise_for_status()
                     data = await r.json()
                     response_time = int((time.monotonic() - start) * 1000)
-                    print(response_time)
-
                     if data and "results" in data:
                         results = data["results"]
 
@@ -192,13 +177,25 @@ class inatApiClient:
                         if isinstance(results, list):
                             for result in data["results"]:  # iterate list of dicts
                                 await _put_in_queue(result)
-
-                        logger.info(f"Fetched {len(data['results'])} observations")
                     else:
                         logger.warning(f"No results found for IDs {item_key}")
             except Exception as e:
                 logger.error(r.url)
                 logger.error(f"API request FAILED for IDs {item_key}: {e}")
+
+    def _chunk_items(self, items: list[str]) -> list[str]:
+        items_count = len(items)
+
+        # Chunk items for batch processing
+        items_chunks = [
+            items[i : i + self.per_page] for i in range(0, len(items), self.per_page)
+        ]
+
+        logger.info(
+            f"Processing {items_count} items in "
+            f"{len(items_chunks)} chunks of {self.per_page}"
+        )
+        return items_chunks
 
 
 # Convert to the special syntax
