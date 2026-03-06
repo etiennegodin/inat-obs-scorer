@@ -25,5 +25,5 @@ class Dependencies:
         self.DB_PATH = self._DATA_FOLDER / "inat.duckdb"
 
         self._QUERY_FOLDER = self.root / "queries"
-        self.RAW_QUERY_FOLDER = self._QUERY_FOLDER / "raw"
+        self.INGEST_QUERY_FOLDER = self._QUERY_FOLDER / "ingest"
         self.FEATURES_QUERY_FOLDER = self._QUERY_FOLDER / "features"

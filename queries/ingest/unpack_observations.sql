@@ -6,7 +6,7 @@ WITH unpacked AS (
     SELECT obs.*
     FROM (
         SELECT from_json(
-            json,
+            raw_json,
             '{
                 "uuid":"VARCHAR",
                 "id":"UBIGINT",

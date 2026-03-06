@@ -13,7 +13,8 @@ authors = [{ name="Etienne Godin", email="etiennegodin@duck.com" }]
 
 dependencies = [
     "pandas",
-    "scikit-learn"
+    "scikit-learn",
+    "tdqm"
 ]
 
 [project.optional-dependencies]

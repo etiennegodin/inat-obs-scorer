@@ -20,7 +20,6 @@ WITH labeled AS(
     JOIN staged.identifications i ON o.id = i.observation_id
     GROUP BY o.id
 
-
 )
 
 SELECT 

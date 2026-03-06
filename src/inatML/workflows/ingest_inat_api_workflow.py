@@ -60,7 +60,19 @@ def execute(deps: Dependencies, limit: Union[None, int] = 200) -> None:
     try:
         con.execute(
             f"""CREATE TABLE IF NOT EXISTS {TARGET_TABLE_NAME}
-            ( chunk_idx INT, item_key VARCHAR, json JSON, time VARCHAR)"""
+            (
+            raw_id VARCHAR,
+            raw_json JSON,
+
+            scraped_at VARCHAR,
+            api_page INT,
+            api_per_page INT,
+            request_params JSON,
+            response_time_ms INT,
+            http_status_code INT,
+            scrapper_version VARCHAR,
+
+            )"""
         )
         logger.info(f"Created table {TARGET_TABLE_NAME}")
     except CatalogException:
@@ -72,8 +84,8 @@ def execute(deps: Dependencies, limit: Union[None, int] = 200) -> None:
             f"""
             SELECT s.uuid
             FROM {SOURCE_TABLE_NAME} s
-            LEFT JOIN {TARGET_TABLE_NAME} t ON s.uuid  = t.item_key
-            WHERE t.item_key IS NULL
+            LEFT JOIN {TARGET_TABLE_NAME} t ON s.uuid  = t.raw_id
+            WHERE t.raw_id IS NULL
             {f'LIMIT {limit}' if limit is not None else ''}"""
         ).df()
     except CatalogException:
@@ -93,7 +105,8 @@ def execute(deps: Dependencies, limit: Union[None, int] = 200) -> None:
     else:
         logger.info("All items already processed")
 
-    sql = SQL_Engine(con, deps.RAW_QUERY_FOLDER)
+    sql = SQL_Engine(con, deps.INGEST_QUERY_FOLDER)
+    # sql.execute("clean_inat_api")
     sql.execute("unpack_observations")
     sql.execute("unpack_relative")
     sql.execute("unpack_taxa")

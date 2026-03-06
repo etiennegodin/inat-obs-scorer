@@ -1,6 +1,7 @@
 import asyncio
 import json
 import logging
+import time
 from asyncio import Queue
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
@@ -8,6 +9,8 @@ from datetime import datetime
 import aiohttp
 import duckdb
 from aiolimiter import AsyncLimiter
+
+from ...utils.git import get_git_hash
 
 logger = logging.getLogger(__name__)
 
@@ -23,21 +26,34 @@ class inatApiClient:
     ):
         # Init api
         self.base_url = "https://api.inaturalist.org/v2/observations/"
+        self.per_page = per_page
+        self.table_name = table_name
 
+        # Convert fields dict to request format
         if fields is not None:
             self.fields = f"({fields_to_string(fields)})"
         else:
             self.fields = None
 
-        self.explicit_params = explicit_params
+        # Set request params
+        if explicit_params is not None:
+            self.params = explicit_params
+        else:
+            self.params = {}
 
-        # Init fetch behaviour
-        self.per_page = per_page
+        # Add default params
+        self.params["per_page"] = self.per_page
+        if self.fields is not None:
+            self.params["fields"] = self.fields
+
+        # Set limiter
         self.limiter = AsyncLimiter(limiter, 60)
 
         # Init writer
         self.queue = Queue()
-        self.table_name = table_name
+
+        # Get git has for version
+        self.version = get_git_hash(short=True)
 
     def chunk_items(self, items: list[str]) -> list[str]:
         items_count = len(items)
@@ -102,28 +118,24 @@ class inatApiClient:
             try:
                 # Run blocking database batch insert in thread pool
 
-                def batch_insert_v2():
-                    """With datetime metadata"""
-                    for chunk_idx, item_key, data in batch:
+                def batch_insert():
+                    for chunk_idx, item_key, data, response_time, status in batch:
                         logger.debug(f"Saved item {item_key}")
                         con.execute(
-                            f"INSERT INTO {self.table_name} VALUES (?, ?, ?, ?)",
+                            f"""INSERT INTO {self.table_name} VALUES (
+                            ?, ?, ?, ?, ?, ?, ?, ?, ? 
+                            )""",
                             (
-                                chunk_idx,
                                 item_key,
                                 json.dumps(data),
                                 str(datetime.now()),
+                                chunk_idx,
+                                self.per_page,
+                                json.dumps(self.params),
+                                response_time,
+                                status,
+                                self.version,
                             ),
-                        )
-                    con.commit()  # Commit batch
-
-                def batch_insert():
-                    """Original query"""
-                    for chunk_idx, item_key, data in batch:
-                        logger.debug(f"Saved item {item_key}")
-                        con.execute(
-                            f"INSERT INTO {self.table_name} VALUES (?, ?, ?)",
-                            (chunk_idx, item_key, json.dumps(data)),
                         )
                     con.commit()  # Commit batch
 
@@ -146,28 +158,19 @@ class inatApiClient:
         """Fetch data for multiple IDs in
         a single request using comma-separated ID string"""
 
-        # Set params
-        if self.explicit_params is not None:
-            params = self.explicit_params
-        else:
-            params = {}
-
-        # Set fields
-        if self.fields is not None:
-            params["fields"] = self.fields
-
-        # Per-page param
-        params["per_page"] = self.per_page
-
         # Append observation ids to url
         url = self.base_url + (item_key)
 
         async with self.limiter:
             try:
-                async with session.get(url, params=params, timeout=10) as r:
+                start = time.monotonic()
+                async with session.get(url, params=self.params, timeout=10) as r:
                     logger.debug(r.url)
                     r.raise_for_status()
                     data = await r.json()
+                    response_time = int((time.monotonic() - start) * 1000)
+                    print(response_time)
+
                     if data and "results" in data:
                         results = data["results"]
 
@@ -175,7 +178,13 @@ class inatApiClient:
                             item_key = result_to_add["uuid"]
                             try:
                                 await self.queue.put(
-                                    (chunk_idx, item_key, result_to_add)
+                                    (
+                                        chunk_idx,
+                                        item_key,
+                                        result_to_add,
+                                        response_time,
+                                        r.status,
+                                    )
                                 )
                             except Exception as e:
                                 logger.error(f"FAILED to queue result: {e}")
