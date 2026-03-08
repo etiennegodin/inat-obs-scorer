@@ -1,38 +1,17 @@
-# inat-obs-scorer
+# inat-obs-scorer v0.1
 
-> Early triage machine learning model for inaturalist observations
 
-> Which “Needs ID” observations are most likely to reach Research Grade if reviewed soon?
+> Expert Review Prioritization Engine for inaturalist
 
-"I modeled consensus formation in citizen science and built a prioritization engine to improve expert review efficiency using time-aware supervised learning and calibrated ranking models."
-
-Product prompt:
-
-Experts are overwhelmed.
-Thousands of “Needs ID” observations sit untouched.
-We want to prioritize:
-- Observations likely to be misidentified
-- Observations likely to reach Research Grade with one more ID
-- Observations from underrepresented taxa/regions
-
-Resource allocation modeling
-Ranking problem
-Time-window prediction
-
-## Features
-- Data pipeline for inaturalist observations
-- CLI interface
-
+Which “Needs ID” observations are most likely to reach Research Grade if reviewed soon?
 
 ## Data Challenges 
 
-- Avoid temporal leakage and reconstruct features at time $t$
+- Avoid temporal leakage and reconstruct features at time of observation submission
     - Reconstruct identifications history per observation 
     - Reconstruct community taxon from identifications using iNaturalist's algorithm
-        - Taxonomic hierarchy   
+        - Taxonomic hierarchy
     - Reconstruct research grade in history based using community taxon
-
-
 
 
 ## Installation
@@ -55,55 +34,74 @@ inat_pipe ingest
 inat_pipe process
 ```
 
-### Model 
-
+### Model
 ```bash
-# Runs model
-inat_pipe model
+# Unpacks raw data, creates features 
+
+inat_pipe model*
 ```
+*Not Implemented
+
 
 ## Domain Model
 ```
 Observer quality     → Observation documentation quality
+Identifier quality   → Identifier knowlege of the species
 Taxon difficulty     → Community attention required
 Geographic activity  → Speed of community response
+Community consensus  → 
 Observation recency  → Has time even elapsed?
                               ↓
                     Research Grade (outcome)
 ```
 
-## Main Features
+## Main Engineered Features
 
+| Group                     | Features                                                           |
+| ------------------------- | ------------------------------------------------------------------ |
+| Observer history          | historical RG rate, total obs count, tenure days, taxa diversity   |
+| Identifiers history*       | historical RG rate, total id count, tenure days, taxa diversity    |
+| Observation documentation | photo count, has notes, coordinate uncertainty                     |
+| Taxon context             | taxon rank, taxon-level baseline RG rate,                          |
+| Temporal                  | day of year, time since submission, hour of day                    |
+| Community signals*         | number of IDs already received, ID agreement rate so far           |
+| Geographic context*      | regional iNat activity density, distance to nearest urban center |
 
-- Windowed macros 
-    - Community taxon
-    - Research Grade 
-
+*Not Implemented
 
 ## Data Pipeline Architecture
 
 ```
 [Raw Source]
-    iNaturalist Open Data (AWS S3 — public Parquet/CSV dumps, updated monthly)
-    + GBIF export if needed
+    iNaturalist observations exports 
+    + Low rate queries on [inaturalist's api](api.inaturalist/v1/docs/)
           ↓
 [Storage Layer]
-    Local: DuckDB database + Parquet files organized by partition (taxon/year)
+    Local: DuckDB database
           ↓
 [Feature Engineering Layer]
-    Python modules per feature group (observer_features.py, taxon_features.py, etc.)
+    Python features module running sql queries
     All transforms are reproducible and testable
           ↓
-[Training Dataset]
+[Training Dataset]*
     Snapshot at time T, label = RG status at T+90 days
-    Important: respect temporal ordering — no future leakage
           ↓
-[Model Registry]
+[Model Registry]*
     MLflow tracking (params, metrics, artifacts)
           ↓
-[Serving Layer]
+[Serving Layer]*
     FastAPI endpoint: POST /score → returns {observation_id, rg_probability, rank}
+
+* Not Implemented
 ```
+
+## Model Features
+- Data pipeline for inaturalist observations
+- Internal Dashboard API*
+- CLI interface
+
+*Not Implemented
+
 
 ## Roadmap
 
@@ -113,9 +111,19 @@ Observation recency  → Has time even elapsed?
 - mlFlow and Optuna setup
 - Simple logistic regression model on subset of features as baseline
 
-### v0.2 - Extended user features and Real Model
+### v0.2 - Extended user features, real model, evaluation strategy
+- LightGBM model 
+- Optuna tuning
+- SHAP analysis
 
 ### v0.3 - System design
 
+- Model wrapped in FastApi 
+
 ### v0.4 - Ranking and expert routing
+
+- Survival model (time-to-RG)
+- ID velocity features (time-to-first-ID, ID burst patterns)
+- Specific rare species to expert
+
 
