@@ -2,7 +2,8 @@ CREATE OR REPLACE TABLE features.taxon AS
 
 WITH aggregates AS(
 
-    SELECT o.id AS observation_id,
+    SELECT 
+    o.id AS observation_id,
     o.taxon_id,
     COALESCE(
         COUNT(*) OVER taxon_history, 0

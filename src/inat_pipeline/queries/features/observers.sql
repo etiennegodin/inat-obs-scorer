@@ -15,14 +15,15 @@ o.created_at - u.created_at AS observer_tenure_days,
 CASE WHEN observer_tenure_days > INTERVAL '730 days' THEN TRUE ELSE FALSE END AS is_veteran,
 CASE WHEN u.orcid IS NOT NULL THEN TRUE ELSE FALSE END AS has_orcid,
 
+COALESCE(
+    research_grade_windowed(INTERVAL '999 years'),
+    0
+    ) AS observer_rg_count_at_t
+
 -- Observer stats at time T (excluding current observation)
 COALESCE(
     COUNT(*) OVER observer_history, 0
     ) AS observer_obs_count_at_t,
-
-COALESCE(
-    SUM(CASE WHEN o.quality_grade = 'research' THEN 1 ELSE 0 END) OVER observer_history, 0
-    ) AS observer_rg_count_at_t,
 
 COALESCE(
     AVG(CASE WHEN o.quality_grade = 'research' THEN 1.0 ELSE 0 END) OVER observer_history, 0
