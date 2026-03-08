@@ -68,9 +68,10 @@ with_consensus AS(
 )
 
 SELECT 
-    observation_id,
-    consensus_level,
-    consensus_level = 'species' AS consensus_level_rg,
+    *,
+    --observation_id,
+    --consensus_level,
+    --consensus_level = 'species' AS consensus_level_rg,
     CASE consensus_level
         WHEN 'species' THEN species_id_map
         WHEN 'genus'   THEN genus_id_map

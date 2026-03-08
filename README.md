@@ -27,9 +27,10 @@ Time-window prediction
 ## Data Challenges 
 
 - Avoid temporal leakage and reconstruct features at time $t$
-    - Reconstruct identifications history 
-    - Reconstruct community taxon from identifications
-    - Reconstruct research grade in history based on identifications (not user current label from data)
+    - Reconstruct identifications history per observation 
+    - Reconstruct community taxon from identifications using iNaturalist's algorithm
+        - Taxonomic hierarchy   
+    - Reconstruct research grade in history based using community taxon
 
 
 
@@ -43,15 +44,22 @@ pip install inat_pipeline
 ## Pipeline modules
 
 ### Ingest
-```
-#Ingests data sources, run api queries
+```bash
+#Ingests data sources, runs api queries and stores to db
 inat_pipe ingest
 ```
 
 ### Process
-```
-# Process features 
+```bash
+# Unpacks raw data, creates features 
 inat_pipe process
+```
+
+### Model 
+
+```bash
+# Runs model
+inat_pipe model
 ```
 
 ## Domain Model
@@ -66,8 +74,10 @@ Observation recency  → Has time even elapsed?
 
 ## Main Features
 
-```
-```
+
+- Windowed macros 
+    - Community taxon
+    - Research Grade 
 
 
 ## Data Pipeline Architecture
