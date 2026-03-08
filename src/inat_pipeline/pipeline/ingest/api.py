@@ -4,6 +4,7 @@ import logging
 import time
 from asyncio import Queue
 from concurrent.futures import ThreadPoolExecutor
+from dataclasses import dataclass, field
 from datetime import datetime
 
 import aiohttp
@@ -16,31 +17,36 @@ from ...utils.git import get_git_hash
 logger = logging.getLogger(__name__)
 
 
+def fields_to_string(fields_dict, level=0):
+    parts = []
+    for key, value in fields_dict.items():
+        if isinstance(value, dict):
+            nested = fields_to_string(value, level + 1)
+            parts.append(f"{key}:({nested})")
+        elif value is True:
+            parts.append(f"{key}:!t")
+    return ",".join(parts)
+
+
+@dataclass
+class inatApiConfig:
+    fields: dict = field(default_factory=dict)
+    limiter: int
+    per_page: int = 200
+
+
 class inatApiClient:
-    def __init__(
-        self,
-        table_name: str,
-        explicit_params: dict = None,
-        fields: dict = None,
-        limiter: int = 60,
-        per_page: int = 200,
-    ):
+    def __init__(self, table_name: str, config: inatApiConfig):
         # Init api
         self.base_url = "https://api.inaturalist.org/v2/observations/"
-        self.per_page = per_page
+        self.per_page = config.per_page
         self.table_name = table_name
 
         # Convert fields dict to request format
-        if fields is not None:
-            self.fields = f"({fields_to_string(fields)})"
-        else:
-            self.fields = None
+        self.fields = f"({fields_to_string(config.fields)})"
 
-        # Set request params
-        if explicit_params is not None:
-            self.params = explicit_params
-        else:
-            self.params = {}
+        # Init params
+        self.params = {}
 
         # Add default params
         self.params["per_page"] = self.per_page
@@ -48,7 +54,7 @@ class inatApiClient:
             self.params["fields"] = self.fields
 
         # Set limiter
-        self.limiter = AsyncLimiter(limiter, 60)
+        self.limiter = AsyncLimiter(config.limiter, 60)
 
         # Init writer
         self.queue = Queue()
@@ -196,15 +202,3 @@ class inatApiClient:
             f"{len(items_chunks)} chunks of {self.per_page}"
         )
         return items_chunks
-
-
-# Convert to the special syntax
-def fields_to_string(fields_dict, level=0):
-    parts = []
-    for key, value in fields_dict.items():
-        if isinstance(value, dict):
-            nested = fields_to_string(value, level + 1)
-            parts.append(f"{key}:({nested})")
-        elif value is True:
-            parts.append(f"{key}:!t")
-    return ",".join(parts)

@@ -5,48 +5,11 @@ from typing import Union
 from duckdb import CatalogException
 
 from ..app.container import Dependencies
-from ..pipeline.ingest.api import inatApiClient
-from ..utils.db import SQL_Engine, _open_connection
+from ..pipeline.ingest.api import inatApiClient, inatApiConfig
+from ..utils.config import read_config
+from ..utils.db import _open_connection
 
 logger = logging.getLogger(__name__)
-
-# params = {'place_id': place_id['id'] }
-
-fields = {
-    "id": True,
-    "reviewed_by": True,
-    "owners_identification_from_vision": True,
-    "identifications_count": True,
-    "user": {"id": True, "created_at": True, "orcid": True},
-    "description": True,
-    "tags": True,
-    "observation_photos": True,
-    "comments_count": True,
-    "faves_count": True,
-    "outlinks": True,
-    "community_taxon_id": True,
-    "taxon_geoprivacy": True,
-    "place_ids": True,
-    "identifications": {
-        "uuid": True,
-        "created_at": True,
-        "user": {
-            "id": True,
-            "login": True,
-            "observations_count": True,
-            "identifications_count": True,
-            "species_count": True,
-        },
-        "body": True,
-        "category": True,
-        "current": True,
-        "own_observation": True,
-        "vision": True,
-        "disagreement": True,
-        "previous_observation_taxon_id": True,
-        "taxon_id": True,
-    },
-}
 
 
 def execute(deps: Dependencies, limit: Union[None, int]) -> None:
@@ -94,21 +57,15 @@ def execute(deps: Dependencies, limit: Union[None, int]) -> None:
     # Convert to list
     items = df_samples["uuid"].to_list()
 
-    if items:
-        # Set up api
-        api = inatApiClient(
-            TARGET_TABLE_NAME, fields=fields, limiter=10, per_page=CHUNK_SIZE
-        )
+    # Read api fields to query
+    api_fields = read_config(deps.API_FIELDS_PATH)
 
-        # Run api
+    # Set up api configs
+    config = inatApiConfig(fields=api_fields, limiter=10, per_page=CHUNK_SIZE)
+
+    # Run api
+    if items:
+        api = inatApiClient(TARGET_TABLE_NAME, config=config)
         asyncio.run(api.execute(items, con))
     else:
         logger.info("All items already processed")
-
-    sql = SQL_Engine(con, deps.SQL_INGEST_PATH)
-    # sql.execute("clean_inat_api")
-    sql.execute("unpack_observations")
-    sql.execute("unpack_identifications")
-    sql.execute("unpack_photos")
-    sql.execute("unpack_users")
-    sql.execute("unpack_taxa")

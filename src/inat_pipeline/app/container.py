@@ -27,3 +27,5 @@ class Dependencies:
         self._QUERY_FOLDER = self.root / "queries"
         self.SQL_INGEST_PATH = self._QUERY_FOLDER / "ingest"
         self.SQL_FEATURES_PATH = self._QUERY_FOLDER / "features"
+
+        self.API_FIELDS_PATH = self.root / "api_fields.yaml"
