@@ -5,21 +5,24 @@ from argparse import Namespace
 from pathlib import Path
 
 from .app import ApplicationService, Dependencies
+from .pipeline.exceptions import InatPipelineError
 from .utils.logger import init_logger
 
 
 def ingest_cmd(args: Namespace, app: ApplicationService):
     try:
         app.ingest(api_limit=args.api_limit)
-    except Exception as e:
-        print(e)
+    except InatPipelineError as e:
+        print(f"[red]✗ {e}[/red]")
+        return 1
 
 
 def process_cmd(args: Namespace, app: ApplicationService):
     try:
         app.process()
-    except Exception as e:
-        print(e)
+    except InatPipelineError as e:
+        print(f"[red]✗ {e}[/red]")
+        return 1
 
 
 def create_parser() -> argparse.ArgumentParser:
@@ -62,8 +65,11 @@ def main():
 
     # Create dependencies
     try:
-        deps = Dependencies(logger=logger, root=Path(__file__).parents[2])
-        print(deps.root)
+        deps = Dependencies(
+            logger=logger,
+            project_root=Path(__file__).parents[2],
+            package_root=Path(__file__).parents[0],
+        )
     except Exception as e:
         print(f"[red]Configuration error: {e}[/red]")
         sys.exit(1)

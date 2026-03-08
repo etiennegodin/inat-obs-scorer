@@ -4,7 +4,6 @@ SELECT
     o.id AS observation_id,
     t.community_taxon AS taxon_id,
     o.taxon_id as tx,
-    t.consensus_level,
     t.consensus_level_rg,
     o.created_at,
 
@@ -49,7 +48,7 @@ JOIN community_taxon_windowed(eval_interval) t ON o.id = t.observation_id
 WHERE o.created_at IS NOT NULL  
 GROUP BY o.id,
     t.community_taxon,
-    t.consensus_level,
+    n_ids_at_window,
     t.consensus_level_rg,
     o.taxon_id,
     o.created_at,

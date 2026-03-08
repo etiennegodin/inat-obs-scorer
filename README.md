@@ -10,7 +10,7 @@ Which “Needs ID” observations are most likely to reach Research Grade if rev
 - Avoid temporal leakage and reconstruct features at time of observation submission
     - Reconstruct identifications history per observation 
     - Reconstruct community taxon from identifications using iNaturalist's algorithm
-        - Taxonomic hierarchy
+        - Taxonomic tree traversal
     - Reconstruct research grade in history based using community taxon
 
 
@@ -71,7 +71,7 @@ Observation recency  → Has time even elapsed?
 
 ## Data Pipeline Architecture
 
-```
+```markdown
 [Raw Source]
     iNaturalist observations exports 
     + Low rate queries on [inaturalist's api](api.inaturalist/v1/docs/)

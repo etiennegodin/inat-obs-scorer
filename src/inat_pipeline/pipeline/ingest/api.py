@@ -31,8 +31,8 @@ def fields_to_string(fields_dict, level=0):
 @dataclass
 class inatApiConfig:
     fields: dict = field(default_factory=dict)
-    limiter: int
     per_page: int = 200
+    limiter: int = 10
 
 
 class inatApiClient:

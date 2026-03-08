@@ -14,18 +14,19 @@ class Dependencies:
 
     # Core components
     logger: logging.Logger
-    root: Path
+    project_root: Path
+    package_root: Path
 
     def __post_init__(self):
-        self._DATA_FOLDER = self.root / "data"
+        self._DATA_FOLDER = self.project_root / "data"
         self._RAW_DATA_FOLDER = self._DATA_FOLDER / "raw"
         self._PROCESSED_DATA_FOLDER = self._DATA_FOLDER / "processed"
 
         self.DOWNLOADS_FOLDER = self._RAW_DATA_FOLDER / "downloads"
         self.DB_PATH = self._DATA_FOLDER / "inat.duckdb"
 
-        self._QUERY_FOLDER = self.root / "queries"
+        self._QUERY_FOLDER = self.package_root / "queries"
         self.SQL_INGEST_PATH = self._QUERY_FOLDER / "ingest"
         self.SQL_FEATURES_PATH = self._QUERY_FOLDER / "features"
 
-        self.API_FIELDS_PATH = self.root / "api_fields.yaml"
+        self.API_FIELDS_PATH = self.project_root / "api_fields.yaml"

@@ -1,97 +1,117 @@
 CREATE OR REPLACE MACRO community_taxon_windowed(eval_interval) AS TABLE
 
 WITH id_window AS (
-    SELECT i.*
+    SELECT
+        i.observation_id,
+        i.taxon_id      AS id_taxon_id,
+        i.user_id,
+        i.own_observation,
+        
+        -- Full ancestor chain for each identification's taxon
+        t.species_id,
+        t.genus_id,
+        t.family_id,
+        t.order_id,
+        t.class_id,
+        t.phylum_id,
+        t."rank",    
+        t.rank_level,  -- species=10, genus=20, family=30, etc
+
     FROM staged.identifications i
     JOIN staged.observations o ON i.observation_id = o.id
+    JOIN staged.taxa t           ON i.taxon_id = t.taxon_id
+
     WHERE i."current" IS TRUE
       AND i.created_at >= o.created_at
       AND i.created_at <= o.created_at + eval_interval  -- <- window parameter
 ),
 
-counts AS(
+-- All candidate taxa to score = every taxon appearing in any ID, 
+-- plus all their ancestors
+candidates AS(
 
-    SELECT i.observation_id,
-        COUNT(*) AS total_ids,
-        -- How many distinct values exist at each rank (disagreement signal)
-        COUNT(DISTINCT i.class)     AS class_distinct_count,
-        COUNT(DISTINCT i."order")   AS order_distinct_count,
-        COUNT(DISTINCT i.family)    AS family_distinct_count,
-        COUNT(DISTINCT i.genus)     AS genus_distinct_count,
-        COUNT(DISTINCT i.species)   AS species_distinct_count,
+    SELECT DISTINCT observation_id, id_taxon_id AS candidate_taxon_id, rank_level
+    FROM id_window
 
-
-        COUNT(i.class)     AS class_count,
-        COUNT(i."order")   AS order_count,
-        COUNT(i.family)    AS family_count,
-        COUNT(i.genus)     AS genus_count,
-        COUNT(i.species)   AS specie_count,
+    UNION
+    SELECT DISTINCT observation_id, genus_id,   20 FROM id_window WHERE genus_id  IS NOT NULL
+    UNION
+    SELECT DISTINCT observation_id, family_id,  30 FROM id_window WHERE family_id IS NOT NULL
+    UNION
+    SELECT DISTINCT observation_id, order_id,   40 FROM id_window WHERE order_id  IS NOT NULL
+    UNION
+    SELECT DISTINCT observation_id, class_id,   50 FROM id_window WHERE class_id  IS NOT NULL
 
 
-        -- Full distribution: {value: count, ...} per rank
-        HISTOGRAM(i.class)          AS class_map,
-        HISTOGRAM(i."order")        AS order_map,
-        HISTOGRAM(i.family)         AS family_map,
-        HISTOGRAM(i.genus)          AS genus_map,
-        HISTOGRAM(i.species)        AS species_map,
-
-        -- Full distribution with taxon_id
-        HISTOGRAM(CASE WHEN i."taxonRank" = 'class' THEN i.taxon_id END) AS class_id_map,
-        HISTOGRAM(CASE WHEN i."taxonRank" = 'order' THEN i.taxon_id END) AS order_id_map,
-        HISTOGRAM(CASE WHEN i."taxonRank" = 'family' THEN i.taxon_id END) AS family_id_map,
-        HISTOGRAM(CASE WHEN i."taxonRank" = 'genus' THEN i.taxon_id END) AS genus_id_map,
-        HISTOGRAM(CASE WHEN i."taxonRank" = 'species' THEN i.taxon_id END) AS species_id_map,
-    
-        -- Top proportion for each taxonomic level
-        list_max(map_values(class_map))::FLOAT / class_count::FLOAT AS class_top_proportion,
-        list_max(map_values(order_map))::FLOAT / order_count::FLOAT AS order_top_proportion,
-        list_max(map_values(family_map))::FLOAT / family_count::FLOAT AS family_top_proportion,
-        list_max(map_values(genus_map))::FLOAT / genus_count::FLOAT AS genus_top_proportion,
-        list_max(map_values(species_map))::FLOAT / specie_count::FLOAT AS species_top_proportion,
-
-
-    FROM id_window i
-    GROUP BY observation_id
 ),
 
-with_consensus AS(
+scored AS (
 
-    SELECT *,
-        CASE
-            WHEN specie_count = genus_count  THEN 'species'
-            WHEN genus_count   = family_count THEN 'genus'
-            WHEN family_count  = order_count  THEN 'family'
-            ELSE 'order'
-        END AS consensus_level,
-    FROM counts
+    SELECT
+        c.observation_id,
+        c.candidate_taxon_id,
+        c.rank_level,
+        iw.rank,
 
+        -- cumulative: IDs whose taxon IS the candidate or is BELOW it (more specific)
+        COUNT(*) FILTER (WHERE 
+            iw.id_taxon_id = c.candidate_taxon_id
+            OR iw.species_id = c.candidate_taxon_id
+            OR iw.genus_id   = c.candidate_taxon_id
+            OR iw.family_id  = c.candidate_taxon_id
+            OR iw.order_id   = c.candidate_taxon_id
+            OR iw.class_id   = c.candidate_taxon_id
+        ) AS cumulative,
+
+        -- ancestor_disagreements: IDs ABOVE candidate (more conservative)
+        COUNT(*) FILTER (WHERE 
+            iw.rank_level > c.rank_level  -- coarser rank = higher number
+            AND iw.id_taxon_id != c.candidate_taxon_id
+        ) AS ancestor_disagreements,
+
+        -- disagreements: IDs in a completely different branch
+        -- = total IDs - cumulative - ancestor_disagreements
+        COUNT(*) - cumulative - ancestor_disagreements AS disagreements,
+
+
+        cumulative::FLOAT / NULLIF(cumulative + disagreements + ancestor_disagreements, 0) AS score
+
+    FROM candidates c
+    JOIN id_window iw ON c.observation_id = iw.observation_id
+    GROUP BY c.observation_id, c.candidate_taxon_id, c.rank_level, iw.rank
+
+
+
+),
+
+-- Pick lowest ranked (most specific) taxon with score > 2/3 and cumulative >= 2
+community_taxon AS (
+    SELECT DISTINCT ON (observation_id)
+        observation_id,
+        candidate_taxon_id AS community_taxon,
+        rank_level,
+        score,
+        cumulative,
+        rank_level <= 10 AS consensus_level_rg,  -- species or below (subspecies = rank 5)
+        rank
+
+    FROM scored
+    WHERE score > 2/3.0
+      AND cumulative >= 2
+    ORDER BY observation_id, rank_level ASC  -- ASC = most specific first
 )
 
 SELECT 
-    *,
-    --observation_id,
-    --consensus_level,
-    --consensus_level = 'species' AS consensus_level_rg,
-    CASE consensus_level
-        WHEN 'species' THEN species_id_map
-        WHEN 'genus'   THEN genus_id_map
-        WHEN 'family'  THEN family_id_map
-        WHEN 'order'   THEN order_id_map
-        ELSE class_id_map
-    END AS consensus_level_histogram,
+    o.id        AS observation_id,
+    o.taxon_id,
+    o.created_at,
+    ct.community_taxon,
+    ct.rank_level,
+    ct.rank,
+    ct.score,
+    ct.cumulative AS n_ids_at_window,
+    COALESCE(ct.consensus_level_rg, FALSE) AS consensus_level_rg,
+    -- RG requires community taxon to match submitted taxon
 
-    -- Extract the winning taxon cleanly (argmax of map)
-    list_max(map_values(
-        CASE consensus_level
-            WHEN 'species' THEN species_id_map
-            WHEN 'genus'   THEN genus_id_map
-            WHEN 'family'  THEN family_id_map
-            ELSE order_id_map
-        END
-    )) AS top_taxon_count,
-    -- community taxon = key with max votes (no unnest fan-out)
-    map_keys(consensus_level_histogram)[
-        list_indexof(map_values(consensus_level_histogram), top_taxon_count)
-    ] AS community_taxon
-
-FROM with_consensus 
+FROM staged.observations o
+LEFT JOIN community_taxon ct ON o.id = ct.observation_id;

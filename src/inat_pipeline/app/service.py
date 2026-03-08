@@ -10,6 +10,7 @@ This is the entry point for all use cases. It handles:
 
 import logging
 
+from ..pipeline.exceptions import InatPipelineError, WorkflowError
 from ..workflows import (
     ingest_downloads_workflow,
     ingest_inat_api_workflow,
@@ -57,6 +58,9 @@ class ApplicationService:
         logger.info("Starting process_features workflow")
         try:
             process_features_workflow.execute(self.deps)
-        except IOError as e:
-            logger.exception(e)
-            raise
+        except InatPipelineError as e:
+            logger.error(f"Process_features failed {e}")
+            raise WorkflowError(f"Process_features failed {e}") from e
+        except Exception as e:
+            logger.exception("Unexpected error during install")
+            raise WorkflowError(f"Install failed: {e}") from e

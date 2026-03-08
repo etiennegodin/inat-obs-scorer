@@ -27,7 +27,7 @@ WITH rank_ids AS (
         t.genus,
         t.species,
 
-            -- Resolve each ancestor name to its canonical taxon_id
+        -- Resolve each ancestor name to its canonical taxon_id
         -- by joining back to taxa at each rank level
         phylum_t.id     AS phylum_id,
         class_t.id      AS class_id,
@@ -48,7 +48,7 @@ WITH rank_ids AS (
             WHEN 'hybrid'       THEN 10  -- treat as species-equivalent
             WHEN 'genushybrid'  THEN 10  -- debatable, see note below
 
-            WHEN 'complex'      THEN 15  -- species complex, sits just above species
+            WHEN 'complex'      THEN 10  -- species complex, sits just above species
 
             -- Genus group
             WHEN 'genus'        THEN 20
@@ -91,7 +91,7 @@ WITH rank_ids AS (
         AND phylum_t.phylum  = t.phylum
         AND phylum_t."taxonRank" = 'phylum'
 
-    LEFT JOIN staged.taxa class_t
+    LEFT JOIN staged.taxa_raw class_t
             ON class_t.species IS NULL
             AND class_t.genus   IS NULL
             AND class_t.family  IS NULL
@@ -99,25 +99,25 @@ WITH rank_ids AS (
             AND class_t.class   = t.class
             AND class_t."taxonRank" = 'class'
 
-    LEFT JOIN staged.taxa order_t
+    LEFT JOIN staged.taxa_raw order_t
         ON order_t.species IS NULL
         AND order_t.genus   IS NULL
         AND order_t.family  IS NULL
         AND order_t."order" = t."order"
         AND order_t."taxonRank" = 'order'
 
-    LEFT JOIN staged.taxa family_t
+    LEFT JOIN staged.taxa_raw family_t
         ON family_t.species IS NULL
         AND family_t.genus   IS NULL
         AND family_t.family  = t.family
         AND family_t."taxonRank" = 'family'
 
-    LEFT JOIN staged.taxa genus_t
+    LEFT JOIN staged.taxa_raw genus_t
         ON genus_t.species IS NULL
         AND genus_t.genus   = t.genus
         AND genus_t."taxonRank" = 'genus'
 
-    LEFT JOIN staged.taxa species_t
+    LEFT JOIN staged.taxa_raw species_t
         ON species_t.species = t.species
         AND species_t.genus  = t.genus      -- genus scopes species to avoid homonyms
         AND species_t."taxonRank" = 'species'

@@ -12,11 +12,11 @@ SELECT
     c.observation_id,
     c.community_taxon,
     o.taxon_id,
-    c.consensus_level,
+    c.rank,
     o."taxonRank",
 
     -- comparisons
-    c.consensus_level = o."taxonRank" AS correct_taxon_level,
+    c.rank = o."taxonRank" AS correct_taxon_level,
     c.community_taxon = o.taxon_id AS correct_taxon,
 
 FROM community_taxon_windowed(INTERVAL '999 years') c
