@@ -1,94 +1,101 @@
 CREATE OR REPLACE TABLE features.observers AS
 
+WITH base_obs AS(
+    SELECT
+        o.id                      AS observation_id,
+        o.user_id,
+        o.taxon_id,
+        o.created_at,
+        o.description,
+        o.license,
+        o.oauth_application_id,
+        o.observation_photos,
+        o."order",
+        o.family,
+        o.genus,
+        o.species,
+        u.created_at              AS user_created_at,
+        u.orcid,
+        t.taxon_rg_rate           AS expected_rg_rate,
+
+        -- Honest RG label from macro (no leakage)
+        COALESCE(rg.is_rg, FALSE)           AS is_rg
+
+    FROM staged.observations o
+    JOIN staged.users u
+        ON o.user_id = u.user_id
+    JOIN features.taxon t
+        ON t.observation_id = o.id
+    -- Unbounded window = all identifications ever, for current-state scoring
+    LEFT JOIN research_grade_windowed(INTERVAL '999 years') rg
+        ON rg.observation_id = o.id
+)
 
 SELECT
+    -- Keys
+    observation_id,
+    user_id,
+    taxon_id,
+    created_at,
 
--- Keys
-    o.id AS observation_id,
-    o.user_id,
-    o.taxon_id,
-    o.created_at,
-    o.quality_grade,
-
--- Temporal & status
-o.created_at - u.created_at AS observer_tenure_days,
-CASE WHEN observer_tenure_days > INTERVAL '730 days' THEN TRUE ELSE FALSE END AS is_veteran,
-CASE WHEN u.orcid IS NOT NULL THEN TRUE ELSE FALSE END AS has_orcid,
-
-COALESCE(
-    research_grade_windowed(INTERVAL '999 years'),
-    0
-    ) AS observer_rg_count_at_t,
-
--- Observer stats at time T (excluding current observation)
-COALESCE(
-    COUNT(*) OVER observer_history, 0
-    ) AS observer_obs_count_at_t,
-
-COALESCE(
-    AVG(CASE WHEN o.quality_grade = 'research' THEN 1.0 ELSE 0 END) OVER observer_history, 0
-    ) AS observer_rg_rate_at_t,
-
-observer_obs_count_at_t >= 20 AS rg_rate_is_reliable,
-
--- Observer 12months stats at time T 
-COALESCE(
-    COUNT(*) OVER observer_12m, 0
-    ) AS observer_obs_count_12m,
-
-COALESCE(
-    SUM(CASE WHEN o.quality_grade = 'research' THEN 1.0 ELSE 0 END) OVER observer_12m, 0
-    )
-    AS observer_rg_count_12m,
-
-COALESCE(
-    SUM(CASE WHEN quality_grade = 'research' THEN 1.0 ELSE 0 END) OVER observer_12m
-    / NULLIF(COUNT(*) OVER observer_12m, 0), 0
-    )AS observer_rg_rate_12m,
+    -- Temporal & status
+    created_at - user_created_at     AS observer_tenure,
+    CASE WHEN observer_tenure > INTERVAL '730 days' THEN TRUE ELSE FALSE END AS is_veteran,
+    orcid IS NOT NULL AS has_orcid,
 
 
--- Observer reputation score (v0.2 definition)
-t.taxon_rg_rate as expected_rg_rate,
-observer_rg_rate_at_t / expected_rg_rate as observer_reputation_raw,
+    -- All-time observer history (excluding current observation)
+    COALESCE(COUNT(*)           OVER observer_history, 0) AS observer_obs_count_at_t,
+    COALESCE(SUM(is_rg::INT)    OVER observer_history, 0) AS observer_rg_count_at_t,
+    COALESCE(observer_rg_count_at_t::FLOAT
+            / NULLIF(observer_obs_count_at_t, 0), 0)          AS observer_rg_rate_at_t,
+
+    observer_obs_count_at_t >= 20 AS rg_rate_is_reliable,
+
+    -- Rolling 12-month window
+    COALESCE(COUNT(*)           OVER observer_12m, 0) AS observer_obs_count_12m,
+    COALESCE(SUM(is_rg::INT)                OVER observer_12m, 0)       AS observer_rg_count_12m,
+    COALESCE(observer_rg_count_12m::FLOAT
+        / NULLIF(observer_obs_count_12m, 0),0)              AS observer_rg_rate_12m,
+
+
+
+    -- Observer reputation score (v0.2 definition)
+    expected_rg_rate,
+    observer_rg_rate_at_t /  NULLIF(expected_rg_rate, 0) as observer_reputation_raw,
 -- (observer_reputation_raw - MIN(observer_reputation_raw) OVER ()) * 1.0 / NULLIF(MAX(observer_reputation_raw) OVER() - MIN(observer_reputation_raw) OVER (),0 ) AS observer_reputation_score,
 
--- Taxonomic behaviour
-COUNT(DISTINCT(o.order)) FILTER (WHERE o.order IS NOT NULL) OVER observer_history AS taxon_diversity_order,
-COUNT(DISTINCT(o.family)) FILTER (WHERE o.family IS NOT NULL) OVER observer_history AS taxon_diversity_family,
-COUNT(DISTINCT(o.genus)) FILTER (WHERE o.genus IS NOT NULL) OVER observer_history AS taxon_diversity_genus,
-COALESCE(COUNT(DISTINCT(o.species)) FILTER (WHERE o.species IS NOT NULL) OVER observer_history,0) AS taxon_diversity_species,
+    -- Taxonomic behaviour
+    COUNT(DISTINCT("order")) FILTER (WHERE "order" IS NOT NULL) OVER observer_history AS taxon_diversity_order,
+    COUNT(DISTINCT(family)) FILTER (WHERE family IS NOT NULL) OVER observer_history AS taxon_diversity_family,
+    COUNT(DISTINCT(genus)) FILTER (WHERE genus IS NOT NULL) OVER observer_history AS taxon_diversity_genus,
+    COALESCE(COUNT(DISTINCT(species)) FILTER (WHERE species IS NOT NULL) OVER observer_history,0) AS taxon_diversity_species,
 
--- Documentation records 
-AVG(LENGTH(o.observation_photos)) OVER observer_history AS avg_photo_count,
-COUNT(DISTINCT(o.id)) FILTER (
-    WHERE o.description IS NOT NULL
-    ) OVER observer_history / observer_obs_count_at_t AS pct_obs_with_description,
-COUNT(DISTINCT(o.id)) FILTER (
-    WHERE o.license IS NOT NULL
-    ) OVER observer_history / observer_obs_count_at_t  AS pct_obs_with_license,
-COUNT(DISTINCT(o.id)) FILTER (
-    WHERE o.oauth_application_id = 3 
-    OR o.oauth_application_id = 4
-    ) OVER observer_history / observer_obs_count_at_t   AS pct_obs_from_mobile,
+    -- Documentation quality
+    COALESCE(
+        AVG(LENGTH(observation_photos)) OVER observer_history,0) AS avg_photo_count,
+    COUNT(DISTINCT(observation_id)) FILTER (
+        WHERE description IS NOT NULL
+        ) OVER observer_history / NULLIF(observer_obs_count_at_t,0) AS pct_obs_with_description,
+    COUNT(DISTINCT(observation_id)) FILTER (
+        WHERE license IS NOT NULL
+        ) OVER observer_history / NULLIF(observer_obs_count_at_t,0)  AS pct_obs_with_license,
+    COUNT(DISTINCT(observation_id)) FILTER (
+        WHERE oauth_application_id = 3 
+        OR oauth_application_id = 4
+        ) OVER observer_history / NULLIF(observer_obs_count_at_t,0)   AS pct_obs_from_mobile,
 
 
-FROM staged.observations o
-JOIN staged.users u ON o.user_id = u.user_id
-JOIN features.taxon t on t.observation_id = o.id
+FROM base_obs
 
 WINDOW
     observer_history AS (
-        PARTITION BY o.user_id
-        ORDER BY o.created_at
+        PARTITION BY user_id
+        ORDER BY created_at
         ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING
     ),
     observer_12m AS (
-        PARTITION BY o.user_id
-        ORDER BY o.created_at
+        PARTITION BY user_id
+        ORDER BY created_at
         RANGE BETWEEN INTERVAL 12 MONTHS PRECEDING AND INTERVAL 1 MICROSECOND PRECEDING
-    ),
-    taxon_history AS (
-    PARTITION BY taxon_id
-    ORDER BY created_at
-    ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING
     )

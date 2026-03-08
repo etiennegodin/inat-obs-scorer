@@ -14,7 +14,6 @@ WITH id_window AS (
         t.order_id,
         t.class_id,
         t.phylum_id,
-        t."rank",    
         t.rank_level,  -- species=10, genus=20, family=30, etc
 
     FROM staged.identifications i
@@ -51,7 +50,6 @@ scored AS (
         c.observation_id,
         c.candidate_taxon_id,
         c.rank_level,
-        iw.rank,
 
         -- cumulative: IDs whose taxon IS the candidate or is BELOW it (more specific)
         COUNT(*) FILTER (WHERE 
@@ -78,7 +76,7 @@ scored AS (
 
     FROM candidates c
     JOIN id_window iw ON c.observation_id = iw.observation_id
-    GROUP BY c.observation_id, c.candidate_taxon_id, c.rank_level, iw.rank
+    GROUP BY c.observation_id, c.candidate_taxon_id, c.rank_level
 
 
 
@@ -93,7 +91,6 @@ community_taxon AS (
         score,
         cumulative,
         rank_level <= 10 AS consensus_level_rg,  -- species or below (subspecies = rank 5)
-        rank
 
     FROM scored
     WHERE score > 2/3.0
@@ -107,7 +104,6 @@ SELECT
     o.created_at,
     ct.community_taxon,
     ct.rank_level,
-    ct.rank,
     ct.score,
     ct.cumulative AS n_ids_at_window,
     COALESCE(ct.consensus_level_rg, FALSE) AS consensus_level_rg,

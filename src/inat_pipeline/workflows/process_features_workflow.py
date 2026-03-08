@@ -1,4 +1,5 @@
 import logging
+from typing import Union
 
 from ..app.container import Dependencies
 from ..utils.db import SQL_Engine, _open_connection
@@ -6,7 +7,7 @@ from ..utils.db import SQL_Engine, _open_connection
 logger = logging.getLogger(__name__)
 
 
-def execute(deps: Dependencies):
+def execute(deps: Dependencies, limit: Union[int, None]):
     con = _open_connection(deps.DB_PATH)
 
     # Unpack raw data

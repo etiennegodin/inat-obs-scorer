@@ -3,7 +3,7 @@ CREATE OR REPLACE TABLE tests.reasearch_grade AS
 SELECT 
     rg.observation_id,
     rg.is_rg,
-    o.quality_grade
+    o.quality_grade = 'research' as o_rg
 
 
 FROM research_grade_windowed(INTERVAL '999 years') rg

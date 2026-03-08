@@ -55,7 +55,6 @@ WITH unpacked AS (
 
 SELECT DISTINCT u.* EXCLUDE(u.'description',
                             u.tags,
-                            u.community_taxon_id,
                             u.taxon_geoprivacy),
 u.user.id AS user_id,
 d.observed_on,
@@ -91,6 +90,7 @@ t.family,
 t.genus,
 t.species,
 t.rank,
+t.rank_level
 --s.sampling_pool
 
 FROM unpacked u

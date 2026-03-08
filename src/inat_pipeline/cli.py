@@ -19,7 +19,7 @@ def ingest_cmd(args: Namespace, app: ApplicationService):
 
 def process_cmd(args: Namespace, app: ApplicationService):
     try:
-        app.process()
+        app.process(limit=args.limit)
     except InatPipelineError as e:
         print(f"[red]✗ {e}[/red]")
         return 1
@@ -51,6 +51,7 @@ def create_parser() -> argparse.ArgumentParser:
 
     # Process command
     process_parser = subparsers.add_parser("process", help="NotImplemented")
+    process_parser.add_argument("--limit", "-l", default=None)
     process_parser.set_defaults(func=process_cmd)
 
     return parser

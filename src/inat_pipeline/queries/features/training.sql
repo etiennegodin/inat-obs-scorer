@@ -29,7 +29,7 @@ SELECT
     o.submitted_year,
 
     -- Observer features (from observer_features, computed pre-split)
-    ob.observer_tenure_days AS obv_tenure_days,
+    ob.observer_tenure AS observer_tenure,
     ob.observer_obs_count_at_t AS obv_obs_count_total,
     ob.observer_rg_rate_at_t AS obv_rg_rate_lifetime,
     ob.observer_rg_rate_12m AS obv_rg_rate_last_12m,
@@ -51,7 +51,6 @@ SELECT
     -- Taxon features (fixed lookup)
     t.taxon_rg_rate,
     t.taxon_popularity_rank,
-    t.rank
     --t.is_difficult_group,
     --t.iconic_taxon_name,
     --t.taxon_avg_ids_to_rg,
