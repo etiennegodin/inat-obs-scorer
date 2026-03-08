@@ -15,10 +15,10 @@ SELECT i.*,
     t.family,
     t.genus,
     t.species,
-    t."taxonRank"
+    t.rank
 
 FROM staged.identifications i
-JOIN staged.taxa t on i.taxon_id = t.id;
+JOIN staged.taxa t on i.taxon_id = t.taxon_id;
 
 
 ALTER TABLE staged.identifications 

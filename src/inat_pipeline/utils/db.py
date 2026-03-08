@@ -1,4 +1,5 @@
 import logging
+import time
 from pathlib import Path
 
 import duckdb
@@ -40,10 +41,10 @@ class SQL_Engine:
     def __init__(self, con: duckdb.DuckDBPyConnection, path: Path):
         self.con = con
         self.path = path
+        logger.info(f"Initialized sql engine for queries in {path}")
 
     def execute(self, name: str):
         file = self._add_suffix(self.path / name)
-        logger.info(f"Running {file} ")
 
         try:
             open(file, "r")
@@ -51,15 +52,20 @@ class SQL_Engine:
             logger.error(e)
             raise FileNotFoundError(e)
         except Exception:
-            logger.error(f"Unexpected error reading file {file}")
-            raise InatPipelineError(f"Unexpected error reading file {file}")
+            logger.error(f"Unexpected error reading file {name}")
+            raise InatPipelineError(f"Unexpected error reading file {name}")
 
         else:
             with open(file, "r") as f:
                 try:
+                    start = time.monotonic()
                     self.con.execute(f.read())
-                except Exception:
-                    raise SqlError(f"Error executing sql query: \n{file}")
+                    logger.info(
+                        f"Executed {name}, took {round((time.monotonic() - start),3)}s"
+                    )
+
+                except Exception as e:
+                    raise SqlError(f"Error executing sql query: \n{file} \n{e}")
 
     def _add_suffix(self, file):
         if not str(file).endswith(".sql"):

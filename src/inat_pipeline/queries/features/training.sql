@@ -51,10 +51,10 @@ SELECT
     -- Taxon features (fixed lookup)
     t.taxon_rg_rate,
     t.taxon_popularity_rank,
+    t.rank
     --t.is_difficult_group,
     --t.iconic_taxon_name,
     --t.taxon_avg_ids_to_rg,
-    t.taxonRank
 
 FROM features.observations o
 LEFT JOIN features.observers ob ON o.observation_id = ob.observation_id

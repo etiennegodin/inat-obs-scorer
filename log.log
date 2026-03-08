@@ -1,0 +1,20 @@
+2026-03-08 16:03:15 - inat_pipeline.app.service - process - INFO - Starting process_features workflow
+2026-03-08 16:03:15 - inat_pipeline.utils.db - __init__ - INFO - Initialized sql engine for queries in /home/etienne/projects/inatML/src/inat_pipeline/queries/ingest
+2026-03-08 16:03:21 - inat_pipeline.utils.db - execute - INFO - Executed unpack_observations, took 5.076s
+2026-03-08 16:03:25 - inat_pipeline.utils.db - execute - INFO - Executed unpack_identifications, took 4.842s
+2026-03-08 16:03:25 - inat_pipeline.utils.db - execute - INFO - Executed unpack_photos, took 0.044s
+2026-03-08 16:03:26 - inat_pipeline.utils.db - execute - INFO - Executed unpack_users, took 0.176s
+2026-03-08 16:03:27 - inat_pipeline.utils.db - execute - INFO - Executed unpack_taxa, took 1.768s
+2026-03-08 16:03:27 - inat_pipeline.utils.db - __init__ - INFO - Initialized sql engine for queries in /home/etienne/projects/inatML/src/inat_pipeline/queries/features
+2026-03-08 16:03:27 - inat_pipeline.utils.db - execute - INFO - Executed community_taxon_windowed, took 0.008s
+2026-03-08 16:03:27 - inat_pipeline.utils.db - execute - INFO - Executed research_grade_windowed, took 0.012s
+2026-03-08 16:03:28 - inat_pipeline.utils.db - execute - INFO - Executed identifications, took 0.952s
+2026-03-08 16:03:33 - inat_pipeline.utils.db - execute - INFO - Executed identifiers, took 4.486s
+2026-03-08 16:03:33 - inat_pipeline.app.service - process - ERROR - Process_features failed Error executing sql query: 
+/home/etienne/projects/inatML/src/inat_pipeline/queries/features/taxon.sql 
+Binder Error: Table "t" does not have a column named "id"
+
+Candidate bindings: : "rank", "class", "order", "genus", "phylum"
+
+LINE 54: LEFT JOIN staged.taxa t on a.taxon_id = t.id
+                                                 ^

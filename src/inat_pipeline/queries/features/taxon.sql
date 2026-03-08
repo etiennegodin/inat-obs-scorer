@@ -48,7 +48,7 @@ t."order",
 t.family,
 t.genus,
 t.species,
-t."taxonRank"
+t.rank
 
 FROM aggregates a 
 LEFT JOIN staged.taxa t on a.taxon_id = t.id
