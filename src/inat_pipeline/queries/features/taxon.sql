@@ -3,21 +3,19 @@ CREATE OR REPLACE TABLE features.taxon AS
 WITH aggregates AS(
 
     SELECT 
-    o.id AS observation_id,
-    o.taxon_id,
+    rg.observation_id,
+    rg.taxon_id,
+    rg.created_at,
+
     COALESCE(
         COUNT(*) OVER taxon_history, 0
         )AS taxon_obs_count,
 
+    COALESCE(COUNT(*) FILTER (WHERE rg.is_rg)  OVER taxon_history, 0) AS taxon_rg_obs,
+
     -- Baseline rates
-    COALESCE(
-        COUNT(*) FILTER (
-            WHERE o.quality_grade = 'research'
-            ) OVER taxon_history, 0
-        ) AS taxon_rg_obs,
-    
-    taxon_rg_obs / taxon_obs_count AS taxon_rg_rate_raw,
-    CASE WHEN isnan(taxon_rg_rate_raw) THEN 0 ELSE taxon_rg_rate_raw END AS taxon_rg_rate,
+    taxon_rg_obs::FLOAT / NULLIF(taxon_obs_count, 0) AS taxon_rg_rate,
+    COALESCE(taxon_rg_rate, 0)                        AS taxon_rg_rate_safe,
 
     LOG(taxon_obs_count + 1) AS taxon_popularity_rank,
 
@@ -26,18 +24,18 @@ WITH aggregates AS(
 
     -- ID convergence tendency
     COALESCE(
-        AVG(LENGTH(o.identifications)) FILTER (
-            WHERE o.quality_grade = 'research'
+        AVG(rg.n_ids_at_window) FILTER (
+            WHERE rg.is_rg
             ) OVER taxon_history, 0
     ) AS taxon_avg_ids_to_rg,
     --    taxon_pct_needs_community   FLOAT       -- pct that require >1 identifier
 
-    FROM staged.observations o
+    FROM research_grade_windowed(INTERVAL '999 years') rg
 
     WINDOW
         taxon_history AS (
-            PARTITION BY o.taxon_id
-            ORDER BY o.created_at
+            PARTITION BY taxon_id
+            ORDER BY created_at
             ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING
         )
 
