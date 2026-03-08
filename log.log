@@ -1,9 +1,0 @@
-2026-03-08 09:17:23 - inatML.app.service - process_features - INFO - Starting process_features workflow
-2026-03-08 09:17:23 - inatML.utils.db - execute - INFO - Running /home/etienne/projects/inatML/queries/features/identifications.sql 
-2026-03-08 09:17:24 - inatML.utils.db - execute - INFO - Running /home/etienne/projects/inatML/queries/features/identifiers.sql 
-2026-03-08 09:17:28 - inatML.utils.db - execute - INFO - Running /home/etienne/projects/inatML/queries/features/taxon.sql 
-2026-03-08 09:17:30 - inatML.utils.db - execute - INFO - Running /home/etienne/projects/inatML/queries/features/community_taxon.sql 
-2026-03-08 09:17:30 - inatML.utils.db - execute - INFO - Running /home/etienne/projects/inatML/queries/features/label.sql 
-2026-03-08 09:17:32 - inatML.utils.db - execute - INFO - Running /home/etienne/projects/inatML/queries/features/observations.sql 
-2026-03-08 09:17:34 - inatML.utils.db - execute - INFO - Running /home/etienne/projects/inatML/queries/features/observers.sql 
-2026-03-08 09:17:40 - inatML.utils.db - execute - INFO - Running /home/etienne/projects/inatML/queries/features/training.sql 

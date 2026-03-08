@@ -6,15 +6,17 @@ build-backend = "setuptools.build_meta"
 where = ["src"]
 
 [project]
-name = "inatML"
+name = "inat_pipeline"
 version = "0.0.1"
-description = "inatML"
+description = "Data pipeline for inaturalist observations"
 authors = [{ name="Etienne Godin", email="etiennegodin@duck.com" }]
 
 dependencies = [
     "pandas",
     "scikit-learn",
-    "tdqm"
+    "optuna",
+    "mlflow"
+
 ]
 
 [project.optional-dependencies]
@@ -27,7 +29,7 @@ dev = [
 ]
 
 [project.scripts]   # <-- entry point CLI
-inatML = "inatML.cli:main"
+inat_pipe = "inat_pipeline.cli:main"
 
 
 [tool.black]
