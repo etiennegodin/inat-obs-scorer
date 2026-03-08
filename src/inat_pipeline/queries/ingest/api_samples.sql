@@ -13,7 +13,6 @@ WITH user_obs AS(
 SELECT u.obs_count, 
 d.*
 
-
 FROM raw.downloads d
 JOIN user_obs u ON u.user_id = d.user_id
 

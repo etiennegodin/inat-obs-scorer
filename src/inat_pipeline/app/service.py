@@ -40,22 +40,20 @@ class ApplicationService:
         """
         self.deps = deps
 
-    def ingest_downloads(self):
+    def ingest(self, api_limit: int):
         logger.info("Starting ingest downloads workflow")
-
         try:
             ingest_downloads_workflow.execute(self.deps)
         except Exception as e:
             logger.exception(e)
 
-    def ingest_api_data(self, limit):
         logger.info("Starting ingest api workflow")
         try:
-            ingest_inat_api_workflow.execute(self.deps, limit=limit)
+            ingest_inat_api_workflow.execute(self.deps, limit=api_limit)
         except Exception as e:
             logger.exception(e)
 
-    def process_features(self):
+    def process(self):
         logger.info("Starting process_features workflow")
         try:
             process_features_workflow.execute(self.deps)

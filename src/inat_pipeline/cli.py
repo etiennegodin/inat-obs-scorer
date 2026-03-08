@@ -10,18 +10,14 @@ from .utils.logger import init_logger
 
 def ingest_cmd(args: Namespace, app: ApplicationService):
     try:
-        if args.step == "download":
-            app.ingest_downloads()
-        elif args.step == "api":
-            app.ingest_api_data(args.limit)
-
+        app.ingest(api_limit=args.api_limit)
     except Exception as e:
         print(e)
 
 
 def process_cmd(args: Namespace, app: ApplicationService):
     try:
-        app.process_features()
+        app.process()
     except Exception as e:
         print(e)
 
@@ -33,7 +29,9 @@ def create_parser() -> argparse.ArgumentParser:
     Returns:
         Configured ArgumentParser with subcommands for publish, install, and scan.
     """
-    parser = argparse.ArgumentParser(prog="inatML", description="Inat ML features")
+    parser = argparse.ArgumentParser(
+        prog="inat_pipeline", description="Data pipeline for inaturalist observations"
+    )
 
     parser.add_argument(
         "--verbose", "-v", action="store_true", help="Enable verbose logging"
@@ -45,14 +43,11 @@ def create_parser() -> argparse.ArgumentParser:
 
     # Ingest command
     ingest_parser = subparsers.add_parser("ingest", help="NotImplemented")
-    ingest_parser.add_argument("step", choices=["download", "api"])
-    ingest_parser.add_argument("--limit", "-l", default=None)
-
+    ingest_parser.add_argument("--api_limit", default=None)
     ingest_parser.set_defaults(func=ingest_cmd)
 
     # Process command
     process_parser = subparsers.add_parser("process", help="NotImplemented")
-
     process_parser.set_defaults(func=process_cmd)
 
     return parser

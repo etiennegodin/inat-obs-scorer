@@ -1,8 +1,8 @@
 import logging
 
 from ..app.container import Dependencies
-from ..pipeline.ingest.downloads import ingest_downloads, select_sample_observations
-from ..utils.db import _open_connection
+from ..pipeline.ingest.downloads import ingest_downloads
+from ..utils.db import SQL_Engine, _open_connection
 
 logger = logging.getLogger(__name__)
 
@@ -20,7 +20,5 @@ def execute(deps: Dependencies):
     logger.info(f"Ingested {len(ingested)} files ")
 
     # Select observations to sample
-    try:
-        select_sample_observations(con)
-    except Exception as e:
-        raise e
+    sql = SQL_Engine(con, deps.SQL_INGEST_PATH)
+    sql.execute("api_samples")

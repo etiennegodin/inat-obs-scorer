@@ -49,7 +49,7 @@ fields = {
 }
 
 
-def execute(deps: Dependencies, limit: Union[None, int] = 200) -> None:
+def execute(deps: Dependencies, limit: Union[None, int]) -> None:
     SOURCE_TABLE_NAME = "raw.obs_sample"
     TARGET_TABLE_NAME = "raw.inat_api"
     CHUNK_SIZE = 200
@@ -105,7 +105,7 @@ def execute(deps: Dependencies, limit: Union[None, int] = 200) -> None:
     else:
         logger.info("All items already processed")
 
-    sql = SQL_Engine(con, deps.INGEST_QUERY_FOLDER)
+    sql = SQL_Engine(con, deps.SQL_INGEST_PATH)
     # sql.execute("clean_inat_api")
     sql.execute("unpack_observations")
     sql.execute("unpack_identifications")

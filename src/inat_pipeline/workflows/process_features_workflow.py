@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 def execute(deps: Dependencies):
     con = _open_connection(deps.DB_PATH)
 
-    sql = SQL_Engine(con, deps.FEATURES_QUERY_FOLDER)
+    sql = SQL_Engine(con, deps.SQL_FEATURES_PATH)
     sql.execute("identifications")
     sql.execute("identifiers")
     sql.execute("taxon")
