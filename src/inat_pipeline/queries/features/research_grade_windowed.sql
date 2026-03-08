@@ -2,8 +2,8 @@ CREATE OR REPLACE MACRO research_grade_windowed(eval_interval) AS TABLE
 
 SELECT 
     o.id AS observation_id,
-    t.community_taxon AS taxon_id,
-    o.taxon_id as tx,
+    t.community_taxon AS community_taxon_id,
+    o.taxon_id,
     t.consensus_level_rg,
     o.created_at,
 

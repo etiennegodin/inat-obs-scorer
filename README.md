@@ -12,7 +12,8 @@ Which “Needs ID” observations are most likely to reach Research Grade if rev
     - Reconstruct community taxon from identifications using iNaturalist's algorithm
         - Taxonomic tree traversal
     - Reconstruct research grade in history based using community taxon
-
+    - Taxonomic fallback for taxon with low observations 
+    
 
 ## Installation
 

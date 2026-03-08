@@ -99,3 +99,12 @@ JOIN staged.taxa t on d.taxon_id = t.taxon_id
 --LEFT JOIN raw.obs_sample s ON u.uuid = s.uuid
 ;
 
+
+-- Time filter for static set 
+CREATE OR REPLACE TABLE staged.observations AS
+SELECT * 
+FROM staged.observations
+WHERE created_at <= DATE('2025-12-01');
+
+
+

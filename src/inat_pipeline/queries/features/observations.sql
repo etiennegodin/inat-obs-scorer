@@ -3,21 +3,17 @@ CREATE SCHEMA IF NOT EXISTS features;
 CREATE OR REPLACE TABLE features.observations AS 
 
 SELECT 
+
 -- Primary keys & joins
 o.id AS observation_id,
 o.uuid,
 o.user.id AS user_id,
 
--- Label (the thing you're predicting)
-CASE 
-    WHEN l.label IS TRUE THEN TRUE
-    WHEN l.label IS NULL THEN FALSE
-    ELSE FALSE
-END AS label,  
-o.quality_grade AS final_grade,
+-- Label
+l.label,
+--o.quality_grade AS final_grade,
 
 -- Temporal (submission-time signals)
-
 o.observed_on,
 o.created_at,
 o.created_at - o.observed_on AS obs_to_submit_lag_days,
@@ -77,9 +73,14 @@ o.longitude,
 o.place_guess,
 
 -- Taxon (for taxon features join)
-o.taxon_id
+o.taxon_id,
 
 -- Metadata
+a.scraped_at,
+
+-- Train/Validate/Test split 
+
 
 FROM staged.observations o
 LEFT JOIN features.label l ON o.id = l.observation_id
+LEFT JOIN raw.inat_api a ON o.uuid = a.raw_id
