@@ -51,7 +51,7 @@ t.species,
 t.rank
 
 FROM aggregates a 
-LEFT JOIN staged.taxa t on a.taxon_id = t.id
+LEFT JOIN staged.taxa t on a.taxon_id = t.taxon_id
 
 
 

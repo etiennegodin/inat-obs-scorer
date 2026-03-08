@@ -29,7 +29,6 @@ def execute(deps: Dependencies):
     sql_features.execute("identifications")
     sql_features.execute("identifiers")
     sql_features.execute("taxon")
-    sql_features.execute("community_taxon")
     sql_features.execute("label")
     sql_features.execute("observations")
     sql_features.execute("observers")

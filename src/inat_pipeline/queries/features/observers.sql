@@ -18,7 +18,7 @@ CASE WHEN u.orcid IS NOT NULL THEN TRUE ELSE FALSE END AS has_orcid,
 COALESCE(
     research_grade_windowed(INTERVAL '999 years'),
     0
-    ) AS observer_rg_count_at_t
+    ) AS observer_rg_count_at_t,
 
 -- Observer stats at time T (excluding current observation)
 COALESCE(
