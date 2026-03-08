@@ -25,5 +25,6 @@ htmlcov/
 *.md
 !README.md
 obsidian/
+notebooks/*
 data/*
 temp/
