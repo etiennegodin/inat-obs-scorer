@@ -59,5 +59,6 @@ class ApplicationService:
         logger.info("Starting process_features workflow")
         try:
             process_features_workflow.execute(self.deps)
-        except Exception as e:
+        except IOError as e:
             logger.exception(e)
+            raise

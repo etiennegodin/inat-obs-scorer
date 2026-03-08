@@ -97,7 +97,7 @@ def execute(deps: Dependencies, limit: Union[None, int] = 200) -> None:
     if items:
         # Set up api
         api = inatApiClient(
-            TARGET_TABLE_NAME, fields=fields, limiter=30, per_page=CHUNK_SIZE
+            TARGET_TABLE_NAME, fields=fields, limiter=10, per_page=CHUNK_SIZE
         )
 
         # Run api
