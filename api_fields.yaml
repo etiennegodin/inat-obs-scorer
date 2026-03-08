@@ -1,3 +1,4 @@
+# Observation fields to query with inatApiS
 comments_count: true
 community_taxon_id: true
 description: true

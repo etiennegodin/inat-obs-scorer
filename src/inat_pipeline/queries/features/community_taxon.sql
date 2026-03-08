@@ -1,4 +1,4 @@
-CREATE OR REPLACE VIEW features.community_taxon AS
+CREATE OR REPLACE TABLE features.community_taxon AS
 
 SELECT i.observation_id,
 COUNT(*) AS total_ids,
@@ -68,7 +68,7 @@ CASE consensus_level
     WHEN 'species' THEN TRUE
     ELSE FALSE
 END AS consensus_level_rg,
-unnest(map_keys(consensus_level_histogram))                                          AS community_taxon,
+unnest(map_keys(consensus_level_histogram)) AS community_taxon,
 
 FROM staged.identifications i
 JOIN staged.observations o ON i.observation_id = o.id
@@ -76,6 +76,6 @@ JOIN staged.observations o ON i.observation_id = o.id
 -- non-deleted identfications
 WHERE i."current" IS TRUE
 -- time filter
-AND o.created_at - i.created_at < INTERVAL '90 days'
+AND i.created_at - o.created_at BETWEEN INTERVAL '0 seconds' AND INTERVAL '90 days'
 
 GROUP BY i.observation_id;

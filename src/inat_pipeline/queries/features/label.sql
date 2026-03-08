@@ -20,8 +20,9 @@ AND LENGTH(o.observation_photos) > 0
 AND o.captive_cultivated is FALSE
 AND t.community_taxon = o.taxon_id
 AND t.consensus_level_rg IS TRUE
+
 --added time filter
-AND o.created_at - i.created_at < INTERVAL '90 days'
+i.created_at - o.created_at BETWEEN INTERVAL '0 seconds' AND INTERVAL '90 days'
 
 GROUP BY o.id;
 
