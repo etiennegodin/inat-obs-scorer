@@ -1,4 +1,4 @@
-# inat-obs-scorer v0.1
+# inat-obs-scorer v0.2
 
 
 > Expert Review Prioritization Engine for inaturalist
