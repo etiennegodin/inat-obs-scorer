@@ -84,10 +84,26 @@ class ApplicationService:
             logger.exception("Unexpected error during install")
             raise WorkflowError(f"Install failed: {e}") from e
 
-    def model(self):
+    def model(self, args):
         logger.info("Starting model workflow")
+
+        # Catch if test mode
+        if args.test:
+            logger.info("Test mode, limited to 10 trials")
+            n_trials = 10
+        else:
+            n_trials = args.n_trials
+
         try:
-            model_workflow.execute(self.deps)
+            return model_workflow.execute(
+                self.deps.DB_PATH,
+                classifier=args.classifier,
+                reducer=args.reducer,
+                scaler=args.scaler,
+                encoder=args.encoder,
+                imputer=args.imputer,
+                n_trials=n_trials,
+            )
         except InatPipelineError as e:
             logger.error(f"Process_features failed {e}")
             raise WorkflowError(f"Process_features failed {e}") from e

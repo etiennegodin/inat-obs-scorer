@@ -19,7 +19,7 @@ from .registery import (
 from .utils import _instantiate
 
 
-def load(
+def load_and_split(
     db_path: Path,
 ) -> tuple[
     pd.DataFrame,

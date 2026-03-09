@@ -6,6 +6,13 @@ from pathlib import Path
 
 from .app import ApplicationService, Dependencies
 from .pipeline.exceptions import InatPipelineError
+from .pipeline.model.registery import (
+    CLASSIFIER_REGISTRY,
+    ENCODER_REGISTRY,
+    IMPUTER_REGISTRY,
+    REDUCER_REGISTRY,
+    SCALER_REGISTRY,
+)
 from .utils.logger import init_logger
 
 
@@ -27,10 +34,13 @@ def features_cmd(args: Namespace, app: ApplicationService):
 
 def model_cmd(args: Namespace, app: ApplicationService):
     try:
-        app.model()
+        result = app.model(args)
     except InatPipelineError as e:
         print(f"[red]✗ {e}[/red]")
         return 1
+
+    print("\n✓ Model run passed!")
+    print(f"  Test ROC-AUC: {result['test_metrics']['test_roc_auc']:.4f}")
 
 
 def create_parser() -> argparse.ArgumentParser:
@@ -67,7 +77,15 @@ def create_parser() -> argparse.ArgumentParser:
 
     # Process command
     model_parser = subparsers.add_parser("model", help="NotImplemented")
-    # process_parser.add_argument("--limit", "-l", default=None)
+    model_parser.add_argument(
+        "--classifier", default="logistic", choices=CLASSIFIER_REGISTRY
+    )
+    model_parser.add_argument("--reducder", default="none", choices=REDUCER_REGISTRY)
+    model_parser.add_argument("--scaler", default="standard", choices=SCALER_REGISTRY)
+    model_parser.add_argument("--encoder", default="onehot", choices=ENCODER_REGISTRY)
+    model_parser.add_argument("--imputer", default="median", choices=IMPUTER_REGISTRY)
+    model_parser.add_argument("--n_trials", "-n", default=10)
+    model_parser.add_argument("--test", "-t", default=False)
     model_parser.set_defaults(func=model_cmd)
 
     return parser

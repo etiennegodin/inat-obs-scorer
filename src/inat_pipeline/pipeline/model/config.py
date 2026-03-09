@@ -11,7 +11,6 @@ class PipelineConfig:
     # ── Data ──────────────────────────────────────────────────────────────────
     # data_path:          str = "data/observations.csv"
     target_column: str = "label"  # what we're predicting
-    test_size: float = 0.2
     random_seed: int = 42  # controls ALL randomness
 
     # ── Column groups ─────────────────────────────────────────────────────────
