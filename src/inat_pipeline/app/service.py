@@ -89,11 +89,12 @@ class ApplicationService:
 
         # Catch if test mode
         if args.test:
-            logger.info("Test mode, limited to 10 trials")
-            n_trials = 10
+            logger.info("Test mode, limited to 3 trials and 2 cv_folds")
+            n_trials = 3
+            cv_folds = 2
         else:
             n_trials = args.n_trials
-
+            cv_folds = args.cv_folds
         try:
             return train_workflow.execute(
                 self.deps.DB_PATH,
@@ -103,6 +104,7 @@ class ApplicationService:
                 encoder=args.encoder,
                 imputer=args.imputer,
                 n_trials=n_trials,
+                cv_folds=cv_folds,
             )
         except InatPipelineError as e:
             logger.error(f"Process_features failed {e}")
