@@ -1,6 +1,6 @@
 from pathlib import Path
+from typing import Optional
 
-import numpy as np
 import pandas as pd
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
@@ -9,9 +9,12 @@ from ...utils.db import _open_connection
 from ...utils.git import get_git_hash
 from .config import (
     CATEGORICAL_IMPUTER_REGISTRY,
+    CLASSIFIER_REGISTRY,
     ENCODER_REGISTRY,
     IMPUTER_REGISTRY,
+    REDUCER_REGISTRY,
     SCALER_REGISTRY,
+    PipelineConfig,
     _instantiate,
 )
 
@@ -33,7 +36,7 @@ def load(db_path: Path) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, str]:
     return train, val, test, split_seed
 
 
-def _build_categorical_transformer(config: dict):
+def _build_categorical_transformer(config: PipelineConfig) -> Pipeline:
     steps = []
 
     cat_imputer = _instantiate(CATEGORICAL_IMPUTER_REGISTRY, config.categorical_imputer)
@@ -45,7 +48,7 @@ def _build_categorical_transformer(config: dict):
     return Pipeline(steps)
 
 
-def _build_numeric_transformer(config: dict):
+def _build_numeric_transformer(config: PipelineConfig) -> Pipeline:
     steps = []
 
     imputer = _instantiate(IMPUTER_REGISTRY, config.numeric_imputer)
@@ -58,7 +61,7 @@ def _build_numeric_transformer(config: dict):
     return Pipeline(steps)
 
 
-def build_preprocessor(config: dict):
+def build_preprocessor(config: PipelineConfig) -> ColumnTransformer:
     numeric_transformer = _build_numeric_transformer(config)
     categorical_transformer = _build_categorical_transformer(config)
 
@@ -74,21 +77,22 @@ def build_preprocessor(config: dict):
     return preprocessor
 
 
-def scale():
-    pass
+def build_pipeline(
+    config: PipelineConfig, classifier_params: Optional[dict] = None
+) -> Pipeline:
+    steps = []
+    # Step 1: preprocessing (always present)
+    preprocessor = build_preprocessor(config)
+    steps.append(("preprocessor", preprocessor))
 
+    # Step 2: dimensionality reduction (optional)
+    reducer = _instantiate(REDUCER_REGISTRY, config.reducer)
+    if reducer is not None:
+        steps.append(("reducer", reducer))
 
-def reduce(df: pd.DataFrame):
-    corr_cols = _find_correlated(df)
+    # Step 3: classifier
+    classifier = _instantiate(CLASSIFIER_REGISTRY, config.classifier, classifier_params)
+    steps.append(("classifier", classifier))
 
-    if corr_cols:
-        pass
-
-
-def _find_correlated(self, df: pd.DataFrame) -> list:
-    df = df.drop(columns=[self.table_id])
-    corr = df.corr(numeric_only=True)
-    upper_tri = corr.where(np.triu(np.ones(corr.shape), k=1).astype(bool))
-    return [
-        column for column in upper_tri.columns if any(upper_tri[column].abs() > 0.8)
-    ]
+    pipeline = Pipeline(steps, verbose=False)
+    return pipeline

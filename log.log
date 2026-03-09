@@ -1,2 +1,4 @@
-2026-03-09 14:08:59 - inat_pipeline.app.service - model - INFO - Starting model workflow
-2026-03-09 14:09:00 - inat_pipeline.pipeline.model.config - set_features - DEBUG - Removed label
+2026-03-09 14:20:20 - inat_pipeline.app.service - model - INFO - Starting model workflow
+2026-03-09 14:20:21 - inat_pipeline.pipeline.model.config - set_features - DEBUG - Removed label
+2026-03-09 14:20:21 - inat_pipeline.pipeline.model.config - change_feature_type - INFO - Moved oauth_application_id to categorical features
+2026-03-09 14:20:21 - inat_pipeline.workflows.model_workflow - execute - INFO - Model workflow

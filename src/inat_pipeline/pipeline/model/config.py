@@ -83,7 +83,7 @@ CLASSIFIER_REGISTRY = {
     "logistic": (
         "sklearn.linear_model",
         "LogisticRegression",
-        {"max_iter": 1000, "random_state": 42},
+        {"max_iter": 500, "random_state": 42},
     ),
     "lightgbm": ("lightgbm", "LGBMClassifier", {"random_state": 42, "verbose": -1}),
 }
@@ -158,7 +158,7 @@ SEARCH_SPACES = {
 
 
 @dataclass
-class ModelPrepConfig:
+class PipelineConfig:
     # ── Data ──────────────────────────────────────────────────────────────────
     # data_path:          str = "data/observations.csv"
     target_column: str = "label"  # what we're predicting
@@ -202,11 +202,12 @@ class ModelPrepConfig:
                 self.categorical_features.append(feature_name)
                 self.numeric_features.remove(feature_name)
                 logger.info(f"Moved {feature_name} to categorical features")
-            except Exception:
+            except ValueError:
                 self.numeric_features.append(feature_name)
                 self.categorical_features.remove(feature_name)
                 logger.info(f"Moved {feature_name} to numeric features")
-        logger.warning(f"{feature_name} not found in features list")
+        else:
+            logger.warning(f"{feature_name} not found in features list")
 
     def to_dict(self) -> dict:
         """Serialize config for logging to MLflow."""
