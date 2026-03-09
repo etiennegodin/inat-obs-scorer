@@ -87,11 +87,11 @@ inat_pipe ingest
 inat_pipe features
 ```
 
-### Model
+### Train
 ```bash
-#  Model
+#  Train
 
-inat_pipe model*
+inat_pipe train*
 ```
 *Not Implemented
 

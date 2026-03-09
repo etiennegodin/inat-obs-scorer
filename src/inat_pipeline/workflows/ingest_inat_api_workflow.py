@@ -49,7 +49,7 @@ def execute(deps: Dependencies, limit: Union[None, int]) -> None:
             FROM {SOURCE_TABLE_NAME} s
             LEFT JOIN {TARGET_TABLE_NAME} t ON s.uuid  = t.raw_id
             WHERE t.raw_id IS NULL
-            {f'LIMIT {limit}' if limit is not None else ''}"""
+            {f"LIMIT {limit}" if limit is not None else ""}"""
         ).df()
     except CatalogException:
         raise

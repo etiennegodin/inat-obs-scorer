@@ -32,9 +32,9 @@ def features_cmd(args: Namespace, app: ApplicationService):
         return 1
 
 
-def model_cmd(args: Namespace, app: ApplicationService):
+def train_cmd(args: Namespace, app: ApplicationService):
     try:
-        result = app.model(args)
+        result = app.train(args)
     except InatPipelineError as e:
         print(f"[red]✗ {e}[/red]")
         return 1
@@ -76,17 +76,17 @@ def create_parser() -> argparse.ArgumentParser:
     process_parser.set_defaults(func=features_cmd)
 
     # Process command
-    model_parser = subparsers.add_parser("model", help="NotImplemented")
-    model_parser.add_argument(
+    train_parser = subparsers.add_parser("train", help="NotImplemented")
+    train_parser.add_argument(
         "--classifier", default="logistic", choices=CLASSIFIER_REGISTRY
     )
-    model_parser.add_argument("--reducder", default="none", choices=REDUCER_REGISTRY)
-    model_parser.add_argument("--scaler", default="standard", choices=SCALER_REGISTRY)
-    model_parser.add_argument("--encoder", default="onehot", choices=ENCODER_REGISTRY)
-    model_parser.add_argument("--imputer", default="median", choices=IMPUTER_REGISTRY)
-    model_parser.add_argument("--n_trials", "-n", default=10)
-    model_parser.add_argument("--test", "-t", default=False)
-    model_parser.set_defaults(func=model_cmd)
+    train_parser.add_argument("--reducer", default="none", choices=REDUCER_REGISTRY)
+    train_parser.add_argument("--scaler", default="standard", choices=SCALER_REGISTRY)
+    train_parser.add_argument("--encoder", default="onehot", choices=ENCODER_REGISTRY)
+    train_parser.add_argument("--imputer", default="median", choices=IMPUTER_REGISTRY)
+    train_parser.add_argument("--n_trials", "-n", default=10)
+    train_parser.add_argument("--test", "-t", default=False)
+    train_parser.set_defaults(func=train_cmd)
 
     return parser
 

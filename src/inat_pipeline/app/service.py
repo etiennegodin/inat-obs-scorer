@@ -17,7 +17,7 @@ from ..workflows import (
     ingest_downloads_workflow,
     ingest_inat_api_workflow,
     ingest_unpack_workflow,
-    model_workflow,
+    train_workflow,
 )
 from .container import Dependencies
 
@@ -84,8 +84,8 @@ class ApplicationService:
             logger.exception("Unexpected error during install")
             raise WorkflowError(f"Install failed: {e}") from e
 
-    def model(self, args):
-        logger.info("Starting model workflow")
+    def train(self, args):
+        logger.info("Starting training workflow")
 
         # Catch if test mode
         if args.test:
@@ -95,7 +95,7 @@ class ApplicationService:
             n_trials = args.n_trials
 
         try:
-            return model_workflow.execute(
+            return train_workflow.execute(
                 self.deps.DB_PATH,
                 classifier=args.classifier,
                 reducer=args.reducer,

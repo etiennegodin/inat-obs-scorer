@@ -20,7 +20,7 @@ from .utils import _instantiate
 
 
 def load_and_split(
-    db_path: Path,
+    db_path: Path, config: PipelineConfig
 ) -> tuple[
     pd.DataFrame,
     pd.DataFrame,
@@ -28,7 +28,7 @@ def load_and_split(
     pd.DataFrame,
     pd.DataFrame,
     pd.DataFrame,
-    str,
+    dict,
 ]:
     con = _open_connection(db_path)
 
@@ -50,9 +50,24 @@ def load_and_split(
     y_test = test["label"]
     test.pop("label")
 
-    split_seed = get_git_hash(short=True)
+    git_hash = get_git_hash(short=True)
 
-    return train, y_train, val, y_val, test, y_test, split_seed
+    # Store features from dataframe
+    config.set_features(test)
+
+    # Override features type
+    config.change_feature_type("oauth_application_id")
+
+    # ── Log basic data stats (will be passed to MLflow by experiment.py) ──────
+    data_stats = {
+        "n_rows_total": len(df),
+        "n_features_numeric": len(config.numeric_features),
+        "n_features_cat": len(config.categorical_features),
+        "target_positive_rate": float(df[config.target_column].mean()),
+        "git_hash": git_hash,
+    }
+
+    return train, y_train, val, y_val, test, y_test, data_stats
 
 
 def _build_categorical_transformer(config: PipelineConfig) -> Pipeline:

@@ -112,7 +112,7 @@ class SQL_Engine:
             self.con.execute(sql)
             logger.info(
                 f"Executed {file_path.stem},"
-                f"took {round((time.monotonic() - start),3)}s"
+                f"took {round((time.monotonic() - start), 3)}s"
             )
         except Exception as e:
             raise SqlError(f"Error executing sql query: \n{file_path} \n{e}")

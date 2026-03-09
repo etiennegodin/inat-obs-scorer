@@ -1,5 +1,12 @@
-2026-03-09 14:32:46 - inat_pipeline.app.service - model - INFO - Starting model workflow
-2026-03-09 14:32:47 - inat_pipeline.pipeline.model.config - set_features - DEBUG - 'label'
-2026-03-09 14:32:47 - inat_pipeline.pipeline.model.config - change_feature_type - INFO - Moved oauth_application_id to categorical features
-2026-03-09 14:32:47 - inat_pipeline.workflows.model_workflow - execute - INFO - Fitting inat_obs_scorer_v0_1
-2026-03-09 14:32:49 - inat_pipeline.workflows.model_workflow - execute - INFO - Model workflow
+2026-03-09 16:00:52 - inat_pipeline.app.service - train - INFO - Starting training workflow
+2026-03-09 16:00:53 - inat_pipeline.pipeline.model.config - set_features - DEBUG - 'label'
+2026-03-09 16:00:53 - inat_pipeline.pipeline.model.config - change_feature_type - INFO - Moved oauth_application_id to categorical features
+2026-03-09 16:00:56 - inat_pipeline - main - ERROR - Unexpected error
+Traceback (most recent call last):
+  File "/home/etienne/projects/inatML/src/inat_pipeline/cli.py", line 118, in main
+    exit_code = args.func(args, app)
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/home/etienne/projects/inatML/src/inat_pipeline/cli.py", line 43, in train_cmd
+    print(f"  Test ROC-AUC: {result['test_metrics']['test_roc_auc']:.4f}")
+                             ~~~~~~^^^^^^^^^^^^^^^^
+TypeError: 'NoneType' object is not subscriptable
