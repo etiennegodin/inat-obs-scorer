@@ -65,7 +65,7 @@ def make_objective(
         # trial.suggest_* methods implement Bayesian optimization:
         # early trials explore randomly; later trials focus on promising regions.
 
-        logger.debug("Optuna objective")
+        logger.debug("\nOptuna objective")
         trial_params = {}
         for param_name, spec in search_space.items():
             suggest_type = spec["type"]
@@ -86,12 +86,12 @@ def make_objective(
         # ── Step 2: Build pipeline with suggested params ──────────────────────
         pipeline = build_pipeline(config, classifier_params=trial_params)
 
-        logger.debug(pipeline.steps["classifier"])
+        logger.debug(pipeline.named_steps["classifier"])
 
         # ── Step 3: Cross-validate ────────────────────────────────────────────
 
         start = time.time()
-        logger.debug(f"Start cv {start}")
+        logger.debug("Start cv")
 
         scores = cross_val_score(
             pipeline,

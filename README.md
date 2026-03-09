@@ -1,6 +1,5 @@
 # inat-obs-scorer v0.2
 
-
 > Expert Review Prioritization Engine for inaturalist
 
 Which “Needs ID” observations are most likely to reach Research Grade if reviewed soon?
@@ -29,7 +28,7 @@ Other challenges:
 ```markdown
 [Raw Source]
     iNaturalist observations exports
-    + Low rate queries on [inaturalist's api](api.inaturalist/v1/docs/)
+    + Low rate queries on inaturalist's api
           ↓
 [Storage Layer]
     Local: DuckDB database
@@ -43,6 +42,7 @@ Other challenges:
           ↓
 [Model Registry]
     MLflow tracking (params, metrics, artifacts)
+    Optuna studies to run Cv
           ↓
 [Serving Layer]*
     FastAPI endpoint: POST /score → returns {observation_id, rg_probability, rank}
@@ -73,7 +73,7 @@ Used to ensure reproducibility
 pip install inat_pipeline
 ```
 
-## Pipeline modules
+## Pipeline commands
 
 ### Ingest
 ```bash
@@ -90,9 +90,28 @@ inat_pipe features
 ### Train
 ```bash
 #  Train
+inat_pipe train
 
-inat_pipe train*
+inat_pipe train -h
+
+  -h, --help            show this help message and exit
+  --classifier {random_forest,gradient_boost,logistic,lightgbm}
+  --reducer {pca,svd,none}
+  --scaler {standard,minmax,robust,none}
+  --encoder {onehot,ordinal}
+  --imputer {median,mean,knn,constant}
+  --n_trials N_TRIALS, -n N_TRIALS
+  --cv_folds CV_FOLDS
+  --test, -t            Run a quick test
 ```
+
+### Inference
+
+```bash
+# Run inference on observations
+inat_pipe inference*
+```
+
 *Not Implemented
 
 
@@ -114,6 +133,9 @@ Community consensus  →
 
 *Not Implemented
 
+## Working with inaturalist's API
+
+
 
 ## Roadmap
 
@@ -123,8 +145,8 @@ Community consensus  →
 - Simple logistic regression model on subset of features as baseline
 
 ### v0.2 - Extended user features, real model, evaluation strategy
+- sklearn Pipeline
 - mlFlow and Optuna setup
-- feature encoding
 - LightGBM model
 - SHAP analysis
 - Bayesian shrinkage for taxon

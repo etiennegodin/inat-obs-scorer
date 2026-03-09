@@ -29,11 +29,6 @@ ENCODER_REGISTRY = {
         "OrdinalEncoder",
         {"handle_unknown": "use_encoded_value", "unknown_value": -1},
     ),
-    "target": (
-        "category_encoders",
-        "TargetEncoder",
-        {},
-    ),  # pip install category_encoders
 }
 
 SCALER_REGISTRY = {
@@ -50,7 +45,6 @@ REDUCER_REGISTRY = {
         {"n_components": 0.95},
     ),  # keep 95% variance
     "svd": ("sklearn.decomposition", "TruncatedSVD", {"n_components": 50}),
-    "umap": ("umap", "UMAP", {"n_components": 2}),  # pip install umap-learn
     "none": None,  # skip reduction entirely
 }
 
@@ -64,11 +58,6 @@ CLASSIFIER_REGISTRY = {
         "sklearn.ensemble",
         "GradientBoostingClassifier",
         {"random_state": 42},
-    ),
-    "xgboost": (
-        "xgboost",
-        "XGBClassifier",
-        {"random_state": 42, "eval_metric": "logloss"},
     ),
     "logistic": (
         "sklearn.linear_model",
@@ -86,8 +75,8 @@ CLASSIFIER_REGISTRY = {
 
 SEARCH_SPACES = {
     "random_forest": {
-        "classifier__n_estimators": {"type": "int", "low": 10, "high": 100, "step": 10},
-        "classifier__max_depth": {"type": "int", "low": 3, "high": 10},
+        "classifier__n_estimators": {"type": "int", "low": 10, "high": 200, "step": 10},
+        "classifier__max_depth": {"type": "int", "low": 3, "high": 15},
         "classifier__min_samples_leaf": {"type": "int", "low": 1, "high": 10},
         "classifier__max_features": {
             "type": "categorical",
@@ -104,24 +93,6 @@ SEARCH_SPACES = {
         },
         "classifier__max_depth": {"type": "int", "low": 2, "high": 10},
         "classifier__subsample": {"type": "float", "low": 0.5, "high": 1.0},
-    },
-    "xgboost": {
-        "classifier__n_estimators": {"type": "int", "low": 50, "high": 500, "step": 50},
-        "classifier__learning_rate": {
-            "type": "float",
-            "low": 1e-3,
-            "high": 0.3,
-            "log": True,
-        },
-        "classifier__max_depth": {"type": "int", "low": 2, "high": 10},
-        "classifier__subsample": {"type": "float", "low": 0.5, "high": 1.0},
-        "classifier__colsample_bytree": {"type": "float", "low": 0.5, "high": 1.0},
-        "classifier__reg_alpha": {
-            "type": "float",
-            "low": 1e-8,
-            "high": 1.0,
-            "log": True,
-        },
     },
     "logistic": {
         "classifier__C": {"type": "float", "low": 1e-4, "high": 100, "log": True},
