@@ -21,6 +21,7 @@ SELECT
     o.oauth_application_id,
 
     -- Temporal features
+    o.created_at,
     o.obs_to_submit_lag_days,
     o.observed_month,
     o.observed_week,

@@ -12,6 +12,7 @@ description = "Data pipeline for inaturalist observations"
 authors = [{ name="Etienne Godin", email="etiennegodin@duck.com" }]
 
 dependencies = [
+    "argcomplete",
     "pandas",
     "scikit-learn",
     "optuna",

@@ -7,15 +7,67 @@ Which “Needs ID” observations are most likely to reach Research Grade if rev
 
 ## Data Challenges 
 
-- Avoid temporal leakage and reconstruct features at time of observation submission
-    - Reconstruct identifications history per observation 
-    - Reconstruct community taxon from identifications using iNaturalist's algorithm
+Main challenge is to avoid temporal leakage and reconstruct features at point in time per observation
+- Observations features
+    - Identifications history per observation 
+    - [Community taxon](https://help.inaturalist.org/en/support/solutions/articles/151000173076-what-are-the-community-taxon-and-the-observation-taxon) from identifications
         - Taxonomic tree traversal
-    - Reconstruct research grade in history based using community taxon
-    - Taxonomic fallback for taxon with low observations 
-    
+    - [Research grade](https://help.inaturalist.org/en/support/solutions/articles/151000169936-what-is-the-data-quality-assessment-and-how-do-observations-qualify-to-become-research-grade-) using community taxon and other quality requirements (main-label)
+- Observer features 
+    - Observations history
+    - Research grade rate
+    - Taxon diversity, 
+    - Historical documentation aggregates 
 
-## Installation
+Other challenges:
+- Taxonomic fallback for taxon with low observations using Bayesian Shrinkage
+- Train/Validation/Test Splits accounting for label time 
+
+
+## Data Pipeline Architecture
+
+```markdown
+[Raw Source]
+    iNaturalist observations exports 
+    + Low rate queries on [inaturalist's api](api.inaturalist/v1/docs/)
+          ↓
+[Storage Layer]
+    Local: DuckDB database
+          ↓
+[Feature Engineering Layer]
+    Python features module running sql queries
+    All transforms are reproducible and testable
+          ↓
+[Training Dataset]*
+    Snapshot at time T, label = RG status at T+90 days
+          ↓
+[Model Registry]*
+    MLflow tracking (params, metrics, artifacts)
+          ↓
+[Serving Layer]*
+    FastAPI endpoint: POST /score → returns {observation_id, rg_probability, rank}
+
+* Not Implemented
+```
+
+## Main Engineered Features
+
+| Group                     | Features                                                           |
+| ------------------------- | ------------------------------------------------------------------ |
+| Observer history          | historical RG rate, total obs count, tenure days, taxa diversity   |
+| Identifiers history*       | historical RG rate, total id count, tenure days, taxa diversity    |
+| Observation documentation | photo count, has notes, coordinate uncertainty                     |
+| Taxon context             | taxon rank, taxon-level RG rate,                           |
+| Temporal                  | day of year, time since submission, hour of day                    |
+| Community signals*         | number of IDs already received, ID agreement rate so far           |
+| Geographic context*      | regional iNat activity density, distance to nearest urban center |
+
+*Not Implemented
+
+## Python pipeline orchestrator
+
+Used to ensure reproducibility 
+
 
 ```bash
 pip install inat_pipeline
@@ -51,52 +103,11 @@ Identifier quality   → Identifier knowlege of the species
 Taxon difficulty     → Community attention required
 Geographic activity  → Speed of community response
 Community consensus  → 
-Observation recency  → Has time even elapsed?
                               ↓
                     Research Grade (outcome)
 ```
 
-## Main Engineered Features
-
-| Group                     | Features                                                           |
-| ------------------------- | ------------------------------------------------------------------ |
-| Observer history          | historical RG rate, total obs count, tenure days, taxa diversity   |
-| Identifiers history*       | historical RG rate, total id count, tenure days, taxa diversity    |
-| Observation documentation | photo count, has notes, coordinate uncertainty                     |
-| Taxon context             | taxon rank, taxon-level baseline RG rate,                          |
-| Temporal                  | day of year, time since submission, hour of day                    |
-| Community signals*         | number of IDs already received, ID agreement rate so far           |
-| Geographic context*      | regional iNat activity density, distance to nearest urban center |
-
-*Not Implemented
-
-## Data Pipeline Architecture
-
-```markdown
-[Raw Source]
-    iNaturalist observations exports 
-    + Low rate queries on [inaturalist's api](api.inaturalist/v1/docs/)
-          ↓
-[Storage Layer]
-    Local: DuckDB database
-          ↓
-[Feature Engineering Layer]
-    Python features module running sql queries
-    All transforms are reproducible and testable
-          ↓
-[Training Dataset]*
-    Snapshot at time T, label = RG status at T+90 days
-          ↓
-[Model Registry]*
-    MLflow tracking (params, metrics, artifacts)
-          ↓
-[Serving Layer]*
-    FastAPI endpoint: POST /score → returns {observation_id, rg_probability, rank}
-
-* Not Implemented
-```
-
-## Model Features
+## Features
 - Data pipeline for inaturalist observations
 - Internal Dashboard API*
 - CLI interface
@@ -121,10 +132,12 @@ Observation recency  → Has time even elapsed?
 
 - Model wrapped in FastApi 
 
-### v0.4 - Ranking and expert routing
+### v0.4 - Ranking and expert routing, additionnal features
 
 - Survival model (time-to-RG)
 - ID velocity features (time-to-first-ID, ID burst patterns)
 - Specific rare species to expert
+- Similar species 
+- Annotations
 
 

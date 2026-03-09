@@ -4,6 +4,8 @@ import sys
 from argparse import Namespace
 from pathlib import Path
 
+import argcomplete
+
 from .app import ApplicationService, Dependencies
 from .pipeline.exceptions import InatPipelineError
 from .utils.logger import init_logger
@@ -53,6 +55,8 @@ def create_parser() -> argparse.ArgumentParser:
     process_parser = subparsers.add_parser("process", help="NotImplemented")
     process_parser.add_argument("--limit", "-l", default=None)
     process_parser.set_defaults(func=process_cmd)
+
+    argcomplete.autocomplete(parser)
 
     return parser
 
