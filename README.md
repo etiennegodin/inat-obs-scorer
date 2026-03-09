@@ -120,15 +120,14 @@ Community consensus  →
 ### v0.1 - Data pipeline and baseline model
 - ELT data pipeline
 - Basic feature engineering
-- mlFlow and Optuna setup
 - Simple logistic regression model on subset of features as baseline
 
 ### v0.2 - Extended user features, real model, evaluation strategy
+- mlFlow and Optuna setup
+- feature encoding 
 - LightGBM model 
-- Optuna tuning
 - SHAP analysis
 - Bayesian shrinkage for taxon
-- Identifiers features 
 
 ### v0.3 - System design
 
@@ -137,6 +136,7 @@ Community consensus  →
 ### v0.4 - Ranking and expert routing, additionnal features
 
 - Survival model (time-to-RG)
+- Identifiers features
 - ID velocity features (time-to-first-ID, ID burst patterns)
 - Specific rare species to expert
 - Similar species 
