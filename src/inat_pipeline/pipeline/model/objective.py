@@ -64,6 +64,8 @@ def make_objective(
         # ── Step 1: Ask Optuna for hyperparameter suggestions ─────────────────
         # trial.suggest_* methods implement Bayesian optimization:
         # early trials explore randomly; later trials focus on promising regions.
+
+        logger.debug("Optuna objective")
         trial_params = {}
         for param_name, spec in search_space.items():
             suggest_type = spec["type"]
@@ -84,8 +86,13 @@ def make_objective(
         # ── Step 2: Build pipeline with suggested params ──────────────────────
         pipeline = build_pipeline(config, classifier_params=trial_params)
 
+        logger.debug(pipeline)
+
         # ── Step 3: Cross-validate ────────────────────────────────────────────
+
         start = time.time()
+        logger.debug(f"Start cv {start}")
+
         scores = cross_val_score(
             pipeline,
             X_train,
@@ -96,8 +103,12 @@ def make_objective(
             error_score="raise",
         )
         elapsed = time.time() - start
+        logger.debug(f"End cv {elapsed}")
+
         mean_score = float(np.mean(scores))
         std_score = float(np.std(scores))
+
+        logger.debug(f"Mean score {mean_score}")
 
         # ── Step 4: Log this trial as a child MLflow run ──────────────────────
         with mlflow.start_run(

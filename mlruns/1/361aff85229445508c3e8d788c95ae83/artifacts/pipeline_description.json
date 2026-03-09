@@ -1,0 +1,76 @@
+{
+  "preprocessor": {
+    "num": {
+      "class": "Pipeline",
+      "columns": [
+        "observation_id",
+        "user_id",
+        "photo_count",
+        "tag_count",
+        "positional_accuracy_m",
+        "obs_to_submit_lag_days",
+        "observed_month",
+        "observed_week",
+        "observed_hour",
+        "submitted_hour",
+        "submitted_year",
+        "observer_tenure_days",
+        "obv_obs_count_total",
+        "obv_rg_rate_lifetime",
+        "obv_rg_rate_last_12m",
+        "obv_reputation_score",
+        "obv_taxon_diversity_family",
+        "obv_taxon_diversity_genus",
+        "obv_taxon_diversity_species",
+        "obv_avg_photo_count",
+        "obv_pct_obs_with_description",
+        "obv_pct_obs_with_license",
+        "obv_pct_obs_from_mobile",
+        "taxon_rg_rate",
+        "taxon_popularity_rank",
+        "taxon_rg_rate_1",
+        "taxon_avg_ids_to_rg"
+      ]
+    },
+    "cat": {
+      "class": "Pipeline",
+      "columns": [
+        "rg_rate_source",
+        "oauth_application_id"
+      ]
+    }
+  },
+  "reducer": {
+    "class": "PCA",
+    "params": {
+      "copy": true,
+      "iterated_power": "auto",
+      "n_components": 0.95,
+      "n_oversamples": 10,
+      "power_iteration_normalizer": "auto",
+      "random_state": null,
+      "svd_solver": "auto",
+      "tol": 0.0,
+      "whiten": false
+    }
+  },
+  "classifier": {
+    "class": "LogisticRegression",
+    "params": {
+      "C": 1.0,
+      "class_weight": null,
+      "dual": false,
+      "fit_intercept": true,
+      "intercept_scaling": 1,
+      "l1_ratio": 0.0,
+      "max_iter": 500,
+      "n_jobs": null,
+      "penalty": "deprecated",
+      "random_state": 42,
+      "solver": "lbfgs",
+      "tol": 0.0001,
+      "verbose": 0,
+      "warm_start": false
+    }
+  }
+}

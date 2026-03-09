@@ -95,7 +95,7 @@ def execute(
         study.optimize(
             objective,
             n_trials=config.n_trials,
-            show_progress_bar=False,
+            show_progress_bar=True,
         )
 
         best_params = study.best_params

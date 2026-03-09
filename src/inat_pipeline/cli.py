@@ -84,7 +84,7 @@ def create_parser() -> argparse.ArgumentParser:
     train_parser.add_argument("--scaler", default="standard", choices=SCALER_REGISTRY)
     train_parser.add_argument("--encoder", default="onehot", choices=ENCODER_REGISTRY)
     train_parser.add_argument("--imputer", default="median", choices=IMPUTER_REGISTRY)
-    train_parser.add_argument("--n_trials", default=10)
+    train_parser.add_argument("--n_trials", "-n", default=10)
     train_parser.add_argument("--cv_folds", default=5)
 
     train_parser.add_argument("--test", "-t", default=False, action="store_true")
