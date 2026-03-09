@@ -78,9 +78,6 @@ o.taxon_id,
 -- Metadata
 a.scraped_at,
 
--- Train/Validate/Test split 
-
-
 FROM staged.observations o
 LEFT JOIN features.label l ON o.id = l.observation_id
 LEFT JOIN raw.inat_api a ON o.uuid = a.raw_id

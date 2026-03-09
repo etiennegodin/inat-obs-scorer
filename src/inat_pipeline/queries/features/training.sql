@@ -3,7 +3,7 @@ SELECT
     -- Identity
     o.observation_id,
     o.user_id,
-    --o.split,
+    s.split,
 
     -- Label
     o.label,
@@ -59,6 +59,7 @@ SELECT
     --t.iconic_taxon_name,
 
 FROM features.observations o
+JOIN features.splits s ON s.observation_id = o.observation_id
 LEFT JOIN features.observers ob ON o.observation_id = ob.observation_id
 LEFT JOIN features.identifications i ON o.observation_id = i.observation_id
 --LEFT JOIN features.identifiers id ON o.observation_id = id.observation_id

@@ -102,9 +102,15 @@ JOIN staged.taxa t on d.taxon_id = t.taxon_id
 
 -- Time filter for static set 
 CREATE OR REPLACE TABLE staged.observations AS
+WITH max_date AS(
+    SELECT MAX(created_at) - INTERVAL '90 days' as max_date
+    FROM staged.observations
+)
+
 SELECT * 
 FROM staged.observations
-WHERE created_at <= DATE('2025-12-01');
+CROSS JOIN max_date
+WHERE created_at <= max_date;
 
 
 

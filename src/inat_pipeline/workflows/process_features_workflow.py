@@ -33,4 +33,5 @@ def execute(deps: Dependencies, limit: Union[int, None]):
     sql_features.execute("label")
     sql_features.execute("observations")
     sql_features.execute("observers")
+    sql_features.execute("stratify")
     sql_features.execute("training")

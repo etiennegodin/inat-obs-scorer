@@ -20,7 +20,7 @@ Main challenge is to avoid temporal leakage and reconstruct features at point in
     - Historical documentation aggregates 
 
 Other challenges:
-- Taxonomic fallback for taxon with low observations using Bayesian Shrinkage
+- Taxonomic fallback for taxon with low observations using Bayesian Shrinkage*
 - Train/Validation/Test Splits accounting for label time 
 
 
@@ -127,6 +127,8 @@ Community consensus  →
 - LightGBM model 
 - Optuna tuning
 - SHAP analysis
+- Bayesian shrinkage for taxon
+- Identifiers features 
 
 ### v0.3 - System design
 
