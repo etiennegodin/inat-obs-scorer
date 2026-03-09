@@ -5,30 +5,30 @@
 
 Which “Needs ID” observations are most likely to reach Research Grade if reviewed soon?
 
-## Data Challenges 
+## Data Challenges
 
 Main challenge is to avoid temporal leakage and reconstruct features at point in time per observation
 - Observations features
-    - Identifications history per observation 
+    - Identifications history per observation
     - [Community taxon](https://help.inaturalist.org/en/support/solutions/articles/151000173076-what-are-the-community-taxon-and-the-observation-taxon) from identifications
         - Taxonomic tree traversal
     - [Research grade](https://help.inaturalist.org/en/support/solutions/articles/151000169936-what-is-the-data-quality-assessment-and-how-do-observations-qualify-to-become-research-grade-) using community taxon and other quality requirements (main-label)
-- Observer features 
+- Observer features
     - Observations history
     - Research grade rate
-    - Taxon diversity, 
-    - Historical documentation aggregates 
+    - Taxon diversity,
+    - Historical documentation aggregates
 
 Other challenges:
 - Taxonomic fallback for taxon with low observations using Bayesian Shrinkage*
-- Train/Validation/Test Splits accounting for label time 
+- Train/Validation/Test Splits accounting for label time
 
 
 ## Data Pipeline Architecture
 
 ```markdown
 [Raw Source]
-    iNaturalist observations exports 
+    iNaturalist observations exports
     + Low rate queries on [inaturalist's api](api.inaturalist/v1/docs/)
           ↓
 [Storage Layer]
@@ -38,10 +38,10 @@ Other challenges:
     Python features module running sql queries
     All transforms are reproducible and testable
           ↓
-[Training Dataset]*
+[Training Dataset]
     Snapshot at time T, label = RG status at T+90 days
           ↓
-[Model Registry]*
+[Model Registry]
     MLflow tracking (params, metrics, artifacts)
           ↓
 [Serving Layer]*
@@ -66,7 +66,7 @@ Other challenges:
 
 ## Python pipeline orchestrator
 
-Used to ensure reproducibility 
+Used to ensure reproducibility
 
 
 ```bash
@@ -77,13 +77,13 @@ pip install inat_pipeline
 
 ### Ingest
 ```bash
-#Ingests data sources, runs api queries, saves to db and stage data 
+#Ingests data sources, runs api queries, saves to db and stage data
 inat_pipe ingest
 ```
 
 ### Features
 ```bash
-# Creates features suite  
+# Creates features suite
 inat_pipe features
 ```
 
@@ -102,7 +102,7 @@ Observer quality     → Observation documentation quality
 Identifier quality   → Identifier knowlege of the species
 Taxon difficulty     → Community attention required
 Geographic activity  → Speed of community response
-Community consensus  → 
+Community consensus  →
                               ↓
                     Research Grade (outcome)
 ```
@@ -124,14 +124,14 @@ Community consensus  →
 
 ### v0.2 - Extended user features, real model, evaluation strategy
 - mlFlow and Optuna setup
-- feature encoding 
-- LightGBM model 
+- feature encoding
+- LightGBM model
 - SHAP analysis
 - Bayesian shrinkage for taxon
 
 ### v0.3 - System design
 
-- Model wrapped in FastApi 
+- Model wrapped in FastApi
 
 ### v0.4 - Ranking and expert routing, additionnal features
 
@@ -139,7 +139,5 @@ Community consensus  →
 - Identifiers features
 - ID velocity features (time-to-first-ID, ID burst patterns)
 - Specific rare species to expert
-- Similar species 
+- Similar species
 - Annotations
-
-
