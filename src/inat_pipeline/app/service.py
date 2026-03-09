@@ -13,9 +13,10 @@ from typing import Union
 
 from ..pipeline.exceptions import InatPipelineError, WorkflowError
 from ..workflows import (
+    features_workflow,
     ingest_downloads_workflow,
     ingest_inat_api_workflow,
-    process_features_workflow,
+    ingest_unpack_workflow,
 )
 from .container import Dependencies
 
@@ -62,10 +63,19 @@ class ApplicationService:
         except Exception as e:
             logger.exception(e)
 
-    def process(self, limit: Union[int, None]):
-        logger.info("Starting process_features workflow")
+        logger.info("Starting ingest unpack workflow")
         try:
-            process_features_workflow.execute(self.deps, limit=limit)
+            ingest_unpack_workflow.execute(self.deps, limit=api_limit)
+        except InatPipelineError as e:
+            logger.error(f"Ingest api failed {e}")
+            raise WorkflowError(f"Ingest api failed failed {e}") from e
+        except Exception as e:
+            logger.exception(e)
+
+    def features(self, limit: Union[int, None]):
+        logger.info("Starting features workflow")
+        try:
+            features_workflow.execute(self.deps, limit=limit)
         except InatPipelineError as e:
             logger.error(f"Process_features failed {e}")
             raise WorkflowError(f"Process_features failed {e}") from e

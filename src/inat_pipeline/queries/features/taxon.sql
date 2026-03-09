@@ -93,7 +93,7 @@ rates AS(
         WHEN order_obs_count  >= 30 THEN 'order'
         ELSE 'insufficient'
     END AS rg_rate_source,
-    CASE WHEN taxon_obs_count  >= 30 THEN TRUE ELSE FALSE END AS taxon_cold_start,
+    CASE WHEN taxon_obs_count  < 30 THEN TRUE ELSE FALSE END AS taxon_cold_start,
     COALESCE(taxon_rg_rate, 0) AS taxon_rg_rate_safe,
     LOG(taxon_obs_count + 1) AS taxon_popularity_rank,
 

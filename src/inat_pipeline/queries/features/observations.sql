@@ -19,7 +19,7 @@ o.created_at,
 o.created_at - o.observed_on AS obs_to_submit_lag_days,
 MONTH(o.observed_on) AS observed_month,
 WEEK(o.observed_on) AS observed_week,
-HOUR(observed_on_string) AS observed_hour,
+COALESCE(HOUR(observed_on_string),0) AS observed_hour,
 HOUR(o.created_at) AS submitted_hour,
 YEAR(o.created_at) AS submitted_year,
 

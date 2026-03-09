@@ -18,11 +18,11 @@ SELECT
     o.obscured,
     o.geoprivacy IS NOT NULL                AS geoprivacy_set,
     o.captive,                              -- should be FALSE for all training rows
-    o.oauth_application_id,
+    COALESCE(o.oauth_application_id,0)      AS oauth_application_id,
 
     -- Temporal features
     o.created_at,
-    o.obs_to_submit_lag_days,
+    date_part('day',o.obs_to_submit_lag_days) AS obs_to_submit_lag_days,
     o.observed_month,
     o.observed_week,
     o.observed_hour,
@@ -30,7 +30,8 @@ SELECT
     o.submitted_year,
 
     -- Observer features (from observer_features, computed at observation time)
-    ob.observer_tenure AS observer_tenure,
+    date_part('day',ob.observer_tenure) AS observer_tenure_days,
+    ob.is_veteran AS obv_is_veteran,
     ob.observer_obs_count_at_t AS obv_obs_count_total,
     ob.observer_rg_rate_at_t AS obv_rg_rate_lifetime,
     ob.observer_rg_rate_12m AS obv_rg_rate_last_12m,
@@ -53,7 +54,6 @@ SELECT
     t.taxon_popularity_rank,
     t.rg_rate_source,
     t.taxon_rg_rate,
-    t.taxon_id_source,
     t.taxon_avg_ids_to_rg,
     t.taxon_cold_start
     --t.is_difficult_group,

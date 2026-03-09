@@ -1,29 +1,35 @@
+-- Injected by Python at runtime — do not edit this block manually
+
 CREATE OR REPLACE TABLE features.splits AS
 
-WITH base AS(
+{params_cte}
+
+
+,
+base AS(
     SELECT 
         observation_id,
         created_at,
         submitted_year
-    FROM features.observations 
+    FROM features.observations,
 ),
 
 pre_cutoff AS(
 
 SELECT *,
 'train' AS split
-FROM base
-WHERE created_at <= DATE('2021-01-01')
+FROM base, params p
+WHERE created_at <= p.cutoff_date
 ),
 
 post_cutoff_gapped AS (
     SELECT *
-    FROM   base
-    WHERE  created_at >= DATE('2021-01-01')
+    FROM   base, params p
+    WHERE  created_at >= p.cutoff_date
       AND  created_at NOT BETWEEN
-               DATE '2021-01-01' AND DATE '2021-01-01' + INTERVAL '90 days'
+               p.train_val_boundary AND p.train_val_boundary + INTERVAL '90 days'
       AND  created_at NOT BETWEEN
-               DATE '2022-06-01' AND DATE '2022-06-01' + INTERVAL '90 days'
+               p.val_test_boundary AND p.val_test_boundary + INTERVAL '90 days'
 ),
 
 -- Step 2c: Stratified sampling within each post-cutoff year
@@ -43,11 +49,11 @@ post_cutoff_ranked AS (
 post_cutoff_split AS (
     SELECT *,
            CASE
-               WHEN rn <= FLOOR(year_total * 0.70) THEN 'train'
-               WHEN rn <= FLOOR(year_total * 0.85) THEN 'val'
+               WHEN rn <= FLOOR(year_total * p.train_frac) THEN 'train'
+               WHEN rn <= FLOOR(year_total * p.train_val_frac) THEN 'val'
                ELSE                                     'test'
            END AS split
-    FROM   post_cutoff_ranked
+    FROM   post_cutoff_ranked, params p
 )
 
 SELECT observation_id, split

@@ -62,7 +62,7 @@ SELECT
 
     -- Observer reputation score (v0.2 definition)
     expected_rg_rate,
-    observer_rg_rate_at_t /  NULLIF(expected_rg_rate, 0) as observer_reputation_raw,
+    COALESCE(observer_rg_rate_at_t /  NULLIF(expected_rg_rate, 0),0) as observer_reputation_raw,
 -- (observer_reputation_raw - MIN(observer_reputation_raw) OVER ()) * 1.0 / NULLIF(MAX(observer_reputation_raw) OVER() - MIN(observer_reputation_raw) OVER (),0 ) AS observer_reputation_score,
 
     -- Taxonomic behaviour
@@ -74,16 +74,16 @@ SELECT
     -- Documentation quality
     COALESCE(
         AVG(LENGTH(observation_photos)) OVER observer_history,0) AS avg_photo_count,
-    COUNT(DISTINCT(observation_id)) FILTER (
+    COALESCE(COUNT(DISTINCT(observation_id)) FILTER (
         WHERE description IS NOT NULL
-        ) OVER observer_history / NULLIF(observer_obs_count_at_t,0) AS pct_obs_with_description,
-    COUNT(DISTINCT(observation_id)) FILTER (
+        ) OVER observer_history / NULLIF(observer_obs_count_at_t,0),0) AS pct_obs_with_description,
+    COALESCE(COUNT(DISTINCT(observation_id)) FILTER (
         WHERE license IS NOT NULL
-        ) OVER observer_history / NULLIF(observer_obs_count_at_t,0)  AS pct_obs_with_license,
-    COUNT(DISTINCT(observation_id)) FILTER (
+        ) OVER observer_history / NULLIF(observer_obs_count_at_t,0),0)  AS pct_obs_with_license,
+    COALESCE(COUNT(DISTINCT(observation_id)) FILTER (
         WHERE oauth_application_id = 3 
         OR oauth_application_id = 4
-        ) OVER observer_history / NULLIF(observer_obs_count_at_t,0)   AS pct_obs_from_mobile,
+        ) OVER observer_history / NULLIF(observer_obs_count_at_t,0),0)   AS pct_obs_from_mobile,
 
 
 FROM base_obs

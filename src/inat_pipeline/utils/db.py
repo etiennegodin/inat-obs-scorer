@@ -1,5 +1,7 @@
 import logging
 import time
+from dataclasses import dataclass
+from datetime import date
 from pathlib import Path
 
 import duckdb
@@ -37,35 +39,83 @@ def _load_spatial_extension(con: duckdb.DuckDBPyConnection) -> None:
         raise e
 
 
+@dataclass
+class SqlConfig:
+    """General purpose sql config"""
+
+    pass
+
+
+@dataclass
+class SplitConfig(SqlConfig):
+    cutoff_date: int = date(2021, 1, 1)
+    gap_days: int = 90
+    train_frac: float = 0.70
+    val_frac: float = 0.15
+    train_val_boundary: date = date(2021, 1, 1)
+    val_test_boundary: date = date(2022, 6, 1)
+
+    def build_params_cte(self) -> str:
+        return f"""
+WITH params AS (
+    SELECT
+        DATE '{self.cutoff_date}'                       AS cutoff_date,
+        {self.gap_days}                               AS gap_days,
+        DATE '{self.train_val_boundary.isoformat()}'  AS train_val_boundary,
+        DATE '{self.val_test_boundary.isoformat()}'   AS val_test_boundary,
+        {self.train_frac}                             AS train_frac,
+        {self.val_frac}                               AS val_frac,
+        {self.train_frac + self.val_frac}              AS train_val_frac
+    
+)
+"""
+
+
 class SQL_Engine:
     def __init__(self, con: duckdb.DuckDBPyConnection, path: Path):
         self.con = con
         self.path = path
         logger.info(f"Initialized sql engine for queries in {path}")
 
-    def execute(self, name: str):
-        file = self._add_suffix(self.path / name)
-
+    @staticmethod
+    def _check_file(file: Path) -> bool:
+        exists = False
         try:
             open(file, "r")
+            exists = True
         except FileNotFoundError as e:
             logger.error(e)
             raise FileNotFoundError(e)
         except Exception:
-            logger.error(f"Unexpected error reading file {name}")
-            raise InatPipelineError(f"Unexpected error reading file {name}")
+            logger.error(f"Unexpected error reading file {file}")
+            raise InatPipelineError(f"Unexpected error reading file {file}")
 
-        else:
+        return exists
+
+    def execute(self, name: str) -> None:
+        file = self._add_suffix(self.path / name)
+        if self._check_file(file):
             with open(file, "r") as f:
-                try:
-                    start = time.monotonic()
-                    self.con.execute(f.read())
-                    logger.info(
-                        f"Executed {name}, took {round((time.monotonic() - start),3)}s"
-                    )
+                self._execute(f.read(), file)
 
-                except Exception as e:
-                    raise SqlError(f"Error executing sql query: \n{file} \n{e}")
+    def execute_with_params(self, name: str, format: str) -> None:
+        file = self._add_suffix(self.path / name)
+        if self._check_file(file):
+            with open(file, "r") as f:
+                sql = f.read().format(params_cte=format)
+                # logger.debug(sql)
+                self._execute(sql, file)
+
+    def _execute(self, sql: str, file_path: str) -> None:
+        try:
+            start = time.monotonic()
+            self.con.execute(sql)
+            logger.info(
+                f"Executed {file_path.stem},"
+                f"took {round((time.monotonic() - start),3)}s"
+            )
+        except Exception as e:
+            raise SqlError(f"Error executing sql query: \n{file_path} \n{e}")
 
     def _add_suffix(self, file):
         if not str(file).endswith(".sql"):

@@ -18,20 +18,3 @@ def execute(deps: Dependencies, limit: Union[int, None]):
     sql_ingest.execute("unpack_photos")
     sql_ingest.execute("unpack_users")
     sql_ingest.execute("unpack_taxa")
-
-    # Transform data and create features
-    sql_features = SQL_Engine(con, deps.SQL_FEATURES_PATH)
-
-    # Macros
-    sql_features.execute("community_taxon_windowed")
-    sql_features.execute("research_grade_windowed")
-
-    # Features
-    sql_features.execute("identifications")
-    sql_features.execute("identifiers")
-    sql_features.execute("taxon")
-    sql_features.execute("label")
-    sql_features.execute("observations")
-    sql_features.execute("observers")
-    sql_features.execute("stratify")
-    sql_features.execute("training")

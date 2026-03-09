@@ -77,19 +77,19 @@ pip install inat_pipeline
 
 ### Ingest
 ```bash
-#Ingests data sources, runs api queries and stores to db
+#Ingests data sources, runs api queries, saves to db and stage data 
 inat_pipe ingest
 ```
 
-### Process
+### Features
 ```bash
-# Unpacks raw data, creates features 
-inat_pipe process
+# Creates features suite  
+inat_pipe features
 ```
 
 ### Model
 ```bash
-# Unpacks raw data, creates features 
+#  Model
 
 inat_pipe model*
 ```

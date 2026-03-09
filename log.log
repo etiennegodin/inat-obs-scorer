@@ -1,22 +1,12 @@
-2026-03-08 20:35:39 - inat_pipeline.app.service - process - INFO - Starting process_features workflow
-2026-03-08 20:35:40 - inat_pipeline.utils.db - __init__ - INFO - Initialized sql engine for queries in /home/etienne/projects/inatML/src/inat_pipeline/queries/ingest
-2026-03-08 20:35:48 - inat_pipeline.utils.db - execute - INFO - Executed unpack_observations, took 8.026s
-2026-03-08 20:35:53 - inat_pipeline.utils.db - execute - INFO - Executed unpack_identifications, took 5.175s
-2026-03-08 20:35:53 - inat_pipeline.utils.db - execute - INFO - Executed unpack_photos, took 0.054s
-2026-03-08 20:35:53 - inat_pipeline.utils.db - execute - INFO - Executed unpack_users, took 0.133s
-2026-03-08 20:35:54 - inat_pipeline.utils.db - execute - INFO - Executed unpack_taxa, took 1.438s
-2026-03-08 20:35:54 - inat_pipeline.utils.db - __init__ - INFO - Initialized sql engine for queries in /home/etienne/projects/inatML/src/inat_pipeline/queries/features
-2026-03-08 20:35:54 - inat_pipeline.utils.db - execute - INFO - Executed community_taxon_windowed, took 0.008s
-2026-03-08 20:35:54 - inat_pipeline.utils.db - execute - INFO - Executed research_grade_windowed, took 0.007s
-2026-03-08 20:35:55 - inat_pipeline.utils.db - execute - INFO - Executed identifications, took 0.861s
-2026-03-08 20:36:00 - inat_pipeline.utils.db - execute - INFO - Executed identifiers, took 4.277s
-2026-03-08 20:36:03 - inat_pipeline.utils.db - execute - INFO - Executed taxon, took 3.669s
-2026-03-08 20:36:05 - inat_pipeline.utils.db - execute - INFO - Executed label, took 1.912s
-2026-03-08 20:36:07 - inat_pipeline.utils.db - execute - INFO - Executed observations, took 1.627s
-2026-03-08 20:36:14 - inat_pipeline.utils.db - execute - INFO - Executed observers, took 7.459s
-2026-03-08 20:36:14 - inat_pipeline.app.service - process - ERROR - Process_features failed Error executing sql query: 
-/home/etienne/projects/inatML/src/inat_pipeline/queries/features/stratify.sql 
-Parser Error: syntax error at or near "base"
-
-LINE 3: base AS(
-        ^
+2026-03-08 23:13:21 - inat_pipeline.app.service - features - INFO - Starting features workflow
+2026-03-08 23:13:22 - inat_pipeline.utils.db - __init__ - INFO - Initialized sql engine for queries in /home/etienne/projects/inatML/src/inat_pipeline/queries/features
+2026-03-08 23:13:22 - inat_pipeline.utils.db - _execute - INFO - Executed community_taxon_windowed, took 0.015s
+2026-03-08 23:13:22 - inat_pipeline.utils.db - _execute - INFO - Executed research_grade_windowed, took 0.009s
+2026-03-08 23:13:22 - inat_pipeline.utils.db - _execute - INFO - Executed identifications, took 0.884s
+2026-03-08 23:13:27 - inat_pipeline.utils.db - _execute - INFO - Executed identifiers, took 4.399s
+2026-03-08 23:13:32 - inat_pipeline.utils.db - _execute - INFO - Executed taxon, took 4.692s
+2026-03-08 23:13:34 - inat_pipeline.utils.db - _execute - INFO - Executed label, took 2.774s
+2026-03-08 23:13:36 - inat_pipeline.utils.db - _execute - INFO - Executed observations, took 1.63s
+2026-03-08 23:13:44 - inat_pipeline.utils.db - _execute - INFO - Executed observers, took 7.542s
+2026-03-08 23:13:44 - inat_pipeline.utils.db - _execute - INFO - Executed stratify, took 0.277s
+2026-03-08 23:13:45 - inat_pipeline.utils.db - _execute - INFO - Executed training, took 0.838s
