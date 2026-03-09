@@ -5,8 +5,8 @@ import pandas as pd
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 
-from ...utils.db import _open_connection
-from ...utils.git import get_git_hash
+from ..utils.db import _open_connection
+from ..utils.git import get_git_hash
 from .config import PipelineConfig
 from .registery import (
     CATEGORICAL_IMPUTER_REGISTRY,

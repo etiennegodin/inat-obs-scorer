@@ -14,7 +14,7 @@ from sklearn.metrics import (
     roc_auc_score,
 )
 
-from ..pipeline import model
+from .. import model
 
 logger = logging.getLogger(__name__)
 

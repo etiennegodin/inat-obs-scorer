@@ -24,27 +24,33 @@ dev = [
     "pytest",
     "pytest-cov",
     "pytest-dependency",
-    "black",
     "ruff",
 ]
 
 [project.scripts]   # <-- entry point CLI
 inat_pipe = "inat_pipeline.cli:main"
 
-
-[tool.black]
-line-length = 88
-target-version = ["py310"]
-
 [tool.ruff]
 line-length = 88
 target-version = "py310"
+
+[tool.ruff.lint]
+# E: pycodestyle errors, F: Pyflakes, I: isort (imports)
 select = ["E", "F", "I"]
-fix = true
+fixable = ["ALL"]
+unfixable = []
+
+[tool.ruff.format]
+# Matches Black's default style
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
 
 [tool.mypy]
 python_version = "3.11"
 strict = true
 
 [tool.pytest.ini_options]
-addopts = "--cov=src/nukekit --cov-report=term-missing --cov-report=html"
+# Updated the cov path to match your project name
+addopts = "--cov=src/inat_pipeline --cov-report=term-missing --cov-report=html"

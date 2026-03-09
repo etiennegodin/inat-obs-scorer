@@ -11,7 +11,7 @@ This is the entry point for all use cases. It handles:
 import logging
 from typing import Union
 
-from ..pipeline.exceptions import InatPipelineError, WorkflowError
+from ..exceptions import InatPipelineError, WorkflowError
 from ..workflows import (
     features_workflow,
     ingest_downloads_workflow,

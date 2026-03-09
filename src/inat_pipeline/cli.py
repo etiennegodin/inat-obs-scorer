@@ -5,8 +5,8 @@ from argparse import Namespace
 from pathlib import Path
 
 from .app import ApplicationService, Dependencies
-from .pipeline.exceptions import InatPipelineError
-from .pipeline.model.registery import (
+from .exceptions import InatPipelineError
+from .model.registery import (
     CLASSIFIER_REGISTRY,
     ENCODER_REGISTRY,
     IMPUTER_REGISTRY,

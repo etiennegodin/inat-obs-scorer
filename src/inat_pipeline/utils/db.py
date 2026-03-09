@@ -7,7 +7,7 @@ from pathlib import Path
 import duckdb
 from duckdb import IOException
 
-from ..pipeline.exceptions import InatPipelineError, SqlError
+from ..exceptions import InatPipelineError, SqlError
 
 logger = logging.getLogger(__name__)
 
@@ -66,7 +66,7 @@ WITH params AS (
         {self.train_frac}                             AS train_frac,
         {self.val_frac}                               AS val_frac,
         {self.train_frac + self.val_frac}              AS train_val_frac
-    
+
 )
 """
 

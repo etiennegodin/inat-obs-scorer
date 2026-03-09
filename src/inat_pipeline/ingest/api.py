@@ -116,7 +116,7 @@ class inatApiClient:
                         logger.debug(f"Saved item {item_key}")
                         con.execute(
                             f"""INSERT INTO {self.table_name} VALUES (
-                            ?, ?, ?, ?, ?, ?, ?, ?, ? 
+                            ?, ?, ?, ?, ?, ?, ?, ?, ?
                             )""",
                             (
                                 item_key,

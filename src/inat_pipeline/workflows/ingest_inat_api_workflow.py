@@ -5,7 +5,7 @@ from typing import Union
 from duckdb import CatalogException
 
 from ..app.container import Dependencies
-from ..pipeline.ingest.api import inatApiClient, inatApiConfig
+from ..ingest.api import inatApiClient, inatApiConfig
 from ..utils.config import read_config
 from ..utils.db import _open_connection
 

@@ -86,7 +86,7 @@ def make_objective(
         # ── Step 2: Build pipeline with suggested params ──────────────────────
         pipeline = build_pipeline(config, classifier_params=trial_params)
 
-        logger.debug(pipeline)
+        logger.debug(pipeline.steps["classifier"])
 
         # ── Step 3: Cross-validate ────────────────────────────────────────────
 

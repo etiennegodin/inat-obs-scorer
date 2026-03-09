@@ -1,7 +1,7 @@
 import logging
 
 from ..app.container import Dependencies
-from ..pipeline.ingest.downloads import ingest_downloads
+from ..ingest.downloads import ingest_downloads
 from ..utils.db import SQL_Engine, _open_connection
 
 logger = logging.getLogger(__name__)
