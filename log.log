@@ -1,4 +1,5 @@
-2026-03-09 14:30:52 - inat_pipeline.app.service - model - INFO - Starting model workflow
-2026-03-09 14:30:52 - inat_pipeline.pipeline.model.config - set_features - DEBUG - 'label'
-2026-03-09 14:30:52 - inat_pipeline.pipeline.model.config - change_feature_type - INFO - Moved oauth_application_id to categorical features
-2026-03-09 14:30:56 - inat_pipeline.workflows.model_workflow - execute - INFO - Model workflow
+2026-03-09 14:32:46 - inat_pipeline.app.service - model - INFO - Starting model workflow
+2026-03-09 14:32:47 - inat_pipeline.pipeline.model.config - set_features - DEBUG - 'label'
+2026-03-09 14:32:47 - inat_pipeline.pipeline.model.config - change_feature_type - INFO - Moved oauth_application_id to categorical features
+2026-03-09 14:32:47 - inat_pipeline.workflows.model_workflow - execute - INFO - Fitting inat_obs_scorer_v0_1
+2026-03-09 14:32:49 - inat_pipeline.workflows.model_workflow - execute - INFO - Model workflow

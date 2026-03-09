@@ -7,16 +7,16 @@ from sklearn.pipeline import Pipeline
 
 from ...utils.db import _open_connection
 from ...utils.git import get_git_hash
-from .config import (
+from .config import PipelineConfig
+from .registery import (
     CATEGORICAL_IMPUTER_REGISTRY,
     CLASSIFIER_REGISTRY,
     ENCODER_REGISTRY,
     IMPUTER_REGISTRY,
     REDUCER_REGISTRY,
     SCALER_REGISTRY,
-    PipelineConfig,
-    _instantiate,
 )
+from .utils import _instantiate
 
 
 def load(
@@ -92,7 +92,6 @@ def build_preprocessor(config: PipelineConfig) -> ColumnTransformer:
         remainder="drop",  # drop any unlisted columns
         verbose_feature_names_out=True,  # keeps feature names for inspection
     )
-
     return preprocessor
 
 

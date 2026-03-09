@@ -27,6 +27,8 @@ def execute(deps: Dependencies):
 
     pipe = core.build_pipeline(conf)
 
+    logger.info(f"Fitting {conf.experiment_name}")
+
     pipe.fit(X_train, y_train)
 
     preds = pipe.predict(X_test)
