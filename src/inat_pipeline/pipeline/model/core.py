@@ -19,7 +19,17 @@ from .config import (
 )
 
 
-def load(db_path: Path) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, str]:
+def load(
+    db_path: Path,
+) -> tuple[
+    pd.DataFrame,
+    pd.DataFrame,
+    pd.DataFrame,
+    pd.DataFrame,
+    pd.DataFrame,
+    pd.DataFrame,
+    str,
+]:
     con = _open_connection(db_path)
 
     df = con.execute("SELECT * FROM features.training").df()
@@ -31,9 +41,18 @@ def load(db_path: Path) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, str]:
     val.pop("split")
     test.pop("split")
 
+    y_train = train["label"]
+    train.pop("label")
+
+    y_val = val["label"]
+    val.pop("label")
+
+    y_test = test["label"]
+    test.pop("label")
+
     split_seed = get_git_hash(short=True)
 
-    return train, val, test, split_seed
+    return train, y_train, val, y_val, test, y_test, split_seed
 
 
 def _build_categorical_transformer(config: PipelineConfig) -> Pipeline:
