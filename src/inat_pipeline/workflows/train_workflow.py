@@ -4,7 +4,15 @@ import warnings
 from pathlib import Path
 
 import mlflow
+import mlflow.models
 import optuna
+from sklearn.metrics import (
+    accuracy_score,
+    average_precision_score,
+    classification_report,
+    f1_score,
+    roc_auc_score,
+)
 
 from ..pipeline import model
 
@@ -13,6 +21,8 @@ logger = logging.getLogger(__name__)
 # Suppress noisy warnings during hyperparameter search
 warnings.filterwarnings("ignore", category=UserWarning)
 optuna.logging.set_verbosity(optuna.logging.WARNING)
+
+mlflow.set_tracking_uri("sqlite:///mlruns.db")  # single file, easy to inspect
 
 
 def execute(
@@ -66,6 +76,7 @@ def execute(
         with open("pipeline_description.json", "w") as f:
             json.dump(pipeline_desc, f, indent=2, default=str)
         mlflow.log_artifact("pipeline_description.json")
+        Path("pipeline_description.json").unlink()
 
         # ── 3. Optuna hyperparameter search ───────────────────────────────────
         logger.info(f"Starting Optuna search ({config.n_trials} trials)...\n")
@@ -104,12 +115,6 @@ def execute(
         final_model = model.train_final_model(config, best_params, X_train, y_train)
 
         # ── 5. Evaluate on held-out test set ──────────────────────────────────
-        from sklearn.metrics import (
-            accuracy_score,
-            average_precision_score,
-            f1_score,
-            roc_auc_score,
-        )
 
         y_pred = final_model.predict(X_test)
         y_pred_proba = final_model.predict_proba(X_test)[:, 1]
@@ -123,6 +128,51 @@ def execute(
 
         mlflow.log_metrics(test_metrics)
 
-        print("\nTest set results:")
+        logger.info("\nTest set results:")
         for k, v in test_metrics.items():
-            print(f"  {k}: {v:.4f}")
+            logger.info(f"  {k}: {v:.4f}")
+
+            # Save classification report as artifact
+        report = classification_report(
+            y_test, y_pred, target_names=["not_rg", "research_grade"]
+        )
+        with open("classification_report.txt", "w") as f:
+            f.write(report)
+        mlflow.log_artifact("classification_report.txt")
+        Path("classification_report.txt").unlink()
+
+        # ── 6. Log the final model ─────────────────────────────────────────────
+        # This saves the *entire pipeline* (preprocessor + reducer + classifier)
+        # as a single artifact. Load it anywhere with:
+        #   pipeline = mlflow.sklearn.load_model("runs:/<run_id>/model")
+        #   predictions = pipeline.predict(new_dataframe)
+
+        # Cast to concrete dtypes so MLflow can read them
+        X_sample = X_train.head(3).copy()
+        for col in config.numeric_features:
+            X_sample[col] = X_sample[col].astype(float)
+        for col in config.categorical_features:
+            X_sample[col] = X_sample[col].astype(str)
+
+        signature = mlflow.models.infer_signature(X_sample, y_train.head(3))
+        mlflow.sklearn.log_model(
+            sk_model=final_model,
+            name="model",
+            signature=signature,
+            input_example=X_train.head(3),
+            registered_model_name=f"inat_scorer_{config.classifier}",
+        )
+
+        logger.info(f"\n✓ Model logged. Run ID: {parent_run_id}")
+        logger.info(
+            f"  To load: mlflow.sklearn.load_model('runs:/{parent_run_id}/model')"
+        )
+        logger.info("  View UI: mlflow ui  (then open http://localhost:5000)\n")
+
+        return {
+            "run_id": parent_run_id,
+            "best_params": best_params,
+            "best_cv_score": best_cv_score,
+            "test_metrics": test_metrics,
+            "model": final_model,
+        }

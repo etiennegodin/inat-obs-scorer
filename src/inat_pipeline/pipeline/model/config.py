@@ -44,6 +44,9 @@ class PipelineConfig:
         self.categorical_features = df.select_dtypes(include="object").columns.to_list()
         self.numeric_features = df.select_dtypes(include="number").columns.to_list()
 
+    def set_git_hash(self, git_hash: str):
+        self.git_hash = git_hash
+
     def change_feature_type(self, feature_name: str) -> None:
         if feature_name in self.features:
             try:

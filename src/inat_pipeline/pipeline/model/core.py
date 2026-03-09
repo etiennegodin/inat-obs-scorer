@@ -52,6 +52,8 @@ def load_and_split(
 
     git_hash = get_git_hash(short=True)
 
+    config.set_git_hash(git_hash)
+
     # Store features from dataframe
     config.set_features(test)
 
@@ -64,7 +66,6 @@ def load_and_split(
         "n_features_numeric": len(config.numeric_features),
         "n_features_cat": len(config.categorical_features),
         "target_positive_rate": float(df[config.target_column].mean()),
-        "git_hash": git_hash,
     }
 
     return train, y_train, val, y_val, test, y_test, data_stats

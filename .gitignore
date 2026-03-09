@@ -18,7 +18,6 @@ htmlcov/
 .ruff_cache
 .idea/
 *.swp
-.cursor/
 
 # Project
 .env
@@ -28,3 +27,4 @@ obsidian/
 notebooks/*
 data/*
 temp/
+mlruns.db

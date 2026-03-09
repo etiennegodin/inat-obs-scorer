@@ -87,7 +87,7 @@ def create_parser() -> argparse.ArgumentParser:
     train_parser.add_argument("--n_trials", default=10)
     train_parser.add_argument("--cv_folds", default=5)
 
-    train_parser.add_argument("--test", "-t", default=False)
+    train_parser.add_argument("--test", "-t", default=False, action="store_true")
     train_parser.set_defaults(func=train_cmd)
 
     return parser
