@@ -27,4 +27,5 @@ obsidian/
 notebooks/*
 data/*
 temp/
+mlruns/*
 mlruns.db
