@@ -17,7 +17,7 @@ from ..workflows import (
     ingest_downloads_workflow,
     ingest_inat_api_workflow,
     ingest_unpack_workflow,
-    model_prep_workflow,
+    model_workflow,
 )
 from .container import Dependencies
 
@@ -85,9 +85,9 @@ class ApplicationService:
             raise WorkflowError(f"Install failed: {e}") from e
 
     def model(self):
-        logger.info("Starting model prep workflow")
+        logger.info("Starting model workflow")
         try:
-            model_prep_workflow.execute(self.deps)
+            model_workflow.execute(self.deps)
         except InatPipelineError as e:
             logger.error(f"Process_features failed {e}")
             raise WorkflowError(f"Process_features failed {e}") from e
