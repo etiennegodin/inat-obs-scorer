@@ -12,7 +12,7 @@ import duckdb
 from aiolimiter import AsyncLimiter
 from tqdm.asyncio import tqdm_asyncio
 
-from ...utils.git import get_git_hash
+from ..utils.git import get_git_hash
 
 logger = logging.getLogger(__name__)
 
