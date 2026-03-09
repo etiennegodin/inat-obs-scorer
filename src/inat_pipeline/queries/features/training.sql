@@ -54,7 +54,8 @@ SELECT
     t.rg_rate_source,
     t.taxon_rg_rate,
     t.taxon_id_source,
-    t.taxon_avg_ids_to_rg
+    t.taxon_avg_ids_to_rg,
+    t.taxon_cold_start
     --t.is_difficult_group,
     --t.iconic_taxon_name,
 
