@@ -4,8 +4,6 @@ import sys
 from argparse import Namespace
 from pathlib import Path
 
-import argcomplete
-
 from .app import ApplicationService, Dependencies
 from .pipeline.exceptions import InatPipelineError
 from .utils.logger import init_logger
@@ -22,6 +20,14 @@ def ingest_cmd(args: Namespace, app: ApplicationService):
 def features_cmd(args: Namespace, app: ApplicationService):
     try:
         app.features(limit=args.limit)
+    except InatPipelineError as e:
+        print(f"[red]✗ {e}[/red]")
+        return 1
+
+
+def model_cmd(args: Namespace, app: ApplicationService):
+    try:
+        app.model()
     except InatPipelineError as e:
         print(f"[red]✗ {e}[/red]")
         return 1
@@ -47,16 +53,22 @@ def create_parser() -> argparse.ArgumentParser:
     )
 
     # Ingest command
-    ingest_parser = subparsers.add_parser("ingest", help="NotImplemented")
+    ingest_parser = subparsers.add_parser(
+        "ingest",
+        help="Ingests data sources, runs api queries, saves to db and stage data",
+    )
     ingest_parser.add_argument("--api_limit", default=None)
     ingest_parser.set_defaults(func=ingest_cmd)
 
     # Process command
-    process_parser = subparsers.add_parser("features", help="NotImplemented")
+    process_parser = subparsers.add_parser("features", help="Creates features suite")
     process_parser.add_argument("--limit", "-l", default=None)
     process_parser.set_defaults(func=features_cmd)
 
-    argcomplete.autocomplete(parser)
+    # Process command
+    model_parser = subparsers.add_parser("model", help="NotImplemented")
+    # process_parser.add_argument("--limit", "-l", default=None)
+    model_parser.set_defaults(func=model_cmd)
 
     return parser
 

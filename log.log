@@ -1,12 +1,2 @@
-2026-03-08 23:13:21 - inat_pipeline.app.service - features - INFO - Starting features workflow
-2026-03-08 23:13:22 - inat_pipeline.utils.db - __init__ - INFO - Initialized sql engine for queries in /home/etienne/projects/inatML/src/inat_pipeline/queries/features
-2026-03-08 23:13:22 - inat_pipeline.utils.db - _execute - INFO - Executed community_taxon_windowed, took 0.015s
-2026-03-08 23:13:22 - inat_pipeline.utils.db - _execute - INFO - Executed research_grade_windowed, took 0.009s
-2026-03-08 23:13:22 - inat_pipeline.utils.db - _execute - INFO - Executed identifications, took 0.884s
-2026-03-08 23:13:27 - inat_pipeline.utils.db - _execute - INFO - Executed identifiers, took 4.399s
-2026-03-08 23:13:32 - inat_pipeline.utils.db - _execute - INFO - Executed taxon, took 4.692s
-2026-03-08 23:13:34 - inat_pipeline.utils.db - _execute - INFO - Executed label, took 2.774s
-2026-03-08 23:13:36 - inat_pipeline.utils.db - _execute - INFO - Executed observations, took 1.63s
-2026-03-08 23:13:44 - inat_pipeline.utils.db - _execute - INFO - Executed observers, took 7.542s
-2026-03-08 23:13:44 - inat_pipeline.utils.db - _execute - INFO - Executed stratify, took 0.277s
-2026-03-08 23:13:45 - inat_pipeline.utils.db - _execute - INFO - Executed training, took 0.838s
+2026-03-09 13:09:30 - inat_pipeline.app.service - model - INFO - Starting model prep workflow
+2026-03-09 13:09:31 - inat_pipeline.workflows.model_prep_workflow - execute - INFO - Model workflow
