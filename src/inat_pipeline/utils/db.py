@@ -131,7 +131,7 @@ class SQL_Engine:
     def __init__(self, con: duckdb.DuckDBPyConnection, path: Path):
         self.con = con
         self.path = path
-        logger.info(f"Initialized sql engine for queries in {path}")
+        logger.info(f"Initialized sql engine for queries in queries/{path.name}")
 
     @staticmethod
     def _check_file(file: Path) -> bool:
@@ -167,7 +167,7 @@ class SQL_Engine:
             start = time.monotonic()
             self.con.execute(sql)
             logger.info(
-                f"Executed {file_path.stem},"
+                f"Executed {file_path.stem}.sql ,"
                 f"took {round((time.monotonic() - start), 3)}s"
             )
         except Exception as e:

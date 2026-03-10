@@ -19,9 +19,11 @@ def execute(deps: Dependencies):
     # Ingest taxa
     source = "taxa"
     ingested = ingest_downloads(con, source, deps._RAW_DATA_FOLDER / source)
-    logger.info(f"Ingested {len(ingested)} files raw/{source} ")
+    logger.info(f"Ingested {len(ingested)} files from raw/{source} ")
 
     # Ingest places
     source = "places"
-    ingested = ingest_downloads(con, source, deps._RAW_DATA_FOLDER / source)
-    logger.info(f"Ingested {len(ingested)} files raw/{source}")
+    ingested = ingest_downloads(
+        con, source, deps._RAW_DATA_FOLDER / source, ignore_error=False
+    )
+    logger.info(f"Ingested {len(ingested)} files from raw/{source}")

@@ -1,6 +1,9 @@
-2026-03-10 11:20:06 - inat_pipeline.app.service - ingest_local - INFO - Starting local ingest workflow
-2026-03-10 11:20:13 - inat_pipeline.workflows.ingest_local_workflow - execute - INFO - Ingested 5 files
-2026-03-10 11:20:21 - inat_pipeline.workflows.ingest_local_workflow - execute - INFO - Ingested 1 files
-2026-03-10 11:20:23 - inat_pipeline.workflows.ingest_local_workflow - execute - INFO - Ingested 1 files
-2026-03-10 11:20:23 - inat_pipeline.utils.db - __init__ - INFO - Initialized sql engine for queries in /home/etienne/projects/inatML/src/inat_pipeline/queries/api
-2026-03-10 11:20:29 - inat_pipeline.utils.db - _execute - INFO - Executed sample,took 6.129s
+2026-03-10 11:34:53 - inat_pipeline.app.service - features - INFO - Starting features workflow
+2026-03-10 11:34:53 - inat_pipeline.utils.db - __init__ - INFO - Initialized sql engine for queries in features
+2026-03-10 11:34:53 - inat_pipeline.utils.db - _execute - INFO - Executed community_taxon_windowed.sql ,took 0.022s
+2026-03-10 11:34:53 - inat_pipeline.utils.db - _execute - INFO - Executed research_grade_windowed.sql ,took 0.013s
+2026-03-10 11:34:55 - inat_pipeline.utils.db - _execute - INFO - Executed identifications.sql ,took 1.485s
+2026-03-10 11:35:04 - inat_pipeline.utils.db - _execute - INFO - Executed identifiers.sql ,took 9.169s
+2026-03-10 11:35:05 - inat_pipeline.app.service - features - ERROR - Process_features failed Error executing sql query:
+/home/etienne/projects/inatML/src/inat_pipeline/queries/features/taxon.sql
+Query interrupted
