@@ -19,6 +19,10 @@ def execute(deps: Dependencies):
     ingested = ingest_downloads(con, "taxa", deps._RAW_DATA_FOLDER / "taxa")
     logger.info(f"Ingested {len(ingested)} files ")
 
+    # Ingest places
+    ingested = ingest_downloads(con, "places", deps._RAW_DATA_FOLDER / "places")
+    logger.info(f"Ingested {len(ingested)} files ")
+
     # Select observations to sample
     sql = SQL_Engine(con, deps.SQL_API_PATH)
     sql.execute("sample")

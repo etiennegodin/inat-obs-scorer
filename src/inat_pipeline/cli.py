@@ -16,9 +16,17 @@ from .model.registery import (
 from .utils.logger import init_logger
 
 
-def ingest_cmd(args: Namespace, app: ApplicationService):
+def ingest_local_cmd(args: Namespace, app: ApplicationService):
     try:
-        app.ingest(api_limit=args.api_limit)
+        app.ingest_local(args)
+    except InatPipelineError as e:
+        print(f"[red]✗ {e}[/red]")
+        return 1
+
+
+def ingest_api_cmd(args: Namespace, app: ApplicationService):
+    try:
+        app.ingest_api(args)
     except InatPipelineError as e:
         print(f"[red]✗ {e}[/red]")
         return 1
@@ -67,8 +75,23 @@ def create_parser() -> argparse.ArgumentParser:
         "ingest",
         help="Ingests data sources, runs api queries, saves to db and stage data",
     )
-    ingest_parser.add_argument("--api_limit", default=None)
-    ingest_parser.set_defaults(func=ingest_cmd)
+
+    ingest_subparsers = ingest_parser.add_subparsers(
+        title="module", description="Available modules"
+    )
+
+    ingest_local_parser = ingest_subparsers.add_parser(
+        "local",
+        help="Ingests local data sources",
+    )
+    ingest_local_parser.set_defaults(func=ingest_local_cmd)
+
+    ingest_api_parser = ingest_subparsers.add_parser(
+        "api",
+        help="Run api collection",
+    )
+    ingest_api_parser.add_argument("--api_limit", default=None)
+    ingest_api_parser.set_defaults(func=ingest_api_cmd)
 
     # Process command
     process_parser = subparsers.add_parser("features", help="Creates features suite")

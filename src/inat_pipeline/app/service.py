@@ -14,7 +14,8 @@ from typing import Union
 from ..exceptions import InatPipelineError, WorkflowError
 from ..workflows import (
     features_workflow,
-    ingest_workflow,
+    ingest_api_workflow,
+    ingest_local_workflow,
     train_workflow,
 )
 from .container import Dependencies
@@ -42,11 +43,20 @@ class ApplicationService:
         """
         self.deps = deps
 
-    def ingest(self, api_limit: Union[int, None]):
-        logger.info("Starting ingest downloads workflow")
+    def ingest_local(self, args):
+        logger.info("Starting local ingest workflow")
         try:
-            ingest_workflow.execute(self.deps, limit=api_limit)
+            ingest_local_workflow.execute(self.deps)
+        except InatPipelineError as e:
+            logger.error(f"Ingest downloads failed {e}")
+            raise WorkflowError(f"Ingest downloads failed failed {e}") from e
+        except Exception as e:
+            logger.exception(e)
 
+    def ingest_api(self, args):
+        logger.info("Starting api ingest workflow")
+        try:
+            ingest_api_workflow.execute(self.deps, api_limit=args.limit)
         except InatPipelineError as e:
             logger.error(f"Ingest downloads failed {e}")
             raise WorkflowError(f"Ingest downloads failed failed {e}") from e
