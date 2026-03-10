@@ -36,7 +36,9 @@ def execute(deps: Dependencies, limit: Union[None, int]) -> None:
         api_fields = fields.load(deps.API_FIELDS_PATH / "observations.yaml")
 
         # Set up api configs
-        config = inatApiConfig(fields=api_fields, limiter=10, per_page=CHUNK_SIZE)
+        config = inatApiConfig(
+            endpoint="observations", fields=api_fields, limiter=10, per_page=CHUNK_SIZE
+        )
 
         # Run api queries
         api = inatApiClient(TARGET_TABLE_NAME, config=config)

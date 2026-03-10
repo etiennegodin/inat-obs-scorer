@@ -30,15 +30,19 @@ def fields_to_string(fields_dict, level=0):
 
 @dataclass
 class inatApiConfig:
+    endpoint: str
     fields: dict = field(default_factory=dict)
     per_page: int = 200
     limiter: int = 10
+    version: int = 2
 
 
 class inatApiClient:
     def __init__(self, table_name: str, config: inatApiConfig):
         # Init api
-        self.base_url = "https://api.inaturalist.org/v2/observations/"
+        self.base_url = (
+            f"https://api.inaturalist.org/{config.version}/{config.endpoint}/"
+        )
         self.per_page = config.per_page
         self.table_name = table_name
 
