@@ -3,7 +3,7 @@ import logging
 from abc import ABC, abstractmethod
 from asyncio import Queue
 from itertools import islice
-from typing import Iterator
+from typing import Any, Iterator
 
 import aiohttp
 from tqdm.asyncio import tqdm_asyncio
@@ -40,7 +40,7 @@ class BaseInatClient(ABC):
         self.version = get_git_hash(short=True)
 
     @abstractmethod
-    def _iter_requests(self, ids: list) -> Iterator[dict]:
+    def _iter_requests(self, ids: list) -> Iterator[tuple[Any, dict]]:
         """Yield one param-dict per HTTP request (before pagination)."""
         ...
 
@@ -54,8 +54,10 @@ class BaseInatClient(ABC):
 
             # Create fetchers with batched IDs
             fetch_tasks = [
-                asyncio.create_task(self._fetch_all_pages(session, base_params))
-                for base_params in self._iter_requests(ids)
+                asyncio.create_task(
+                    self._fetch_all_pages(session, source_id, base_params)
+                )
+                for source_id, base_params in self._iter_requests(ids)
             ]
 
             await tqdm_asyncio.gather(*fetch_tasks)  # all producers done
@@ -63,11 +65,8 @@ class BaseInatClient(ABC):
             await self.queue.put(None)  # sentinel → stop consumer
             await writer_task
 
-        if hasattr(self.writer, "close"):  # graceful executor shutdown
-            self.writer.close()
-
     async def _fetch_all_pages(
-        self, session: aiohttp.ClientSession, base_params: dict
+        self, session: aiohttp.ClientSession, source_id: Any, base_params: dict
     ) -> None:
         """Producer: fetch all pages for one logical request, enqueue each page."""
         page = 1
@@ -79,8 +78,17 @@ class BaseInatClient(ABC):
             if not results:
                 logger.warning(f"No results found for IDs {params}")
                 break
+
+            # Try to find id in response, otherwise fall back on source_id
+            tagged = [
+                {
+                    "_source_id": _resolve_id(item, source_id, *self.config.id_fields),
+                    **item,
+                }
+                for item in results
+            ]
             try:
-                await self.queue.put(results)  # backpressure if consumer is slow
+                await self.queue.put(tagged)  # backpressure if consumer is slow
             except Exception as e:
                 logger.error(f"FAILED to queue result: {e}")
 
@@ -114,3 +122,10 @@ class BaseInatClient(ABC):
             await self.writer.write(batch)
             processed += len(batch)
             self.queue.task_done()
+
+
+def _resolve_id(item: dict, source_id: Any, *id_fields: str) -> Any:
+    for field in id_fields:
+        if (value := item.get(field)) is not None:
+            return value
+    return source_id

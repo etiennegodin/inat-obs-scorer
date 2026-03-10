@@ -47,15 +47,8 @@ def create_api_raw_table(con: duckdb.DuckDBPyConnection, TARGET_TABLE_NAME: str)
             (
             raw_id VARCHAR,
             raw_json JSON,
-
             scraped_at VARCHAR,
-            api_page INT,
-            api_per_page INT,
-            request_params JSON,
-            response_time_ms INT,
-            http_status_code INT,
             scrapper_version VARCHAR,
-
             )"""
         )
         logger.info(f"Created table {TARGET_TABLE_NAME}")

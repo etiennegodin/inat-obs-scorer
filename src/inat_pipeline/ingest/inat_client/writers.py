@@ -1,8 +1,8 @@
 import asyncio
-import datetime
 import json
 import logging
 from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime
 from pprint import pprint
 from typing import Union
 
@@ -38,6 +38,13 @@ class DuckDbWriter:
         self.version = version
         self._executor = ThreadPoolExecutor(max_workers=1)  # DuckDB isn't thread-safe
 
+    async def __aenter__(self):
+        return self
+
+    async def __aexit__(self, *_):
+        self.close()
+        self.con.close()  # explicitly release DuckDB
+
     async def write(self, results: list[dict]):
         """Receive a ready batch, offload blocking insert to thread pool."""
         logger.info("Init writer task")
@@ -47,20 +54,20 @@ class DuckDbWriter:
     def _insert_batch(self, results: list[dict]) -> None:
         try:
             for item in results:
-                print(item)
+                source_id = item["_source_id"]  # resolved in base
                 self.con.execute(
-                    f"INSERT INTO {self.table_name} VALUES (?, ?, ?, ?, ?, ?)",
+                    f"INSERT INTO {self.table_name} VALUES (?, ?, ?, ?)",
                     (
-                        item["id"],
-                        json.dumps(item["data"]),
+                        source_id,
+                        json.dumps(
+                            {k: v for k, v in item.items() if k != "_source_id"}
+                        ),  # since results is tagged
                         str(datetime.now()),
-                        item["response_time"],
-                        item["status"],
                         self.version,
                     ),
                 )
             self.con.commit()
-            logger.debug("Inserted batch of %d items", len(results))
+            logger.info("Inserted batch of %d items", len(results))
         except Exception as e:
             logger.error("Failed to insert batch: %s", e)
             raise

@@ -1,5 +1,5 @@
 import logging
-from typing import Iterator
+from typing import Any, Iterator
 
 from .base import BaseInatClient, _chunked
 from .config import EndpointConfig
@@ -15,18 +15,23 @@ class BatchEndpointClient(BaseInatClient):
     - Supports per_page pagination
     """
 
-    def _iter_requests(self, ids: list) -> Iterator[dict]:
+    def _iter_requests(self, ids: list) -> Iterator[tuple[Any, dict]]:
         for chunk in _chunked(ids, self.config.chunk_size):
+            # Get params from config
             params = {
                 **self.config.params,
             }
+
+            # Add fields string to params
             if self.config.fields:
                 params["fields"] = self.config.fields
 
             # Modify url to append listed ids
             self.config.url + ",".join(map(str, chunk))
+
             logger.debug(self.config.url)
-            yield params
+            # Add first id of chunk as fallback id
+            yield chunk[0], params
 
 
 class ParametrizedEndpointClient(BaseInatClient):
@@ -43,9 +48,12 @@ class ParametrizedEndpointClient(BaseInatClient):
         ), "ParametrizedEndpointClient requires config.id_param"
         super().__init__(config, fetcher, writer)
 
-    def _iter_requests(self, ids: list) -> Iterator[dict]:
+    def _iter_requests(self, ids: list) -> Iterator[tuple[Any, dict]]:
         for id_ in ids:  # always 1 ID per request
-            yield {
-                **self.config.params,
-                self.config.id_param: id_,
-            }
+            yield (
+                id_,
+                {
+                    **self.config.params,
+                    self.config.id_param: id_,
+                },
+            )

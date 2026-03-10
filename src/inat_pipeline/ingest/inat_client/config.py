@@ -23,6 +23,7 @@ class EndpointConfig:
     id_param: Union[str, None] = None
     api_version: int = 2
     url: str = field(init=False)
+    id_fields: list[str] = field(default_factory=lambda: ["uuid", "id"])
 
     def __post_init__(self):
         print("post")
