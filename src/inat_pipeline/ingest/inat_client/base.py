@@ -77,9 +77,12 @@ class BaseInatClient(ABC):
             results = response.get("results", [])
 
             if not results:
+                logger.warning(f"No results found for IDs {params}")
                 break
-
-            await self.queue.put(results)  # backpressure if consumer is slow
+            try:
+                await self.queue.put(results)  # backpressure if consumer is slow
+            except Exception as e:
+                logger.error(f"FAILED to queue result: {e}")
 
             total = response.get("total_results", 0)
             if page * self.config.per_page >= total:

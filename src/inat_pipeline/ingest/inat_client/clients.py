@@ -39,7 +39,7 @@ class BatchEndpointClient(BaseInatClient):
                 "id": ",".join(map(str, chunk)),
             }
             if self.config.fields:
-                params["fields"] = ",".join(self.config.fields)
+                params["fields"] = self.config.fields
             yield params
 
 
