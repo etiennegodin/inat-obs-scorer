@@ -3,6 +3,7 @@ from typing import Iterator
 from .base import BaseInatClient, _chunked
 from .config import EndpointConfig
 
+"""
 # Init params
 self.params = config.params
 
@@ -16,6 +17,7 @@ if config.per_page is not None:
 # Add provided fields to params
 if self.fields is not None:
     self.params["fields"] = self.fields
+"""
 
 
 class BatchEndpointClient(BaseInatClient):
@@ -26,7 +28,7 @@ class BatchEndpointClient(BaseInatClient):
     - Supports per_page pagination
     """
 
-    def __init__(self, config: EndpointConfig, table_name: str):
+    def __init__(self, config: EndpointConfig, fetcher, writer):
         assert config.id_param, "ParametrizedEndpointClient requires config.id_param"
         super().__init__(config, fetcher, writer)
 
@@ -51,7 +53,7 @@ class ParametrizedEndpointClient(BaseInatClient):
 
     def __init__(self, config: EndpointConfig, fetcher, writer):
         assert config.id_param, "ParametrizedEndpointClient requires config.id_param"
-        super().__init__(config, table_name)
+        super().__init__(config, fetcher, writer)
 
     def _iter_requests(self, ids: list) -> Iterator[dict]:
         for id_ in ids:  # always 1 ID per request
