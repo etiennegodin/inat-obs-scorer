@@ -1,9 +1,6 @@
-2026-03-10 11:13:54 - inat_pipeline - main - ERROR - Unexpected error
-Traceback (most recent call last):
-  File "/home/etienne/projects/inatML/src/inat_pipeline/cli.py", line 138, in main
-    exit_code = args.func(args, app)
-                ^^^^^^^^^^^^^^^^^^^^
-  File "/home/etienne/projects/inatML/src/inat_pipeline/cli.py", line 20, in ingest_cmd
-    print(args.commands)
-          ^^^^^^^^^^^^^
-AttributeError: 'Namespace' object has no attribute 'commands'
+2026-03-10 11:20:06 - inat_pipeline.app.service - ingest_local - INFO - Starting local ingest workflow
+2026-03-10 11:20:13 - inat_pipeline.workflows.ingest_local_workflow - execute - INFO - Ingested 5 files
+2026-03-10 11:20:21 - inat_pipeline.workflows.ingest_local_workflow - execute - INFO - Ingested 1 files
+2026-03-10 11:20:23 - inat_pipeline.workflows.ingest_local_workflow - execute - INFO - Ingested 1 files
+2026-03-10 11:20:23 - inat_pipeline.utils.db - __init__ - INFO - Initialized sql engine for queries in /home/etienne/projects/inatML/src/inat_pipeline/queries/api
+2026-03-10 11:20:29 - inat_pipeline.utils.db - _execute - INFO - Executed sample,took 6.129s
