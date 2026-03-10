@@ -28,10 +28,12 @@ class EndpointConfig:
         print("post")
         if self.id_param is None:
             self.url = (
-                f"https://api.inaturalist.org/{self.api_version}/{self.endpoint}/"
+                f"https://api.inaturalist.org/v{self.api_version}/{self.endpoint}/"
             )
         else:
-            self.url = f"https://api.inaturalist.org/{self.api_version}/{self.endpoint}"
+            self.url = (
+                f"https://api.inaturalist.org/v{self.api_version}/{self.endpoint}"
+            )
 
         # Convert fields dict to request format
         self.fields = f"({_fields_to_string(self.fields)})"

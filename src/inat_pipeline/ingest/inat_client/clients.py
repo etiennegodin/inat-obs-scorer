@@ -19,10 +19,13 @@ class BatchEndpointClient(BaseInatClient):
         for chunk in _chunked(ids, self.config.chunk_size):
             params = {
                 **self.config.params,
-                "id": ",".join(map(str, chunk)),
             }
             if self.config.fields:
                 params["fields"] = self.config.fields
+
+            # Modify url to append listed ids
+            self.config.url + ",".join(map(str, chunk))
+            logger.debug(self.config.url)
             yield params
 
 

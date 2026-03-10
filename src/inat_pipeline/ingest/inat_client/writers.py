@@ -4,6 +4,7 @@ import json
 import logging
 from concurrent.futures import ThreadPoolExecutor
 from pprint import pprint
+from typing import Union
 
 import duckdb
 
@@ -11,8 +12,13 @@ logger = logging.getLogger(__name__)
 
 
 class NullWriter:
+    def __init__(self, limit: Union[int, None] = None):
+        self.limit = limit
+
     async def write(self, results: list[dict]):
         logger.info("Init null writer task")
+        if self.limit is not None:
+            results = results[: self.limit]
         for r in results:
             pprint(r)
 
@@ -24,7 +30,9 @@ class JsonWriter:
 
 
 class DuckDbWriter:
-    def __init__(self, con: duckdb.DuckDBPyConnection, table_name: str, version: str):
+    def __init__(
+        self, con: duckdb.DuckDBPyConnection, table_name: str, version: str = "na"
+    ):
         self.con = con
         self.table_name = table_name
         self.version = version
@@ -39,6 +47,7 @@ class DuckDbWriter:
     def _insert_batch(self, results: list[dict]) -> None:
         try:
             for item in results:
+                print(item)
                 self.con.execute(
                     f"INSERT INTO {self.table_name} VALUES (?, ?, ?, ?, ?, ?)",
                     (
