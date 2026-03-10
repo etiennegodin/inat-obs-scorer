@@ -3,10 +3,18 @@ import datetime
 import json
 import logging
 from concurrent.futures import ThreadPoolExecutor
+from pprint import pprint
 
 import duckdb
 
 logger = logging.getLogger(__name__)
+
+
+class NullWriter:
+    async def write(self, results: list[dict]):
+        logger.info("Init null writer task")
+        for r in results:
+            pprint(r)
 
 
 class JsonWriter:
@@ -50,8 +58,3 @@ class DuckDbWriter:
 
     def close(self):
         self._executor.shutdown(wait=True)
-
-
-class NullWriter:  # for dry runs / debugging
-    def write(self, results: list[dict]) -> None:
-        pass
