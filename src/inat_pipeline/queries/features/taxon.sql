@@ -5,11 +5,11 @@ WITH base AS (
     SELECT
         rg.observation_id,
         -- use computed taxon_id first, if null fallback to observation_id
-        CASE 
+        CASE
             WHEN rg.community_taxon_id IS NULL THEN rg.taxon_id
             ELSE rg.community_taxon_id
         END AS taxon_id,
-        CASE 
+        CASE
             WHEN rg.community_taxon_id IS NULL THEN 'taxon_id'
             ELSE 'community_taxon'
         END AS taxon_id_source,
@@ -95,10 +95,17 @@ rates AS(
     END AS rg_rate_source,
     CASE WHEN taxon_obs_count  < 30 THEN TRUE ELSE FALSE END AS taxon_cold_start,
     COALESCE(taxon_rg_rate, 0) AS taxon_rg_rate_safe,
-    LOG(taxon_obs_count + 1) AS taxon_popularity_rank,
+    CASE rg_rate_source
+        WHEN 'species' THEN taxon_obs_count
+        WHEN 'genus'   THEN genus_obs_count
+        WHEN 'family'  THEN family_obs_count
+        WHEN 'order'   THEN order_obs_count
+    END AS rg_rate_source_obs_count,
+
+    LOG(rg_rate_source_obs_count + 1) AS taxon_popularity_rank,
 
     -- Difficulty flags
-    -- is_difficult_group          BOOLEAN,    
+    -- is_difficult_group          BOOLEAN,
     -- fungi, lichens, bryophytes, micro-invertebrates
 
     FROM aggregates

@@ -116,14 +116,14 @@ def execute(
 
         # ── 5. Evaluate on held-out test set ──────────────────────────────────
 
-        y_pred = final_model.predict(X_test)
-        y_pred_proba = final_model.predict_proba(X_test)[:, 1]
+        y_pred = final_model.predict(X_val)
+        y_pred_proba = final_model.predict_proba(X_val)[:, 1]
 
         test_metrics = {
-            "test_roc_auc": roc_auc_score(y_test, y_pred_proba),
-            "test_avg_precision": average_precision_score(y_test, y_pred_proba),
-            "test_f1": f1_score(y_test, y_pred),
-            "test_accuracy": accuracy_score(y_test, y_pred),
+            "test_roc_auc": roc_auc_score(y_val, y_pred_proba),
+            "test_avg_precision": average_precision_score(y_val, y_pred_proba),
+            "test_f1": f1_score(y_val, y_pred),
+            "test_accuracy": accuracy_score(y_val, y_pred),
         }
 
         mlflow.log_metrics(test_metrics)
@@ -134,7 +134,7 @@ def execute(
 
             # Save classification report as artifact
         report = classification_report(
-            y_test, y_pred, target_names=["not_rg", "research_grade"]
+            y_val, y_pred, target_names=["not_rg", "research_grade"]
         )
         with open("classification_report.txt", "w") as f:
             f.write(report)

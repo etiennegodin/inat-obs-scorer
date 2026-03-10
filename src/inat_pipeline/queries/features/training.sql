@@ -46,11 +46,12 @@ SELECT
     ob.pct_obs_from_mobile AS obv_pct_obs_from_mobile,
     ob.has_orcid AS obv_has_orcid,
 
-    -- v2 identifiers scores 
+    -- v2 identifiers scores
     --id.ids_given_count,
 
     -- Taxon features (fixed lookup)
     t.taxon_rg_rate,
+    t.rank_level,
     t.taxon_popularity_rank,
     t.rg_rate_source,
     t.taxon_rg_rate,

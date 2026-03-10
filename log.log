@@ -1,23 +1,49 @@
-2026-03-09 18:28:26 - inat_pipeline.app.service - train - INFO - Starting training workflow
-2026-03-09 18:28:27 - inat_pipeline.model.config - set_features - DEBUG - 'label'
-2026-03-09 18:28:27 - inat_pipeline.model.config - change_feature_type - INFO - Moved oauth_application_id to categorical features
-2026-03-09 18:28:29 - inat_pipeline.workflows.train_workflow - execute - INFO -
+2026-03-10 09:38:16 - inat_pipeline.app.service - train - INFO - Starting training workflow
+2026-03-10 09:38:16 - inat_pipeline.app.service - train - INFO - Test mode, limited to 3 trials and 2 cv_folds
+2026-03-10 09:38:16 - inat_pipeline.model.config - set_features - DEBUG - 'label'
+2026-03-10 09:38:16 - inat_pipeline.model.config - change_feature_type - INFO - Moved oauth_application_id to categorical features
+2026-03-10 09:38:17 - inat_pipeline.workflows.train_workflow - execute - INFO -
 ============================================================
-2026-03-09 18:28:29 - inat_pipeline.workflows.train_workflow - execute - INFO - MLflow Run ID: b322d75b60bc4369a23c290df79a5345
-2026-03-09 18:28:29 - inat_pipeline.workflows.train_workflow - execute - INFO - Classifier:    random_forest
-2026-03-09 18:28:29 - inat_pipeline.workflows.train_workflow - execute - INFO - Trials:        10
-2026-03-09 18:28:29 - inat_pipeline.workflows.train_workflow - execute - INFO - CV Folds:      5
-2026-03-09 18:28:29 - inat_pipeline.workflows.train_workflow - execute - INFO - ============================================================
+2026-03-10 09:38:17 - inat_pipeline.workflows.train_workflow - execute - INFO - MLflow Run ID: 79c83f916cac4f8691959dde848f0fcf
+2026-03-10 09:38:17 - inat_pipeline.workflows.train_workflow - execute - INFO - Classifier:    gradient_boost
+2026-03-10 09:38:17 - inat_pipeline.workflows.train_workflow - execute - INFO - Trials:        3
+2026-03-10 09:38:17 - inat_pipeline.workflows.train_workflow - execute - INFO - CV Folds:      2
+2026-03-10 09:38:17 - inat_pipeline.workflows.train_workflow - execute - INFO - ============================================================
 
-2026-03-09 18:28:29 - inat_pipeline.workflows.train_workflow - execute - INFO - Starting Optuna search (10 trials)...
+2026-03-10 09:38:17 - inat_pipeline.workflows.train_workflow - execute - INFO - Starting Optuna search (3 trials)...
 
-2026-03-09 18:28:29 - inat_pipeline.model.objective - objective - DEBUG - Optuna objective
-2026-03-09 18:28:29 - inat_pipeline.model.objective - objective - DEBUG - RandomForestClassifier(max_depth=15, min_samples_leaf=8, n_estimators=80,
-                       random_state=42)
-2026-03-09 18:28:29 - inat_pipeline.model.objective - objective - DEBUG - Start cv
-2026-03-09 18:31:52 - inat_pipeline.model.objective - objective - DEBUG - End cv 202.40357971191406
-2026-03-09 18:31:52 - inat_pipeline.model.objective - objective - DEBUG - Mean score 0.8718295759829511
-2026-03-09 18:31:52 - inat_pipeline.model.objective - objective - DEBUG - Optuna objective
-2026-03-09 18:31:52 - inat_pipeline.model.objective - objective - DEBUG - RandomForestClassifier(max_depth=14, max_features=None, min_samples_leaf=7,
-                       n_estimators=20, random_state=42)
-2026-03-09 18:31:52 - inat_pipeline.model.objective - objective - DEBUG - Start cv
+2026-03-10 09:38:17 - inat_pipeline.model.objective - objective - DEBUG - Optuna objective
+2026-03-10 09:38:17 - inat_pipeline.model.objective - objective - DEBUG - GradientBoostingClassifier(learning_rate=0.22648248189516848, max_depth=8,
+                           n_estimators=60, random_state=42,
+                           subsample=0.7993292420985183)
+2026-03-10 09:38:17 - inat_pipeline.model.objective - objective - DEBUG - Start cv
+2026-03-10 09:41:38 - inat_pipeline.model.objective - objective - DEBUG - End cv 200.87291860580444
+2026-03-10 09:41:38 - inat_pipeline.model.objective - objective - DEBUG - Mean score 0.8656813330690171
+2026-03-10 09:41:38 - inat_pipeline.model.objective - objective - DEBUG - Optuna objective
+2026-03-10 09:41:38 - inat_pipeline.model.objective - objective - DEBUG - GradientBoostingClassifier(learning_rate=0.0024345423962016913, max_depth=2,
+                           n_estimators=30, random_state=42,
+                           subsample=0.9330880728874675)
+2026-03-10 09:41:38 - inat_pipeline.model.objective - objective - DEBUG - Start cv
+2026-03-10 09:42:17 - inat_pipeline.model.objective - objective - DEBUG - End cv 38.9302020072937
+2026-03-10 09:42:17 - inat_pipeline.model.objective - objective - DEBUG - Mean score 0.7505018245787161
+2026-03-10 09:42:17 - inat_pipeline.model.objective - objective - DEBUG - Optuna objective
+2026-03-10 09:42:17 - inat_pipeline.model.objective - objective - DEBUG - GradientBoostingClassifier(learning_rate=0.05675206026988748, max_depth=2,
+                           random_state=42, subsample=0.9849549260809971)
+2026-03-10 09:42:17 - inat_pipeline.model.objective - objective - DEBUG - Start cv
+2026-03-10 09:43:56 - inat_pipeline.model.objective - objective - DEBUG - End cv 98.56731176376343
+2026-03-10 09:43:56 - inat_pipeline.model.objective - objective - DEBUG - Mean score 0.8471026315490957
+2026-03-10 09:43:56 - inat_pipeline.workflows.train_workflow - execute - INFO -
+✓ Optuna finished. Best CV roc_auc: 0.8657
+2026-03-10 09:43:56 - inat_pipeline.workflows.train_workflow - execute - INFO -   Best params: {'classifier__n_estimators': 60, 'classifier__learning_rate': 0.22648248189516848, 'classifier__max_depth': 8, 'classifier__subsample': 0.7993292420985183}
+
+2026-03-10 09:43:56 - inat_pipeline.workflows.train_workflow - execute - INFO - Training final model on full training set...
+2026-03-10 09:48:39 - inat_pipeline.workflows.train_workflow - execute - INFO -
+Test set results:
+2026-03-10 09:48:39 - inat_pipeline.workflows.train_workflow - execute - INFO -   test_roc_auc: 0.8767
+2026-03-10 09:48:39 - inat_pipeline.workflows.train_workflow - execute - INFO -   test_avg_precision: 0.8917
+2026-03-10 09:48:39 - inat_pipeline.workflows.train_workflow - execute - INFO -   test_f1: 0.8287
+2026-03-10 09:48:39 - inat_pipeline.workflows.train_workflow - execute - INFO -   test_accuracy: 0.7963
+2026-03-10 09:48:43 - inat_pipeline.workflows.train_workflow - execute - INFO -
+✓ Model logged. Run ID: 79c83f916cac4f8691959dde848f0fcf
+2026-03-10 09:48:43 - inat_pipeline.workflows.train_workflow - execute - INFO -   To load: mlflow.sklearn.load_model('runs:/79c83f916cac4f8691959dde848f0fcf/model')
+2026-03-10 09:48:43 - inat_pipeline.workflows.train_workflow - execute - INFO -   View UI: mlflow ui  (then open http://localhost:5000)

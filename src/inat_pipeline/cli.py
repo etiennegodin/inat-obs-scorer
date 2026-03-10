@@ -80,7 +80,7 @@ def create_parser() -> argparse.ArgumentParser:
     train_parser.add_argument(
         "--classifier", default="logistic", choices=CLASSIFIER_REGISTRY
     )
-    train_parser.add_argument("--reducer", default="none", choices=REDUCER_REGISTRY)
+    train_parser.add_argument("--reducer", default="pca", choices=REDUCER_REGISTRY)
     train_parser.add_argument("--scaler", default="standard", choices=SCALER_REGISTRY)
     train_parser.add_argument("--encoder", default="onehot", choices=ENCODER_REGISTRY)
     train_parser.add_argument("--imputer", default="median", choices=IMPUTER_REGISTRY)

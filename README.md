@@ -4,7 +4,13 @@
 
 Which “Needs ID” observations are most likely to reach Research Grade if reviewed soon?
 
-## Data Challenges
+
+- choose which obsv from larger pool
+-20obs
+time coverage
+
+
+## Dataset Challenges
 
 Main challenge is to avoid temporal leakage and reconstruct features at point in time per observation
 - Observations features
@@ -15,12 +21,17 @@ Main challenge is to avoid temporal leakage and reconstruct features at point in
 - Observer features
     - Observations history
     - Research grade rate
-    - Taxon diversity,
-    - Historical documentation aggregates
+    - Taxon diversity
+    - Documentation habits summary
 
-Other challenges:
+Other mentions:
+- Sampling strategy from all observations records based on observers, using these metrics:
+    - At least 20 observations
+    - Time coverage. Oldest observation before 2020 and newest after 2024.
 - Taxonomic fallback for taxon with low observations using Bayesian Shrinkage*
-- Train/Validation/Test Splits accounting for label time
+- Custom Train/Validation/Test splits accounting for non uniform distribution of observations.
+    - Start/End of split accounting for label time
+
 
 
 ## Data Pipeline Architecture

@@ -75,7 +75,7 @@ CLASSIFIER_REGISTRY = {
 
 SEARCH_SPACES = {
     "random_forest": {
-        "classifier__n_estimators": {"type": "int", "low": 10, "high": 200, "step": 10},
+        "classifier__n_estimators": {"type": "int", "low": 10, "high": 100, "step": 10},
         "classifier__max_depth": {"type": "int", "low": 3, "high": 15},
         "classifier__min_samples_leaf": {"type": "int", "low": 1, "high": 10},
         "classifier__max_features": {
@@ -84,7 +84,7 @@ SEARCH_SPACES = {
         },
     },
     "gradient_boost": {
-        "classifier__n_estimators": {"type": "int", "low": 50, "high": 500, "step": 50},
+        "classifier__n_estimators": {"type": "int", "low": 10, "high": 100, "step": 10},
         "classifier__learning_rate": {
             "type": "float",
             "low": 1e-3,
@@ -99,7 +99,7 @@ SEARCH_SPACES = {
         "classifier__solver": {"type": "categorical", "choices": ["lbfgs", "saga"]},
     },
     "lightgbm": {
-        "classifier__n_estimators": {"type": "int", "low": 50, "high": 500, "step": 50},
+        "classifier__n_estimators": {"type": "int", "low": 10, "high": 120, "step": 10},
         "classifier__learning_rate": {
             "type": "float",
             "low": 1e-3,
