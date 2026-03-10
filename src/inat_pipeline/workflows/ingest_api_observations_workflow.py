@@ -3,8 +3,8 @@ import logging
 from typing import Union
 
 from ..app.container import Dependencies
-from ..ingest import fields
-from ..ingest.api import inatApiClient, inatApiConfig
+from ..ingest.inat_client import fields
+from ..ingest.inat_client.base import inatApiClient
 from ..utils.db import (
     SQL_Engine,
     _open_connection,

@@ -7,4 +7,4 @@ SELECT
     rank
 FROM staged.observations
 WHERE rank_level <= 20 -- genus level and lower
-LIMIT 10
+LIMIT 1
