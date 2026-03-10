@@ -1,23 +1,10 @@
+import logging
 from typing import Iterator
 
 from .base import BaseInatClient, _chunked
 from .config import EndpointConfig
 
-"""
-# Init params
-self.params = config.params
-
-# Add params_key with temp value to params
-self.params[config.param_key] = None
-
-# Add 'per_page' field to params
-if config.per_page is not None:
-    self.params["per_page"] = config.per_page
-
-# Add provided fields to params
-if self.fields is not None:
-    self.params["fields"] = self.fields
-"""
+logger = logging.getLogger(__name__)
 
 
 class BatchEndpointClient(BaseInatClient):
@@ -27,10 +14,6 @@ class BatchEndpointClient(BaseInatClient):
     - Supports sparse fieldsets via ?fields=
     - Supports per_page pagination
     """
-
-    def __init__(self, config: EndpointConfig, fetcher, writer):
-        assert config.id_param, "ParametrizedEndpointClient requires config.id_param"
-        super().__init__(config, fetcher, writer)
 
     def _iter_requests(self, ids: list) -> Iterator[dict]:
         for chunk in _chunked(ids, self.config.chunk_size):
@@ -52,7 +35,9 @@ class ParametrizedEndpointClient(BaseInatClient):
     """
 
     def __init__(self, config: EndpointConfig, fetcher, writer):
-        assert config.id_param, "ParametrizedEndpointClient requires config.id_param"
+        assert (
+            config.id_param is not None
+        ), "ParametrizedEndpointClient requires config.id_param"
         super().__init__(config, fetcher, writer)
 
     def _iter_requests(self, ids: list) -> Iterator[dict]:

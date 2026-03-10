@@ -1,10 +1,7 @@
-import asyncio
 import logging
 from typing import Union
 
 from ..app.container import Dependencies
-from ..ingest.inat_client import fields
-from ..ingest.inat_client.base import inatApiClient
 from ..utils.db import (
     SQL_Engine,
     _open_connection,
@@ -19,7 +16,7 @@ def execute(deps: Dependencies, limit: Union[None, int]) -> None:
     SOURCE_TABLE_NAME = "raw.obs_sample"
     TARGET_TABLE_NAME = "raw.inat_api"
     SOURCE_KEY = "uuid"
-    CHUNK_SIZE = 200
+    # CHUNK_SIZE = 200
 
     con = _open_connection(deps.DB_PATH)
 
@@ -33,16 +30,12 @@ def execute(deps: Dependencies, limit: Union[None, int]) -> None:
 
     if items:
         # Read api fields to query
-        api_fields = fields.load(deps.API_FIELDS_PATH / "observations.yaml")
-
-        # Set up api configs
-        config = inatApiConfig(
-            endpoint="observations", fields=api_fields, limiter=10, per_page=CHUNK_SIZE
-        )
+        # api_fields = registery.load(deps.API_FIELDS_PATH / "observations.yaml")
+        pass
 
         # Run api queries
-        api = inatApiClient(TARGET_TABLE_NAME, config=config)
-        asyncio.run(api.execute(items, con))
+        # api = inatApiClient(TARGET_TABLE_NAME, config=config)
+        # asyncio.run(api.execute(items, con))
     else:
         logger.info("All items already processed")
 

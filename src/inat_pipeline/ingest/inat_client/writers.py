@@ -9,6 +9,12 @@ import duckdb
 logger = logging.getLogger(__name__)
 
 
+class JsonWriter:
+    async def write(self, results: list[dict]):
+        raise NotImplementedError
+        logger.info("Init json writer task")
+
+
 class DuckDbWriter:
     def __init__(self, con: duckdb.DuckDBPyConnection, table_name: str, version: str):
         self.con = con
@@ -44,3 +50,8 @@ class DuckDbWriter:
 
     def close(self):
         self._executor.shutdown(wait=True)
+
+
+class NullWriter:  # for dry runs / debugging
+    def write(self, results: list[dict]) -> None:
+        pass

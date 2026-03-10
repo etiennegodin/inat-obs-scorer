@@ -1,16 +1,16 @@
-from dataclasses import dataclass, field
-from typing import Union
+from dataclasses import asdict, dataclass, field
+from pathlib import Path
+from typing import Any, Union
+
+import yaml
 
 
-def fields_to_string(fields_dict: dict, level=0):
-    parts = []
-    for key, value in fields_dict.items():
-        if isinstance(value, dict):
-            nested = fields_to_string(value, level + 1)
-            parts.append(f"{key}:({nested})")
-        elif value is True:
-            parts.append(f"{key}:!t")
-    return ",".join(parts)
+def load_fields(file: Path) -> dict[Any, Any]:
+    try:
+        with open(file, "r") as file:
+            return yaml.safe_load(file)
+    except Exception as e:
+        raise e
 
 
 @dataclass
@@ -22,8 +22,10 @@ class EndpointConfig:
     chunk_size: int = 200
     id_param: Union[str, None] = None
     api_version: int = 2
+    url: str = field(init=False)
 
-    def __post_init_(self):
+    def __post_init__(self):
+        print("post")
         if self.id_param is None:
             self.url = (
                 f"https://api.inaturalist.org/{self.api_version}/{self.endpoint}/"
@@ -32,4 +34,19 @@ class EndpointConfig:
             self.url = f"https://api.inaturalist.org/{self.api_version}/{self.endpoint}"
 
         # Convert fields dict to request format
-        self.fields = f"({fields_to_string(self.fields)})"
+        self.fields = f"({_fields_to_string(self.fields)})"
+
+    def to_dict(self) -> dict:
+        """Serialize config for logging to MLflow."""
+        return asdict(self)
+
+
+def _fields_to_string(fields_dict: dict, level=0):
+    parts = []
+    for key, value in fields_dict.items():
+        if isinstance(value, dict):
+            nested = _fields_to_string(value, level + 1)
+            parts.append(f"{key}:({nested})")
+        elif value is True:
+            parts.append(f"{key}:!t")
+    return ",".join(parts)
