@@ -20,5 +20,5 @@ def execute(deps: Dependencies):
     logger.info(f"Ingested {len(ingested)} files ")
 
     # Select observations to sample
-    sql = SQL_Engine(con, deps.SQL_INGEST_PATH)
-    sql.execute("api_samples")
+    sql = SQL_Engine(con, deps.SQL_API_PATH)
+    sql.execute("sample")

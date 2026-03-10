@@ -1,7 +1,7 @@
--- photos -- 
+-- photos --
 
 CREATE OR REPLACE TABLE staged.photos AS
-SELECT 
+SELECT
     o.id AS observation_id,
     UNNEST(o.observation_photos, RECURSIVE := true)
 FROM staged.observations o;

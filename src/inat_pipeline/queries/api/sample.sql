@@ -10,7 +10,7 @@ WITH user_obs AS(
     GROUP BY user_id
 )
 
-SELECT u.obs_count, 
+SELECT u.obs_count,
 d.*
 
 FROM raw.downloads d
@@ -21,4 +21,3 @@ AND observed_on IS NOT NULL
 AND u.obs_count >= 20
 AND u.oldest <= DATE('2020-01-01')
 AND u.newest >= DATE('2024-01-01')
-

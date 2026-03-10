@@ -26,7 +26,9 @@ class Dependencies:
         self.DB_PATH = self._DATA_FOLDER / "inat.duckdb"
 
         self._QUERY_FOLDER = self.package_root / "queries"
-        self.SQL_INGEST_PATH = self._QUERY_FOLDER / "ingest"
+        self.SQL_API_PATH = self._QUERY_FOLDER / "api"
+        self.SQL_STAGE_PATH = self._QUERY_FOLDER / "stage"
         self.SQL_FEATURES_PATH = self._QUERY_FOLDER / "features"
 
-        self.API_FIELDS_PATH = self.project_root / "api_fields.yaml"
+        self.API_OBS_FIELDS_PATH = self.project_root / "observations_fields.yaml"
+        self.API_TAXA_FIELDS_PATH = self.project_root / "taxa_fields.yaml"

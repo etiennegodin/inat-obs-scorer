@@ -1,7 +1,7 @@
 -- ids --
 
 CREATE OR REPLACE TABLE staged.identifications AS
-SELECT 
+SELECT
     o.id AS observation_id,
     UNNEST(o.identifications, RECURSIVE := true),
 
@@ -21,24 +21,24 @@ FROM staged.identifications i
 JOIN staged.taxa t on i.taxon_id = t.taxon_id;
 
 
-ALTER TABLE staged.identifications 
+ALTER TABLE staged.identifications
 RENAME id_1 TO user_id;
 
-ALTER TABLE staged.identifications 
+ALTER TABLE staged.identifications
 RENAME login TO user_login;
 
-ALTER TABLE staged.identifications 
+ALTER TABLE staged.identifications
 RENAME observations_count TO user_observations_count;
 
-ALTER TABLE staged.identifications 
+ALTER TABLE staged.identifications
 RENAME identifications_count TO user_identifications_count;
 
-ALTER TABLE staged.identifications 
+ALTER TABLE staged.identifications
 RENAME species_count TO user_species_count;
 
-ALTER TABLE staged.identifications 
-ALTER COLUMN created_at 
-SET DATA TYPE TIMESTAMPTZ 
+ALTER TABLE staged.identifications
+ALTER COLUMN created_at
+SET DATA TYPE TIMESTAMPTZ
 USING COALESCE(
     try_strptime(created_at, '%Y-%m-%d %H:%M:%S %z'), -- Handles -0400
     try_strptime(created_at, '%Y-%m-%d %H:%M:%S %Z'), -- Handles UTC

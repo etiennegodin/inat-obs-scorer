@@ -56,7 +56,7 @@ WITH rank_ids AS (
             WHEN 'section'      THEN 20
             WHEN 'subsection'   THEN 20
 
-            -- Family group  
+            -- Family group
             WHEN 'family'       THEN 30
             WHEN 'subfamily'    THEN 30
             WHEN 'tribe'        THEN 30
@@ -78,7 +78,7 @@ WITH rank_ids AS (
 
             ELSE 99  -- unknown, treat as coarsest
         END AS rank_level
-    
+
     FROM staged.taxa_raw t
 
     -- Each join resolves name → id at that rank
@@ -124,5 +124,3 @@ WITH rank_ids AS (
 
 )
 SELECT * FROM rank_ids;
-
-
