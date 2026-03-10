@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 from typing import Union
 
 
-def fields_to_string(fields_dict, level=0):
+def fields_to_string(fields_dict: dict, level=0):
     parts = []
     for key, value in fields_dict.items():
         if isinstance(value, dict):

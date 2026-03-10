@@ -63,6 +63,9 @@ class BaseInatClient(ABC):
             await self.queue.put(None)  # sentinel → stop consumer
             await writer_task
 
+        if hasattr(self.writer, "close"):  # graceful executor shutdown
+            self.writer.close()
+
     async def _fetch_all_pages(
         self, session: aiohttp.ClientSession, base_params: dict
     ) -> None:
@@ -86,9 +89,25 @@ class BaseInatClient(ABC):
 
     async def _consume_queue(self) -> None:
         """Consumer: drain the queue and delegate to writer."""
+        processed = 0
+
         while True:
-            results = await self.queue.get()
-            if results is None:  # sentinel
+            page = await self.queue.get()  # blocks until a page arrives
+            if page is None:  # sentinel
+                self.queue.task_done()
+                logger.info("Writer done, processed %d items", processed)
                 break
-            await self.writer.write(results)
+
+            # Optional: greedily drain any immediately available pages into one batch
+            batch = page
+            while not self.queue.empty():
+                next_page = self.queue.get_nowait()
+                if next_page is None:
+                    await self.queue.put(None)  # put sentinel back, handle next loop
+                    break
+                batch = batch + next_page
+                self.queue.task_done()
+
+            await self.writer.write(batch)
+            processed += len(batch)
             self.queue.task_done()
