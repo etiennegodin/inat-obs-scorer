@@ -1,35 +1,12 @@
-FIELDS = {
-    "id": True,
-    "reviewed_by": True,
-    "owners_identification_from_vision": True,
-    "identifications_count": True,
-    "user": {"id": True, "created_at": True, "orcid": True},
-    "description": True,
-    "tags": True,
-    "observation_photos": True,
-    "comments_count": True,
-    "faves_count": True,
-    "outlinks": True,
-    "community_taxon_id": True,
-    "taxon_geoprivacy": True,
-    "place_ids": True,
-    "identifications": {
-        "uuid": True,
-        "created_at": True,
-        "user": {
-            "id": True,
-            "login": True,
-            "observations_count": True,
-            "identifications_count": True,
-            "species_count": True,
-        },
-        "body": True,
-        "category": True,
-        "current": True,
-        "own_observation": True,
-        "vision": True,
-        "disagreement": True,
-        "previous_observation_taxon_id": True,
-        "taxon_id": True,
-    },
-}
+from pathlib import Path
+from typing import Any
+
+import yaml
+
+
+def load(file: Path) -> dict[Any, Any]:
+    try:
+        with open(file, "r") as file:
+            return yaml.safe_load(file)
+    except Exception as e:
+        raise e

@@ -1,0 +1,2619 @@
+{
+  "total_results": 1,
+  "page": 1,
+  "per_page": 30,
+  "results": [
+    {
+      "id": 564969,
+      "rank": "species",
+      "rank_level": 10,
+      "iconic_taxon_id": 47126,
+      "ancestor_ids": [48460, 47126, 211194, 47125, 47124, 47791, 47790, 564913, 1653861],
+      "is_active": true,
+      "name": "Chamaenerion angustifolium",
+      "parent_id": 1653861,
+      "ancestry": "48460/47126/211194/47125/47124/47791/47790/564913/1653861",
+      "extinct": false,
+      "provisional": false,
+      "default_photo": {
+        "id": 589344702,
+        "license_code": "cc-by-nc",
+        "attribution": "(c) Anton Dangl, some rights reserved (CC BY-NC), uploaded by Anton Dangl",
+        "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/589344702/square.jpg",
+        "original_dimensions": {
+          "height": 1365,
+          "width": 2048
+        },
+        "flags": [],
+        "attribution_name": "Anton Dangl",
+        "square_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/589344702/square.jpg",
+        "medium_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/589344702/medium.jpg"
+      },
+      "taxon_changes_count": 4,
+      "taxon_schemes_count": 1,
+      "observations_count": 145140,
+      "photos_locked": false,
+      "flag_counts": {
+        "resolved": 3,
+        "unresolved": 1
+      },
+      "current_synonymous_taxon_ids": null,
+      "taxon_photos": [
+        {
+          "taxon_id": 564969,
+          "photo": {
+            "id": 589344702,
+            "license_code": "cc-by-nc",
+            "attribution": "(c) Anton Dangl, some rights reserved (CC BY-NC), uploaded by Anton Dangl",
+            "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/589344702/square.jpg",
+            "original_dimensions": {
+              "height": 1365,
+              "width": 2048
+            },
+            "flags": [],
+            "native_page_url": null,
+            "native_photo_id": null,
+            "type": "LocalPhoto",
+            "attribution_name": "Anton Dangl",
+            "square_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/589344702/square.jpg",
+            "small_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/589344702/small.jpg",
+            "medium_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/589344702/medium.jpg",
+            "large_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/589344702/large.jpg",
+            "original_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/589344702/original.jpg"
+          },
+          "taxon": {
+            "id": 564969,
+            "rank": "species",
+            "rank_level": 10,
+            "iconic_taxon_id": 47126,
+            "ancestor_ids": [48460, 47126, 211194, 47125, 47124, 47791, 47790, 564913, 1653861, 564969],
+            "is_active": true,
+            "name": "Chamaenerion angustifolium",
+            "parent_id": 1653861,
+            "ancestry": "48460/47126/211194/47125/47124/47791/47790/564913/1653861",
+            "extinct": false,
+            "provisional": false,
+            "default_photo": {
+              "id": 589344702,
+              "license_code": "cc-by-nc",
+              "attribution": "(c) Anton Dangl, some rights reserved (CC BY-NC), uploaded by Anton Dangl",
+              "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/589344702/square.jpg",
+              "original_dimensions": {
+                "height": 1365,
+                "width": 2048
+              },
+              "flags": [],
+              "attribution_name": "Anton Dangl",
+              "square_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/589344702/square.jpg",
+              "medium_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/589344702/medium.jpg"
+            },
+            "taxon_changes_count": 4,
+            "taxon_schemes_count": 1,
+            "observations_count": 145140,
+            "photos_locked": false,
+            "flag_counts": {
+              "resolved": 3,
+              "unresolved": 1
+            },
+            "current_synonymous_taxon_ids": null,
+            "atlas_id": null,
+            "complete_species_count": null,
+            "wikipedia_url": "https://en.wikipedia.org/wiki/Chamaenerion_angustifolium",
+            "iconic_taxon_name": "Plantae",
+            "preferred_common_name": "fireweed"
+          }
+        },
+        {
+          "taxon_id": 564969,
+          "photo": {
+            "id": 588237213,
+            "license_code": "cc-by-nc",
+            "attribution": "(c) Denys Davydov, some rights reserved (CC BY-NC), uploaded by Denys Davydov",
+            "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/588237213/square.jpg",
+            "original_dimensions": {
+              "height": 1598,
+              "width": 2048
+            },
+            "flags": [],
+            "native_page_url": null,
+            "native_photo_id": null,
+            "type": "LocalPhoto",
+            "attribution_name": "Denys Davydov",
+            "square_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/588237213/square.jpg",
+            "small_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/588237213/small.jpg",
+            "medium_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/588237213/medium.jpg",
+            "large_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/588237213/large.jpg",
+            "original_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/588237213/original.jpg"
+          },
+          "taxon": {
+            "id": 564969,
+            "rank": "species",
+            "rank_level": 10,
+            "iconic_taxon_id": 47126,
+            "ancestor_ids": [48460, 47126, 211194, 47125, 47124, 47791, 47790, 564913, 1653861, 564969],
+            "is_active": true,
+            "name": "Chamaenerion angustifolium",
+            "parent_id": 1653861,
+            "ancestry": "48460/47126/211194/47125/47124/47791/47790/564913/1653861",
+            "extinct": false,
+            "provisional": false,
+            "default_photo": {
+              "id": 589344702,
+              "license_code": "cc-by-nc",
+              "attribution": "(c) Anton Dangl, some rights reserved (CC BY-NC), uploaded by Anton Dangl",
+              "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/589344702/square.jpg",
+              "original_dimensions": {
+                "height": 1365,
+                "width": 2048
+              },
+              "flags": [],
+              "attribution_name": "Anton Dangl",
+              "square_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/589344702/square.jpg",
+              "medium_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/589344702/medium.jpg"
+            },
+            "taxon_changes_count": 4,
+            "taxon_schemes_count": 1,
+            "observations_count": 145140,
+            "photos_locked": false,
+            "flag_counts": {
+              "resolved": 3,
+              "unresolved": 1
+            },
+            "current_synonymous_taxon_ids": null,
+            "atlas_id": null,
+            "complete_species_count": null,
+            "wikipedia_url": "https://en.wikipedia.org/wiki/Chamaenerion_angustifolium",
+            "iconic_taxon_name": "Plantae",
+            "preferred_common_name": "fireweed"
+          }
+        },
+        {
+          "taxon_id": 564969,
+          "photo": {
+            "id": 589781308,
+            "license_code": "cc-by-nc",
+            "attribution": "(c) textman, some rights reserved (CC BY-NC)",
+            "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/589781308/square.jpg",
+            "original_dimensions": {
+              "height": 2048,
+              "width": 1361
+            },
+            "flags": [],
+            "native_page_url": null,
+            "native_photo_id": null,
+            "type": "LocalPhoto",
+            "attribution_name": "textman",
+            "square_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/589781308/square.jpg",
+            "small_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/589781308/small.jpg",
+            "medium_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/589781308/medium.jpg",
+            "large_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/589781308/large.jpg",
+            "original_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/589781308/original.jpg"
+          },
+          "taxon": {
+            "id": 564969,
+            "rank": "species",
+            "rank_level": 10,
+            "iconic_taxon_id": 47126,
+            "ancestor_ids": [48460, 47126, 211194, 47125, 47124, 47791, 47790, 564913, 1653861, 564969],
+            "is_active": true,
+            "name": "Chamaenerion angustifolium",
+            "parent_id": 1653861,
+            "ancestry": "48460/47126/211194/47125/47124/47791/47790/564913/1653861",
+            "extinct": false,
+            "provisional": false,
+            "default_photo": {
+              "id": 589344702,
+              "license_code": "cc-by-nc",
+              "attribution": "(c) Anton Dangl, some rights reserved (CC BY-NC), uploaded by Anton Dangl",
+              "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/589344702/square.jpg",
+              "original_dimensions": {
+                "height": 1365,
+                "width": 2048
+              },
+              "flags": [],
+              "attribution_name": "Anton Dangl",
+              "square_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/589344702/square.jpg",
+              "medium_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/589344702/medium.jpg"
+            },
+            "taxon_changes_count": 4,
+            "taxon_schemes_count": 1,
+            "observations_count": 145140,
+            "photos_locked": false,
+            "flag_counts": {
+              "resolved": 3,
+              "unresolved": 1
+            },
+            "current_synonymous_taxon_ids": null,
+            "atlas_id": null,
+            "complete_species_count": null,
+            "wikipedia_url": "https://en.wikipedia.org/wiki/Chamaenerion_angustifolium",
+            "iconic_taxon_name": "Plantae",
+            "preferred_common_name": "fireweed"
+          }
+        },
+        {
+          "taxon_id": 564969,
+          "photo": {
+            "id": 619007051,
+            "license_code": "cc-by-nc",
+            "attribution": "(c) Jørgen Møller, some rights reserved (CC BY-NC), uploaded by Jørgen Møller",
+            "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/619007051/square.jpg",
+            "original_dimensions": {
+              "height": 2048,
+              "width": 1413
+            },
+            "flags": [],
+            "native_page_url": null,
+            "native_photo_id": null,
+            "type": "LocalPhoto",
+            "attribution_name": "Jørgen Møller",
+            "square_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/619007051/square.jpg",
+            "small_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/619007051/small.jpg",
+            "medium_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/619007051/medium.jpg",
+            "large_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/619007051/large.jpg",
+            "original_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/619007051/original.jpg"
+          },
+          "taxon": {
+            "id": 564969,
+            "rank": "species",
+            "rank_level": 10,
+            "iconic_taxon_id": 47126,
+            "ancestor_ids": [48460, 47126, 211194, 47125, 47124, 47791, 47790, 564913, 1653861, 564969],
+            "is_active": true,
+            "name": "Chamaenerion angustifolium",
+            "parent_id": 1653861,
+            "ancestry": "48460/47126/211194/47125/47124/47791/47790/564913/1653861",
+            "extinct": false,
+            "provisional": false,
+            "default_photo": {
+              "id": 589344702,
+              "license_code": "cc-by-nc",
+              "attribution": "(c) Anton Dangl, some rights reserved (CC BY-NC), uploaded by Anton Dangl",
+              "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/589344702/square.jpg",
+              "original_dimensions": {
+                "height": 1365,
+                "width": 2048
+              },
+              "flags": [],
+              "attribution_name": "Anton Dangl",
+              "square_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/589344702/square.jpg",
+              "medium_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/589344702/medium.jpg"
+            },
+            "taxon_changes_count": 4,
+            "taxon_schemes_count": 1,
+            "observations_count": 145140,
+            "photos_locked": false,
+            "flag_counts": {
+              "resolved": 3,
+              "unresolved": 1
+            },
+            "current_synonymous_taxon_ids": null,
+            "atlas_id": null,
+            "complete_species_count": null,
+            "wikipedia_url": "https://en.wikipedia.org/wiki/Chamaenerion_angustifolium",
+            "iconic_taxon_name": "Plantae",
+            "preferred_common_name": "fireweed"
+          }
+        },
+        {
+          "taxon_id": 564969,
+          "photo": {
+            "id": 271082135,
+            "license_code": "cc-by-sa",
+            "attribution": "(c) Douglas Goldman, some rights reserved (CC BY-SA), uploaded by Douglas Goldman",
+            "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/271082135/square.jpg",
+            "original_dimensions": {
+              "height": 1371,
+              "width": 2048
+            },
+            "flags": [],
+            "native_page_url": null,
+            "native_photo_id": null,
+            "type": "LocalPhoto",
+            "attribution_name": "Douglas Goldman",
+            "square_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/271082135/square.jpg",
+            "small_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/271082135/small.jpg",
+            "medium_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/271082135/medium.jpg",
+            "large_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/271082135/large.jpg",
+            "original_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/271082135/original.jpg"
+          },
+          "taxon": {
+            "id": 564969,
+            "rank": "species",
+            "rank_level": 10,
+            "iconic_taxon_id": 47126,
+            "ancestor_ids": [48460, 47126, 211194, 47125, 47124, 47791, 47790, 564913, 1653861, 564969],
+            "is_active": true,
+            "name": "Chamaenerion angustifolium",
+            "parent_id": 1653861,
+            "ancestry": "48460/47126/211194/47125/47124/47791/47790/564913/1653861",
+            "extinct": false,
+            "provisional": false,
+            "default_photo": {
+              "id": 589344702,
+              "license_code": "cc-by-nc",
+              "attribution": "(c) Anton Dangl, some rights reserved (CC BY-NC), uploaded by Anton Dangl",
+              "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/589344702/square.jpg",
+              "original_dimensions": {
+                "height": 1365,
+                "width": 2048
+              },
+              "flags": [],
+              "attribution_name": "Anton Dangl",
+              "square_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/589344702/square.jpg",
+              "medium_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/589344702/medium.jpg"
+            },
+            "taxon_changes_count": 4,
+            "taxon_schemes_count": 1,
+            "observations_count": 145140,
+            "photos_locked": false,
+            "flag_counts": {
+              "resolved": 3,
+              "unresolved": 1
+            },
+            "current_synonymous_taxon_ids": null,
+            "atlas_id": null,
+            "complete_species_count": null,
+            "wikipedia_url": "https://en.wikipedia.org/wiki/Chamaenerion_angustifolium",
+            "iconic_taxon_name": "Plantae",
+            "preferred_common_name": "fireweed"
+          }
+        },
+        {
+          "taxon_id": 564969,
+          "photo": {
+            "id": 145664133,
+            "license_code": "cc-by-nc",
+            "attribution": "(c) Susan Elliott, some rights reserved (CC BY-NC), uploaded by Susan Elliott",
+            "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/145664133/square.jpg",
+            "original_dimensions": {
+              "height": 2048,
+              "width": 1536
+            },
+            "flags": [],
+            "native_page_url": null,
+            "native_photo_id": null,
+            "type": "LocalPhoto",
+            "attribution_name": "Susan Elliott",
+            "square_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/145664133/square.jpg",
+            "small_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/145664133/small.jpg",
+            "medium_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/145664133/medium.jpg",
+            "large_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/145664133/large.jpg",
+            "original_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/145664133/original.jpg"
+          },
+          "taxon": {
+            "id": 564969,
+            "rank": "species",
+            "rank_level": 10,
+            "iconic_taxon_id": 47126,
+            "ancestor_ids": [48460, 47126, 211194, 47125, 47124, 47791, 47790, 564913, 1653861, 564969],
+            "is_active": true,
+            "name": "Chamaenerion angustifolium",
+            "parent_id": 1653861,
+            "ancestry": "48460/47126/211194/47125/47124/47791/47790/564913/1653861",
+            "extinct": false,
+            "provisional": false,
+            "default_photo": {
+              "id": 589344702,
+              "license_code": "cc-by-nc",
+              "attribution": "(c) Anton Dangl, some rights reserved (CC BY-NC), uploaded by Anton Dangl",
+              "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/589344702/square.jpg",
+              "original_dimensions": {
+                "height": 1365,
+                "width": 2048
+              },
+              "flags": [],
+              "attribution_name": "Anton Dangl",
+              "square_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/589344702/square.jpg",
+              "medium_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/589344702/medium.jpg"
+            },
+            "taxon_changes_count": 4,
+            "taxon_schemes_count": 1,
+            "observations_count": 145140,
+            "photos_locked": false,
+            "flag_counts": {
+              "resolved": 3,
+              "unresolved": 1
+            },
+            "current_synonymous_taxon_ids": null,
+            "atlas_id": null,
+            "complete_species_count": null,
+            "wikipedia_url": "https://en.wikipedia.org/wiki/Chamaenerion_angustifolium",
+            "iconic_taxon_name": "Plantae",
+            "preferred_common_name": "fireweed"
+          }
+        },
+        {
+          "taxon_id": 564969,
+          "photo": {
+            "id": 150281512,
+            "license_code": "cc-by-nc",
+            "attribution": "(c) Christian P., some rights reserved (CC BY-NC), uploaded by Christian P.",
+            "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/150281512/square.jpeg",
+            "original_dimensions": {
+              "height": 2048,
+              "width": 1536
+            },
+            "flags": [],
+            "native_page_url": null,
+            "native_photo_id": null,
+            "type": "LocalPhoto",
+            "attribution_name": "Christian P.",
+            "square_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/150281512/square.jpeg",
+            "small_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/150281512/small.jpeg",
+            "medium_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/150281512/medium.jpeg",
+            "large_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/150281512/large.jpeg",
+            "original_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/150281512/original.jpeg"
+          },
+          "taxon": {
+            "id": 564969,
+            "rank": "species",
+            "rank_level": 10,
+            "iconic_taxon_id": 47126,
+            "ancestor_ids": [48460, 47126, 211194, 47125, 47124, 47791, 47790, 564913, 1653861, 564969],
+            "is_active": true,
+            "name": "Chamaenerion angustifolium",
+            "parent_id": 1653861,
+            "ancestry": "48460/47126/211194/47125/47124/47791/47790/564913/1653861",
+            "extinct": false,
+            "provisional": false,
+            "default_photo": {
+              "id": 589344702,
+              "license_code": "cc-by-nc",
+              "attribution": "(c) Anton Dangl, some rights reserved (CC BY-NC), uploaded by Anton Dangl",
+              "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/589344702/square.jpg",
+              "original_dimensions": {
+                "height": 1365,
+                "width": 2048
+              },
+              "flags": [],
+              "attribution_name": "Anton Dangl",
+              "square_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/589344702/square.jpg",
+              "medium_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/589344702/medium.jpg"
+            },
+            "taxon_changes_count": 4,
+            "taxon_schemes_count": 1,
+            "observations_count": 145140,
+            "photos_locked": false,
+            "flag_counts": {
+              "resolved": 3,
+              "unresolved": 1
+            },
+            "current_synonymous_taxon_ids": null,
+            "atlas_id": null,
+            "complete_species_count": null,
+            "wikipedia_url": "https://en.wikipedia.org/wiki/Chamaenerion_angustifolium",
+            "iconic_taxon_name": "Plantae",
+            "preferred_common_name": "fireweed"
+          }
+        },
+        {
+          "taxon_id": 564969,
+          "photo": {
+            "id": 8897382,
+            "license_code": "cc-by-nc",
+            "attribution": "(c) Damon Tighe, some rights reserved (CC BY-NC), uploaded by Damon Tighe",
+            "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/8897382/square.jpeg",
+            "original_dimensions": {
+              "height": 1536,
+              "width": 2048
+            },
+            "flags": [],
+            "native_page_url": null,
+            "native_photo_id": null,
+            "type": "LocalPhoto",
+            "attribution_name": "Damon Tighe",
+            "square_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/8897382/square.jpeg",
+            "small_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/8897382/small.jpeg",
+            "medium_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/8897382/medium.jpeg",
+            "large_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/8897382/large.jpeg",
+            "original_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/8897382/original.jpeg"
+          },
+          "taxon": {
+            "id": 564969,
+            "rank": "species",
+            "rank_level": 10,
+            "iconic_taxon_id": 47126,
+            "ancestor_ids": [48460, 47126, 211194, 47125, 47124, 47791, 47790, 564913, 1653861, 564969],
+            "is_active": true,
+            "name": "Chamaenerion angustifolium",
+            "parent_id": 1653861,
+            "ancestry": "48460/47126/211194/47125/47124/47791/47790/564913/1653861",
+            "extinct": false,
+            "provisional": false,
+            "default_photo": {
+              "id": 589344702,
+              "license_code": "cc-by-nc",
+              "attribution": "(c) Anton Dangl, some rights reserved (CC BY-NC), uploaded by Anton Dangl",
+              "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/589344702/square.jpg",
+              "original_dimensions": {
+                "height": 1365,
+                "width": 2048
+              },
+              "flags": [],
+              "attribution_name": "Anton Dangl",
+              "square_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/589344702/square.jpg",
+              "medium_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/589344702/medium.jpg"
+            },
+            "taxon_changes_count": 4,
+            "taxon_schemes_count": 1,
+            "observations_count": 145140,
+            "photos_locked": false,
+            "flag_counts": {
+              "resolved": 3,
+              "unresolved": 1
+            },
+            "current_synonymous_taxon_ids": null,
+            "atlas_id": null,
+            "complete_species_count": null,
+            "wikipedia_url": "https://en.wikipedia.org/wiki/Chamaenerion_angustifolium",
+            "iconic_taxon_name": "Plantae",
+            "preferred_common_name": "fireweed"
+          }
+        },
+        {
+          "taxon_id": 564969,
+          "photo": {
+            "id": 155328304,
+            "license_code": "cc-by-nc",
+            "attribution": "(c) Erin O'Connor, some rights reserved (CC BY-NC), uploaded by Erin O'Connor",
+            "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/155328304/square.jpeg",
+            "original_dimensions": {
+              "height": 1536,
+              "width": 2048
+            },
+            "flags": [],
+            "native_page_url": null,
+            "native_photo_id": null,
+            "type": "LocalPhoto",
+            "attribution_name": "Erin O'Connor",
+            "square_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/155328304/square.jpeg",
+            "small_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/155328304/small.jpeg",
+            "medium_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/155328304/medium.jpeg",
+            "large_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/155328304/large.jpeg",
+            "original_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/155328304/original.jpeg"
+          },
+          "taxon": {
+            "id": 564969,
+            "rank": "species",
+            "rank_level": 10,
+            "iconic_taxon_id": 47126,
+            "ancestor_ids": [48460, 47126, 211194, 47125, 47124, 47791, 47790, 564913, 1653861, 564969],
+            "is_active": true,
+            "name": "Chamaenerion angustifolium",
+            "parent_id": 1653861,
+            "ancestry": "48460/47126/211194/47125/47124/47791/47790/564913/1653861",
+            "extinct": false,
+            "provisional": false,
+            "default_photo": {
+              "id": 589344702,
+              "license_code": "cc-by-nc",
+              "attribution": "(c) Anton Dangl, some rights reserved (CC BY-NC), uploaded by Anton Dangl",
+              "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/589344702/square.jpg",
+              "original_dimensions": {
+                "height": 1365,
+                "width": 2048
+              },
+              "flags": [],
+              "attribution_name": "Anton Dangl",
+              "square_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/589344702/square.jpg",
+              "medium_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/589344702/medium.jpg"
+            },
+            "taxon_changes_count": 4,
+            "taxon_schemes_count": 1,
+            "observations_count": 145140,
+            "photos_locked": false,
+            "flag_counts": {
+              "resolved": 3,
+              "unresolved": 1
+            },
+            "current_synonymous_taxon_ids": null,
+            "atlas_id": null,
+            "complete_species_count": null,
+            "wikipedia_url": "https://en.wikipedia.org/wiki/Chamaenerion_angustifolium",
+            "iconic_taxon_name": "Plantae",
+            "preferred_common_name": "fireweed"
+          }
+        },
+        {
+          "taxon_id": 564969,
+          "photo": {
+            "id": 27154985,
+            "license_code": null,
+            "attribution": "(c) Antonio, all rights reserved, uploaded by Antonio",
+            "url": "https://static.inaturalist.org/photos/27154985/square.jpg",
+            "original_dimensions": {
+              "height": 1000,
+              "width": 750
+            },
+            "flags": [],
+            "native_page_url": null,
+            "native_photo_id": null,
+            "type": "LocalPhoto",
+            "attribution_name": "Antonio",
+            "square_url": "https://static.inaturalist.org/photos/27154985/square.jpg",
+            "small_url": "https://static.inaturalist.org/photos/27154985/small.jpg",
+            "medium_url": "https://static.inaturalist.org/photos/27154985/medium.jpg",
+            "large_url": "https://static.inaturalist.org/photos/27154985/large.jpg",
+            "original_url": "https://static.inaturalist.org/photos/27154985/original.jpg"
+          },
+          "taxon": {
+            "id": 564969,
+            "rank": "species",
+            "rank_level": 10,
+            "iconic_taxon_id": 47126,
+            "ancestor_ids": [48460, 47126, 211194, 47125, 47124, 47791, 47790, 564913, 1653861, 564969],
+            "is_active": true,
+            "name": "Chamaenerion angustifolium",
+            "parent_id": 1653861,
+            "ancestry": "48460/47126/211194/47125/47124/47791/47790/564913/1653861",
+            "extinct": false,
+            "provisional": false,
+            "default_photo": {
+              "id": 589344702,
+              "license_code": "cc-by-nc",
+              "attribution": "(c) Anton Dangl, some rights reserved (CC BY-NC), uploaded by Anton Dangl",
+              "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/589344702/square.jpg",
+              "original_dimensions": {
+                "height": 1365,
+                "width": 2048
+              },
+              "flags": [],
+              "attribution_name": "Anton Dangl",
+              "square_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/589344702/square.jpg",
+              "medium_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/589344702/medium.jpg"
+            },
+            "taxon_changes_count": 4,
+            "taxon_schemes_count": 1,
+            "observations_count": 145140,
+            "photos_locked": false,
+            "flag_counts": {
+              "resolved": 3,
+              "unresolved": 1
+            },
+            "current_synonymous_taxon_ids": null,
+            "atlas_id": null,
+            "complete_species_count": null,
+            "wikipedia_url": "https://en.wikipedia.org/wiki/Chamaenerion_angustifolium",
+            "iconic_taxon_name": "Plantae",
+            "preferred_common_name": "fireweed"
+          }
+        },
+        {
+          "taxon_id": 564969,
+          "photo": {
+            "id": 67068955,
+            "license_code": "cc-by-nc",
+            "attribution": "(c) vladimir_korotkov, some rights reserved (CC BY-NC), uploaded by vladimir_korotkov",
+            "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/67068955/square.jpg",
+            "original_dimensions": {
+              "height": 1536,
+              "width": 2048
+            },
+            "flags": [],
+            "native_page_url": null,
+            "native_photo_id": null,
+            "type": "LocalPhoto",
+            "attribution_name": "vladimir_korotkov",
+            "square_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/67068955/square.jpg",
+            "small_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/67068955/small.jpg",
+            "medium_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/67068955/medium.jpg",
+            "large_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/67068955/large.jpg",
+            "original_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/67068955/original.jpg"
+          },
+          "taxon": {
+            "id": 564969,
+            "rank": "species",
+            "rank_level": 10,
+            "iconic_taxon_id": 47126,
+            "ancestor_ids": [48460, 47126, 211194, 47125, 47124, 47791, 47790, 564913, 1653861, 564969],
+            "is_active": true,
+            "name": "Chamaenerion angustifolium",
+            "parent_id": 1653861,
+            "ancestry": "48460/47126/211194/47125/47124/47791/47790/564913/1653861",
+            "extinct": false,
+            "provisional": false,
+            "default_photo": {
+              "id": 589344702,
+              "license_code": "cc-by-nc",
+              "attribution": "(c) Anton Dangl, some rights reserved (CC BY-NC), uploaded by Anton Dangl",
+              "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/589344702/square.jpg",
+              "original_dimensions": {
+                "height": 1365,
+                "width": 2048
+              },
+              "flags": [],
+              "attribution_name": "Anton Dangl",
+              "square_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/589344702/square.jpg",
+              "medium_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/589344702/medium.jpg"
+            },
+            "taxon_changes_count": 4,
+            "taxon_schemes_count": 1,
+            "observations_count": 145140,
+            "photos_locked": false,
+            "flag_counts": {
+              "resolved": 3,
+              "unresolved": 1
+            },
+            "current_synonymous_taxon_ids": null,
+            "atlas_id": null,
+            "complete_species_count": null,
+            "wikipedia_url": "https://en.wikipedia.org/wiki/Chamaenerion_angustifolium",
+            "iconic_taxon_name": "Plantae",
+            "preferred_common_name": "fireweed"
+          }
+        },
+        {
+          "taxon_id": 564969,
+          "photo": {
+            "id": 244608258,
+            "license_code": "cc-by-nc",
+            "attribution": "(c) Cameron Eckert, some rights reserved (CC BY-NC), uploaded by Cameron Eckert",
+            "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/244608258/square.jpg",
+            "original_dimensions": {
+              "height": 2048,
+              "width": 1365
+            },
+            "flags": [],
+            "native_page_url": null,
+            "native_photo_id": null,
+            "type": "LocalPhoto",
+            "attribution_name": "Cameron Eckert",
+            "square_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/244608258/square.jpg",
+            "small_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/244608258/small.jpg",
+            "medium_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/244608258/medium.jpg",
+            "large_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/244608258/large.jpg",
+            "original_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/244608258/original.jpg"
+          },
+          "taxon": {
+            "id": 564969,
+            "rank": "species",
+            "rank_level": 10,
+            "iconic_taxon_id": 47126,
+            "ancestor_ids": [48460, 47126, 211194, 47125, 47124, 47791, 47790, 564913, 1653861, 564969],
+            "is_active": true,
+            "name": "Chamaenerion angustifolium",
+            "parent_id": 1653861,
+            "ancestry": "48460/47126/211194/47125/47124/47791/47790/564913/1653861",
+            "extinct": false,
+            "provisional": false,
+            "default_photo": {
+              "id": 589344702,
+              "license_code": "cc-by-nc",
+              "attribution": "(c) Anton Dangl, some rights reserved (CC BY-NC), uploaded by Anton Dangl",
+              "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/589344702/square.jpg",
+              "original_dimensions": {
+                "height": 1365,
+                "width": 2048
+              },
+              "flags": [],
+              "attribution_name": "Anton Dangl",
+              "square_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/589344702/square.jpg",
+              "medium_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/589344702/medium.jpg"
+            },
+            "taxon_changes_count": 4,
+            "taxon_schemes_count": 1,
+            "observations_count": 145140,
+            "photos_locked": false,
+            "flag_counts": {
+              "resolved": 3,
+              "unresolved": 1
+            },
+            "current_synonymous_taxon_ids": null,
+            "atlas_id": null,
+            "complete_species_count": null,
+            "wikipedia_url": "https://en.wikipedia.org/wiki/Chamaenerion_angustifolium",
+            "iconic_taxon_name": "Plantae",
+            "preferred_common_name": "fireweed"
+          }
+        }
+      ],
+      "atlas_id": null,
+      "complete_species_count": null,
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Chamaenerion angustifolium",
+      "iconic_taxon_name": "Plantae",
+      "preferred_common_name": "fireweed",
+      "ancestors": [
+        {
+          "id": 47126,
+          "rank": "kingdom",
+          "rank_level": 70,
+          "iconic_taxon_id": 47126,
+          "ancestor_ids": [48460, 47126],
+          "is_active": true,
+          "name": "Plantae",
+          "parent_id": 48460,
+          "ancestry": "48460",
+          "extinct": false,
+          "provisional": false,
+          "default_photo": {
+            "id": 221143410,
+            "license_code": null,
+            "attribution": "(c) Rocío Ramírez Barrios, all rights reserved, uploaded by Rocío Ramírez Barrios",
+            "url": "https://static.inaturalist.org/photos/221143410/square.jpeg",
+            "original_dimensions": {
+              "height": 2048,
+              "width": 1462
+            },
+            "flags": [],
+            "attribution_name": "Rocío Ramírez Barrios",
+            "square_url": "https://static.inaturalist.org/photos/221143410/square.jpeg",
+            "medium_url": "https://static.inaturalist.org/photos/221143410/medium.jpeg"
+          },
+          "taxon_changes_count": 8,
+          "taxon_schemes_count": 2,
+          "observations_count": 134769082,
+          "flag_counts": {
+            "resolved": 29,
+            "unresolved": 2
+          },
+          "current_synonymous_taxon_ids": null,
+          "atlas_id": null,
+          "complete_species_count": null,
+          "wikipedia_url": "https://en.wikipedia.org/wiki/Plant",
+          "complete_rank": "phylum",
+          "iconic_taxon_name": "Plantae",
+          "preferred_common_name": "Plants"
+        },
+        {
+          "id": 211194,
+          "rank": "phylum",
+          "rank_level": 60,
+          "iconic_taxon_id": 47126,
+          "ancestor_ids": [48460, 47126, 211194],
+          "is_active": true,
+          "name": "Tracheophyta",
+          "parent_id": 47126,
+          "ancestry": "48460/47126",
+          "extinct": false,
+          "provisional": false,
+          "default_photo": {
+            "id": 301768574,
+            "license_code": "cc-by-sa",
+            "attribution": "(c) Douglas Goldman, some rights reserved (CC BY-SA), uploaded by Douglas Goldman",
+            "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/301768574/square.jpg",
+            "original_dimensions": {
+              "height": 2048,
+              "width": 1371
+            },
+            "flags": [],
+            "attribution_name": "Douglas Goldman",
+            "square_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/301768574/square.jpg",
+            "medium_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/301768574/medium.jpg"
+          },
+          "taxon_changes_count": 3,
+          "taxon_schemes_count": 2,
+          "observations_count": 130657936,
+          "flag_counts": {
+            "resolved": 8,
+            "unresolved": 1
+          },
+          "current_synonymous_taxon_ids": null,
+          "atlas_id": null,
+          "complete_species_count": null,
+          "wikipedia_url": "https://en.wikipedia.org/wiki/Vascular_plant",
+          "iconic_taxon_name": "Plantae",
+          "preferred_common_name": "Vascular Plants"
+        },
+        {
+          "id": 47125,
+          "rank": "subphylum",
+          "rank_level": 57,
+          "iconic_taxon_id": 47126,
+          "ancestor_ids": [48460, 47126, 211194, 47125],
+          "is_active": true,
+          "name": "Angiospermae",
+          "parent_id": 211194,
+          "ancestry": "48460/47126/211194",
+          "extinct": false,
+          "provisional": false,
+          "default_photo": {
+            "id": 6943609,
+            "license_code": "cc-by-nc",
+            "attribution": "(c) Amy, some rights reserved (CC BY-NC), uploaded by Amy",
+            "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/6943609/square.jpg",
+            "original_dimensions": {
+              "height": 2048,
+              "width": 2048
+            },
+            "flags": [],
+            "attribution_name": "Amy",
+            "square_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/6943609/square.jpg",
+            "medium_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/6943609/medium.jpg"
+          },
+          "taxon_changes_count": 5,
+          "taxon_schemes_count": 2,
+          "observations_count": 123281281,
+          "flag_counts": {
+            "resolved": 15,
+            "unresolved": 0
+          },
+          "current_synonymous_taxon_ids": null,
+          "atlas_id": null,
+          "complete_species_count": null,
+          "wikipedia_url": "https://en.wikipedia.org/wiki/Flowering_plant",
+          "iconic_taxon_name": "Plantae",
+          "preferred_common_name": "Flowering Plants"
+        },
+        {
+          "id": 47124,
+          "rank": "class",
+          "rank_level": 50,
+          "iconic_taxon_id": 47126,
+          "ancestor_ids": [48460, 47126, 211194, 47125, 47124],
+          "is_active": true,
+          "name": "Magnoliopsida",
+          "parent_id": 47125,
+          "ancestry": "48460/47126/211194/47125",
+          "extinct": false,
+          "provisional": false,
+          "default_photo": {
+            "id": 66183364,
+            "license_code": "cc-by",
+            "attribution": "(c) aacocucci, some rights reserved (CC BY), uploaded by aacocucci",
+            "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/66183364/square.jpeg",
+            "original_dimensions": {
+              "height": 1360,
+              "width": 2048
+            },
+            "flags": [],
+            "attribution_name": "aacocucci",
+            "square_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/66183364/square.jpeg",
+            "medium_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/66183364/medium.jpeg"
+          },
+          "taxon_changes_count": 4,
+          "taxon_schemes_count": 2,
+          "observations_count": 103313261,
+          "flag_counts": {
+            "resolved": 10,
+            "unresolved": 0
+          },
+          "current_synonymous_taxon_ids": null,
+          "atlas_id": null,
+          "complete_species_count": null,
+          "wikipedia_url": "https://en.wikipedia.org/wiki/Magnoliopsida",
+          "iconic_taxon_name": "Plantae",
+          "preferred_common_name": "Dicots"
+        },
+        {
+          "id": 47791,
+          "rank": "order",
+          "rank_level": 40,
+          "iconic_taxon_id": 47126,
+          "ancestor_ids": [48460, 47126, 211194, 47125, 47124, 47791],
+          "is_active": true,
+          "name": "Myrtales",
+          "parent_id": 47124,
+          "ancestry": "48460/47126/211194/47125/47124",
+          "extinct": false,
+          "provisional": false,
+          "default_photo": {
+            "id": 42561347,
+            "license_code": null,
+            "attribution": "(c) Eli Sooker, all rights reserved, uploaded by Eli Sooker",
+            "url": "https://static.inaturalist.org/photos/42561347/square.jpeg",
+            "original_dimensions": {
+              "height": 1365,
+              "width": 2048
+            },
+            "flags": [],
+            "attribution_name": "Eli Sooker",
+            "square_url": "https://static.inaturalist.org/photos/42561347/square.jpeg",
+            "medium_url": "https://static.inaturalist.org/photos/42561347/medium.jpeg"
+          },
+          "taxon_changes_count": 1,
+          "taxon_schemes_count": 2,
+          "observations_count": 2761012,
+          "flag_counts": {
+            "resolved": 3,
+            "unresolved": 0
+          },
+          "current_synonymous_taxon_ids": null,
+          "atlas_id": null,
+          "complete_species_count": null,
+          "wikipedia_url": "http://en.wikipedia.org/wiki/Myrtales",
+          "iconic_taxon_name": "Plantae",
+          "preferred_common_name": "myrtles, evening primroses, and allies"
+        },
+        {
+          "id": 47790,
+          "rank": "family",
+          "rank_level": 30,
+          "iconic_taxon_id": 47126,
+          "ancestor_ids": [48460, 47126, 211194, 47125, 47124, 47791, 47790],
+          "is_active": true,
+          "name": "Onagraceae",
+          "parent_id": 47791,
+          "ancestry": "48460/47126/211194/47125/47124/47791",
+          "extinct": false,
+          "provisional": false,
+          "default_photo": {
+            "id": 16678238,
+            "license_code": "cc-by-nc",
+            "attribution": "(c) Steve Ganley, some rights reserved (CC BY-NC), uploaded by Steve Ganley",
+            "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/16678238/square.jpg",
+            "original_dimensions": {
+              "height": 1536,
+              "width": 2048
+            },
+            "flags": [],
+            "attribution_name": "Steve Ganley",
+            "square_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/16678238/square.jpg",
+            "medium_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/16678238/medium.jpg"
+          },
+          "taxon_changes_count": 0,
+          "taxon_schemes_count": 2,
+          "observations_count": 1262273,
+          "flag_counts": {
+            "resolved": 1,
+            "unresolved": 0
+          },
+          "current_synonymous_taxon_ids": null,
+          "atlas_id": null,
+          "complete_species_count": null,
+          "wikipedia_url": "http://en.wikipedia.org/wiki/Onagraceae",
+          "iconic_taxon_name": "Plantae",
+          "preferred_common_name": "evening primrose family"
+        },
+        {
+          "id": 564913,
+          "rank": "genus",
+          "rank_level": 20,
+          "iconic_taxon_id": 47126,
+          "ancestor_ids": [48460, 47126, 211194, 47125, 47124, 47791, 47790, 564913],
+          "is_active": true,
+          "name": "Chamaenerion",
+          "parent_id": 47790,
+          "ancestry": "48460/47126/211194/47125/47124/47791/47790",
+          "extinct": false,
+          "provisional": false,
+          "default_photo": {
+            "id": 4366320,
+            "license_code": null,
+            "attribution": "(c) lolo scheiner, all rights reserved, uploaded by lolo scheiner",
+            "url": "https://static.inaturalist.org/photos/4366320/square.jpeg",
+            "original_dimensions": {
+              "height": 1536,
+              "width": 2048
+            },
+            "flags": [],
+            "attribution_name": "lolo scheiner",
+            "square_url": "https://static.inaturalist.org/photos/4366320/square.jpeg",
+            "medium_url": "https://static.inaturalist.org/photos/4366320/medium.jpeg"
+          },
+          "taxon_changes_count": 2,
+          "taxon_schemes_count": 1,
+          "observations_count": 161085,
+          "flag_counts": {
+            "resolved": 3,
+            "unresolved": 0
+          },
+          "current_synonymous_taxon_ids": null,
+          "atlas_id": null,
+          "complete_species_count": null,
+          "wikipedia_url": "http://en.wikipedia.org/wiki/Chamaenerion",
+          "iconic_taxon_name": "Plantae",
+          "preferred_common_name": "fireweeds"
+        },
+        {
+          "id": 1653861,
+          "rank": "section",
+          "rank_level": 13,
+          "iconic_taxon_id": 47126,
+          "ancestor_ids": [48460, 47126, 211194, 47125, 47124, 47791, 47790, 564913, 1653861],
+          "is_active": true,
+          "name": "Chamaenerion",
+          "parent_id": 564913,
+          "ancestry": "48460/47126/211194/47125/47124/47791/47790/564913",
+          "extinct": false,
+          "provisional": false,
+          "default_photo": {
+            "id": 589781308,
+            "license_code": "cc-by-nc",
+            "attribution": "(c) textman, some rights reserved (CC BY-NC)",
+            "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/589781308/square.jpg",
+            "original_dimensions": {
+              "height": 2048,
+              "width": 1361
+            },
+            "flags": [],
+            "attribution_name": "textman",
+            "square_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/589781308/square.jpg",
+            "medium_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/589781308/medium.jpg"
+          },
+          "taxon_changes_count": 0,
+          "taxon_schemes_count": 0,
+          "observations_count": 155953,
+          "flag_counts": {
+            "resolved": 0,
+            "unresolved": 0
+          },
+          "current_synonymous_taxon_ids": null,
+          "atlas_id": null,
+          "complete_species_count": null,
+          "wikipedia_url": "https://en.wikipedia.org/wiki/Chamaenerion",
+          "iconic_taxon_name": "Plantae"
+        }
+      ],
+      "children": [
+        {
+          "id": 564972,
+          "rank": "subspecies",
+          "rank_level": 5,
+          "iconic_taxon_id": 47126,
+          "ancestor_ids": [48460, 47126, 211194, 47125, 47124, 47791, 47790, 564913, 1653861, 564969, 564972],
+          "is_active": true,
+          "name": "Chamaenerion angustifolium circumvagum",
+          "parent_id": 564969,
+          "ancestry": "48460/47126/211194/47125/47124/47791/47790/564913/1653861/564969",
+          "extinct": false,
+          "provisional": false,
+          "default_photo": {
+            "id": 160298,
+            "license_code": "cc-by-nc-sa",
+            "attribution": "(c) Tony Frates, some rights reserved (CC BY-NC-SA)",
+            "url": "https://inaturalist-open-data.s3.amazonaws.com/photos/160298/square.jpg",
+            "original_dimensions": {
+              "height": 1362,
+              "width": 2048
+            },
+            "flags": [],
+            "attribution_name": "Tony Frates",
+            "square_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/160298/square.jpg",
+            "medium_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/160298/medium.jpg"
+          },
+          "taxon_changes_count": 3,
+          "taxon_schemes_count": 1,
+          "observations_count": 227,
+          "flag_counts": {
+            "resolved": 0,
+            "unresolved": 0
+          },
+          "current_synonymous_taxon_ids": null,
+          "atlas_id": null,
+          "complete_species_count": null,
+          "wikipedia_url": null,
+          "iconic_taxon_name": "Plantae",
+          "preferred_common_name": "Wandering Fireweed"
+        },
+        {
+          "id": 564971,
+          "rank": "subspecies",
+          "rank_level": 5,
+          "iconic_taxon_id": 47126,
+          "ancestor_ids": [48460, 47126, 211194, 47125, 47124, 47791, 47790, 564913, 1653861, 564969, 564971],
+          "is_active": true,
+          "name": "Chamaenerion angustifolium angustifolium",
+          "parent_id": 564969,
+          "ancestry": "48460/47126/211194/47125/47124/47791/47790/564913/1653861/564969",
+          "extinct": false,
+          "provisional": false,
+          "default_photo": {
+            "id": 150363,
+            "license_code": null,
+            "attribution": "(c) faerthen, all rights reserved, uploaded by faerthen",
+            "url": "https://static.inaturalist.org/photos/150363/square.jpg",
+            "original_dimensions": {
+              "height": 2048,
+              "width": 1473
+            },
+            "flags": [],
+            "attribution_name": "faerthen",
+            "square_url": "https://static.inaturalist.org/photos/150363/square.jpg",
+            "medium_url": "https://static.inaturalist.org/photos/150363/medium.jpg"
+          },
+          "taxon_changes_count": 2,
+          "taxon_schemes_count": 1,
+          "observations_count": 49,
+          "flag_counts": {
+            "resolved": 0,
+            "unresolved": 0
+          },
+          "current_synonymous_taxon_ids": null,
+          "atlas_id": null,
+          "complete_species_count": null,
+          "wikipedia_url": null,
+          "iconic_taxon_name": "Plantae"
+        },
+        {
+          "id": 714587,
+          "rank": "variety",
+          "rank_level": 5,
+          "iconic_taxon_id": 47126,
+          "ancestor_ids": [48460, 47126, 211194, 47125, 47124, 47791, 47790, 564913, 1653861, 564969, 714587],
+          "is_active": true,
+          "name": "Chamaenerion angustifolium abbreviatum",
+          "parent_id": 564969,
+          "ancestry": "48460/47126/211194/47125/47124/47791/47790/564913/1653861/564969",
+          "extinct": false,
+          "provisional": false,
+          "default_photo": null,
+          "taxon_changes_count": 2,
+          "taxon_schemes_count": 1,
+          "observations_count": 0,
+          "flag_counts": {
+            "resolved": 0,
+            "unresolved": 0
+          },
+          "current_synonymous_taxon_ids": null,
+          "atlas_id": null,
+          "complete_species_count": null,
+          "wikipedia_url": null,
+          "iconic_taxon_name": "Plantae"
+        }
+      ],
+      "conservation_statuses": [
+        {
+          "id": 137964,
+          "taxon_id": 564969,
+          "taxon_name": "Chamaenerion angustifolium",
+          "taxon_rank": "species",
+          "status": "LC",
+          "authority": "IUCN Red List",
+          "iucn": 10,
+          "url": "https://www.iucnredlist.org/species/164212/78457042",
+          "description": "",
+          "source_id": null,
+          "geoprivacy": null,
+          "updater_id": 7694,
+          "created_at": "2017-10-06T20:04:40+00:00",
+          "updated_at": "2022-06-05T00:51:06+00:00",
+          "updater": {
+            "id": 7694,
+            "login": "schnautzr",
+            "icon_url": null,
+            "orcid": null
+          },
+          "place": null
+        },
+        {
+          "id": 137963,
+          "taxon_id": 564969,
+          "taxon_name": "Chamaenerion angustifolium",
+          "taxon_rank": "species",
+          "status": "E",
+          "authority": "Ohio Department of Natural Resources",
+          "iucn": 40,
+          "url": "https://ohiodnr.gov/discover-and-learn/plants-trees/rare-plants",
+          "description": "Endangered",
+          "source_id": null,
+          "geoprivacy": "obscured",
+          "updater_id": 8669,
+          "created_at": "2017-10-06T20:04:40+00:00",
+          "updated_at": "2023-08-18T13:01:03+00:00",
+          "updater": {
+            "id": 8669,
+            "login": "smpbiologist-rcurtis",
+            "icon_url": null,
+            "orcid": null
+          },
+          "place": {
+            "id": 31,
+            "name": "Ohio",
+            "display_name": "Ohio, US",
+            "admin_level": 10,
+            "ancestor_place_ids": [97394, 1, 31]
+          }
+        }
+      ],
+      "conservation_status": null,
+      "listed_taxa_count": 82,
+      "listed_taxa": [
+        {
+          "id": 14841070,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 97394,
+            "name": "North America",
+            "display_name": "North America",
+            "admin_level": -10,
+            "ancestor_place_ids": [97394]
+          },
+          "list": {
+            "id": 313169,
+            "title": "North America Check List"
+          }
+        },
+        {
+          "id": 14841115,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 97391,
+            "name": "Europe",
+            "display_name": "Europe",
+            "admin_level": -10,
+            "ancestor_place_ids": [97391]
+          },
+          "list": {
+            "id": 313166,
+            "title": "Europe Check List"
+          }
+        },
+        {
+          "id": 7284881,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 6753,
+            "name": "France",
+            "display_name": "France",
+            "admin_level": 0,
+            "ancestor_place_ids": [97391, 6753]
+          },
+          "list": {
+            "id": 7069,
+            "title": "France Check List"
+          }
+        },
+        {
+          "id": 6601863,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 7008,
+            "name": "Belgium",
+            "display_name": "Belgium",
+            "admin_level": 0,
+            "ancestor_place_ids": [97391, 7008]
+          },
+          "list": {
+            "id": 7347,
+            "title": "Belgium Check List"
+          }
+        },
+        {
+          "id": 3268677,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 7016,
+            "name": "Norway",
+            "display_name": "Norway",
+            "admin_level": 0,
+            "ancestor_place_ids": [97391, 7016]
+          },
+          "list": {
+            "id": 7355,
+            "title": "Norway Check List"
+          }
+        },
+        {
+          "id": 5663068,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 6712,
+            "name": "Canada",
+            "display_name": "Canada",
+            "admin_level": 0,
+            "ancestor_place_ids": [97394, 6712]
+          },
+          "list": {
+            "id": 187791,
+            "title": "NatureServe Canada"
+          }
+        },
+        {
+          "id": 3268674,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 6793,
+            "name": "Mexico",
+            "display_name": "Mexico",
+            "admin_level": 0,
+            "ancestor_place_ids": [97394, 6793]
+          },
+          "list": {
+            "id": 7116,
+            "title": "Mexico Check List"
+          }
+        },
+        {
+          "id": 3268666,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 7207,
+            "name": "Germany",
+            "display_name": "Germany",
+            "admin_level": 0,
+            "ancestor_place_ids": [97391, 7207]
+          },
+          "list": {
+            "id": 7548,
+            "title": "Germany Check List"
+          }
+        },
+        {
+          "id": 4767208,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 6973,
+            "name": "Italy",
+            "display_name": "Italy",
+            "admin_level": 0,
+            "ancestor_place_ids": [97391, 6973]
+          },
+          "list": {
+            "id": 7310,
+            "title": "Italy Check List"
+          }
+        },
+        {
+          "id": 14841056,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 1,
+            "name": "United States",
+            "display_name": "United States",
+            "admin_level": 0,
+            "ancestor_place_ids": [97394, 1]
+          },
+          "list": {
+            "id": 299,
+            "title": "United States Check List"
+          }
+        },
+        {
+          "id": 122835,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 6774,
+            "name": "Spain",
+            "display_name": "Spain",
+            "admin_level": 0,
+            "ancestor_place_ids": [97391, 6774]
+          },
+          "list": {
+            "id": 7097,
+            "title": "Spain Check List"
+          }
+        },
+        {
+          "id": 97009634,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 7122,
+            "name": "Portugal",
+            "display_name": "Portugal",
+            "admin_level": 0,
+            "ancestor_place_ids": [97391, 7122]
+          },
+          "list": {
+            "id": 7463,
+            "title": "Portugal Check List"
+          }
+        },
+        {
+          "id": 14841110,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 6857,
+            "name": "United Kingdom",
+            "display_name": "United Kingdom",
+            "admin_level": 0,
+            "ancestor_place_ids": [97391, 6857]
+          },
+          "list": {
+            "id": 7190,
+            "title": "United Kingdom Check List"
+          }
+        },
+        {
+          "id": 2978744,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 14,
+            "name": "California",
+            "display_name": "California, US",
+            "admin_level": 10,
+            "ancestor_place_ids": [97394, 1, 14]
+          },
+          "list": {
+            "id": 70171,
+            "title": "Onagraceae of California, US"
+          }
+        },
+        {
+          "id": 13894075,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 8074,
+            "name": "Auvergne",
+            "display_name": "Auvergne, FR",
+            "admin_level": 10,
+            "ancestor_place_ids": [97391, 6753, 8074]
+          },
+          "list": {
+            "id": 8572,
+            "title": "Auvergne Check List"
+          }
+        },
+        {
+          "id": 3389728,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 50,
+            "name": "Nevada",
+            "display_name": "Nevada, US",
+            "admin_level": 10,
+            "ancestor_place_ids": [97394, 1, 50]
+          },
+          "list": {
+            "id": 348,
+            "title": "Nevada Check List"
+          }
+        },
+        {
+          "id": 14841325,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 10,
+            "name": "Oregon",
+            "display_name": "Oregon, US",
+            "admin_level": 10,
+            "ancestor_place_ids": [97394, 1, 10]
+          },
+          "list": {
+            "id": 308,
+            "title": "Oregon Check List"
+          }
+        },
+        {
+          "id": 6345284,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 30,
+            "name": "North Carolina",
+            "display_name": "North Carolina, US",
+            "admin_level": 10,
+            "ancestor_place_ids": [97394, 1, 30]
+          },
+          "list": {
+            "id": 328,
+            "title": "North Carolina Check List"
+          }
+        },
+        {
+          "id": 87871698,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 10574,
+            "name": "Corse",
+            "display_name": "Corse, FR",
+            "admin_level": 10,
+            "ancestor_place_ids": [97391, 6753, 10574]
+          },
+          "list": {
+            "id": 13335,
+            "title": "Corse Check List"
+          }
+        },
+        {
+          "id": 15017647,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 96793,
+            "name": "Vlaanderen",
+            "display_name": "Vlaanderen, BE",
+            "admin_level": 10,
+            "ancestor_place_ids": [97391, 7008, 96793]
+          },
+          "list": {
+            "id": 312517,
+            "title": "Vlaanderen Check List"
+          }
+        },
+        {
+          "id": 4757209,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 38,
+            "name": "Minnesota",
+            "display_name": "Minnesota, US",
+            "admin_level": 10,
+            "ancestor_place_ids": [97394, 1, 38]
+          },
+          "list": {
+            "id": 336,
+            "title": "Minnesota Check List"
+          }
+        },
+        {
+          "id": 6548948,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 7,
+            "name": "Virginia",
+            "display_name": "Virginia, US",
+            "admin_level": 10,
+            "ancestor_place_ids": [97394, 1, 7]
+          },
+          "list": {
+            "id": 305,
+            "title": "Virginia Check List"
+          }
+        },
+        {
+          "id": 14841125,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 7590,
+            "name": "Manitoba",
+            "display_name": "Manitoba, CA",
+            "admin_level": 10,
+            "ancestor_place_ids": [97394, 6712, 7590]
+          },
+          "list": {
+            "id": 7958,
+            "title": "Manitoba Check List"
+          }
+        },
+        {
+          "id": 9071496,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 29,
+            "name": "Michigan",
+            "display_name": "Michigan, US",
+            "admin_level": 10,
+            "ancestor_place_ids": [97394, 1, 29]
+          },
+          "list": {
+            "id": 327,
+            "title": "Michigan Check List"
+          }
+        },
+        {
+          "id": 4986806,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 22,
+            "name": "Idaho",
+            "display_name": "Idaho, US",
+            "admin_level": 10,
+            "ancestor_place_ids": [97394, 1, 22]
+          },
+          "list": {
+            "id": 320,
+            "title": "Idaho Check List"
+          }
+        },
+        {
+          "id": 2994428,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 52,
+            "name": "Utah",
+            "display_name": "Utah, US",
+            "admin_level": 10,
+            "ancestor_place_ids": [97394, 1, 52]
+          },
+          "list": {
+            "id": 350,
+            "title": "Utah Check List"
+          }
+        },
+        {
+          "id": 3179957,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 1482,
+            "name": "Butte",
+            "display_name": "Butte County, US, CA",
+            "admin_level": 20,
+            "ancestor_place_ids": [97394, 1, 14, 1482]
+          },
+          "list": {
+            "id": 70182,
+            "title": "Onagraceae of Butte County, CA, US"
+          }
+        },
+        {
+          "id": 3179970,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 2280,
+            "name": "Mariposa",
+            "display_name": "Mariposa County, CA, US",
+            "admin_level": 20,
+            "ancestor_place_ids": [97394, 1, 14, 2280]
+          },
+          "list": {
+            "id": 70190,
+            "title": "Onagraceae of Mariposa County, CA, US"
+          }
+        },
+        {
+          "id": 3179958,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 1538,
+            "name": "Calaveras",
+            "display_name": "Calaveras County, CA, US",
+            "admin_level": 20,
+            "ancestor_place_ids": [97394, 1, 14, 1538]
+          },
+          "list": {
+            "id": 70211,
+            "title": "Onagraceae of Calaveras County, CA, US"
+          }
+        },
+        {
+          "id": 3179966,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 1752,
+            "name": "Lassen",
+            "display_name": "Lassen County, US, CA",
+            "admin_level": 20,
+            "ancestor_place_ids": [97394, 1, 14, 1752]
+          },
+          "list": {
+            "id": 70175,
+            "title": "Onagraceae of Lassen County, CA, US"
+          }
+        },
+        {
+          "id": 2988671,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 1286,
+            "name": "Madera",
+            "display_name": "Madera County, US, CA",
+            "admin_level": 20,
+            "ancestor_place_ids": [97394, 1, 14, 1286]
+          },
+          "list": {
+            "id": 70188,
+            "title": "Onagraceae of Madera County, CA, US"
+          }
+        },
+        {
+          "id": 3179962,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 2279,
+            "name": "Glenn",
+            "display_name": "Glenn County, US, CA",
+            "admin_level": 20,
+            "ancestor_place_ids": [97394, 1, 14, 2279]
+          },
+          "list": {
+            "id": 70813,
+            "title": "Onagraceae of Glenn County, CA, US"
+          }
+        },
+        {
+          "id": 13092950,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 489,
+            "name": "Jefferson",
+            "display_name": "Jefferson County, US, OR",
+            "admin_level": 20,
+            "ancestor_place_ids": [97394, 1, 10, 489]
+          },
+          "list": {
+            "id": 787,
+            "title": "Jefferson Check List"
+          }
+        },
+        {
+          "id": 3179975,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 520,
+            "name": "San Bernardino",
+            "display_name": "San Bernardino County, US, CA",
+            "admin_level": 20,
+            "ancestor_place_ids": [97394, 1, 14, 520]
+          },
+          "list": {
+            "id": 70179,
+            "title": "Onagraceae of San Bernardino County, CA, US"
+          }
+        },
+        {
+          "id": 3179978,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 1925,
+            "name": "Shasta",
+            "display_name": "Shasta County, US, CA",
+            "admin_level": 20,
+            "ancestor_place_ids": [97394, 1, 14, 1925]
+          },
+          "list": {
+            "id": 70217,
+            "title": "Onagraceae of Shasta County, CA, US"
+          }
+        },
+        {
+          "id": 22270128,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 2388,
+            "name": "Clark",
+            "display_name": "Clark County, US, NV",
+            "admin_level": 20,
+            "ancestor_place_ids": [97394, 1, 50, 2388]
+          },
+          "list": {
+            "id": 1686,
+            "title": "Clark Check List"
+          }
+        },
+        {
+          "id": 3179977,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 829,
+            "name": "San Diego",
+            "display_name": "San Diego County, CA, US",
+            "admin_level": 20,
+            "ancestor_place_ids": [97394, 1, 14, 829]
+          },
+          "list": {
+            "id": 70180,
+            "title": "Onagraceae of San Diego County, CA, US"
+          }
+        },
+        {
+          "id": 3179955,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 845,
+            "name": "Alameda",
+            "display_name": "Alameda County, US, CA",
+            "admin_level": 20,
+            "ancestor_place_ids": [97394, 1, 14, 845]
+          },
+          "list": {
+            "id": 70202,
+            "title": "Onagraceae of Alameda County, CA, US"
+          }
+        },
+        {
+          "id": 3179960,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 1525,
+            "name": "Del Norte",
+            "display_name": "Del Norte County, US, CA",
+            "admin_level": 20,
+            "ancestor_place_ids": [97394, 1, 14, 1525]
+          },
+          "list": {
+            "id": 70203,
+            "title": "Onagraceae of Del Norte County, CA, US"
+          }
+        },
+        {
+          "id": 3179963,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 1247,
+            "name": "Humboldt",
+            "display_name": "Humboldt County, US, CA",
+            "admin_level": 20,
+            "ancestor_place_ids": [97394, 1, 14, 1247]
+          },
+          "list": {
+            "id": 70204,
+            "title": "Onagraceae of Humboldt County, CA, US"
+          }
+        },
+        {
+          "id": 3179980,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 2757,
+            "name": "Siskiyou",
+            "display_name": "Siskiyou County, US, CA",
+            "admin_level": 20,
+            "ancestor_place_ids": [97394, 1, 14, 2757]
+          },
+          "list": {
+            "id": 70219,
+            "title": "Onagraceae of Siskiyou County, CA, US"
+          }
+        },
+        {
+          "id": 3179961,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 1924,
+            "name": "Fresno",
+            "display_name": "Fresno County, US, CA",
+            "admin_level": 20,
+            "ancestor_place_ids": [97394, 1, 14, 1924]
+          },
+          "list": {
+            "id": 70168,
+            "title": "Onagraceae of Fresno County, CA, US"
+          }
+        },
+        {
+          "id": 3179986,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 1559,
+            "name": "Tuolumne",
+            "display_name": "Tuolumne County, US, CA",
+            "admin_level": 20,
+            "ancestor_place_ids": [97394, 1, 14, 1559]
+          },
+          "list": {
+            "id": 70199,
+            "title": "Onagraceae of Tuolumne County, CA, US"
+          }
+        },
+        {
+          "id": 3389727,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 2696,
+            "name": "Washoe",
+            "display_name": "Washoe County, US, NV",
+            "admin_level": 20,
+            "ancestor_place_ids": [97394, 1, 50, 2696]
+          },
+          "list": {
+            "id": 1994,
+            "title": "Washoe Check List"
+          }
+        },
+        {
+          "id": 3179967,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 962,
+            "name": "Los Angeles",
+            "display_name": "Los Angeles County, US, CA",
+            "admin_level": 20,
+            "ancestor_place_ids": [97394, 1, 14, 962]
+          },
+          "list": {
+            "id": 70176,
+            "title": "Onagraceae of Los Angeles County, CA, US"
+          }
+        },
+        {
+          "id": 3179987,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 2282,
+            "name": "Yolo",
+            "display_name": "Yolo County, US, CA",
+            "admin_level": 20,
+            "ancestor_place_ids": [97394, 1, 14, 2282]
+          },
+          "list": {
+            "id": 70222,
+            "title": "Onagraceae of Yolo County, CA, US"
+          }
+        },
+        {
+          "id": 3179982,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 2764,
+            "name": "Sonoma",
+            "display_name": "Sonoma County, US, CA",
+            "admin_level": 20,
+            "ancestor_place_ids": [97394, 1, 14, 2764]
+          },
+          "list": {
+            "id": 70209,
+            "title": "Onagraceae of Sonoma County, CA, US"
+          }
+        },
+        {
+          "id": 3179974,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 2339,
+            "name": "Sacramento",
+            "display_name": "Sacramento County, CA, US",
+            "admin_level": 20,
+            "ancestor_place_ids": [97394, 1, 14, 2339]
+          },
+          "list": {
+            "id": 70191,
+            "title": "Onagraceae of Sacramento County, CA, US"
+          }
+        },
+        {
+          "id": 3179959,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 1476,
+            "name": "Colusa",
+            "display_name": "Colusa County, US, CA",
+            "admin_level": 20,
+            "ancestor_place_ids": [97394, 1, 14, 1476]
+          },
+          "list": {
+            "id": 70212,
+            "title": "Onagraceae of Colusa County, CA, US"
+          }
+        },
+        {
+          "id": 3179976,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 418,
+            "name": "Santa Cruz",
+            "display_name": "Santa Cruz County, US, CA",
+            "admin_level": 20,
+            "ancestor_place_ids": [97394, 1, 14, 418]
+          },
+          "list": {
+            "id": 70193,
+            "title": "Onagraceae of Santa Cruz County, CA, US"
+          }
+        },
+        {
+          "id": 3179983,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 1530,
+            "name": "Tehama",
+            "display_name": "Tehama County, US, CA",
+            "admin_level": 20,
+            "ancestor_place_ids": [97394, 1, 14, 1530]
+          },
+          "list": {
+            "id": 70220,
+            "title": "Onagraceae of Tehama County, CA, US"
+          }
+        },
+        {
+          "id": 3179979,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 1526,
+            "name": "Sierra",
+            "display_name": "Sierra County, US, CA",
+            "admin_level": 20,
+            "ancestor_place_ids": [97394, 1, 14, 1526]
+          },
+          "list": {
+            "id": 70218,
+            "title": "Onagraceae of Sierra County, CA, US"
+          }
+        },
+        {
+          "id": 22539174,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 2269,
+            "name": "Douglas",
+            "display_name": "Douglas County, US, NV",
+            "admin_level": 20,
+            "ancestor_place_ids": [97394, 1, 50, 2269]
+          },
+          "list": {
+            "id": 1567,
+            "title": "Douglas Check List"
+          }
+        },
+        {
+          "id": 3179965,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 1917,
+            "name": "Lake",
+            "display_name": "Lake County, US, CA",
+            "admin_level": 20,
+            "ancestor_place_ids": [97394, 1, 14, 1917]
+          },
+          "list": {
+            "id": 70187,
+            "title": "Onagraceae of Lake County, CA, US"
+          }
+        },
+        {
+          "id": 13894076,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 30144,
+            "name": "Cantal",
+            "display_name": "Cantal, Auvergne, FR",
+            "admin_level": 20,
+            "ancestor_place_ids": [97391, 6753, 8074, 30144]
+          },
+          "list": {
+            "id": 32907,
+            "title": "Cantal Check List"
+          }
+        },
+        {
+          "id": 3179981,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 1251,
+            "name": "San Luis Obispo",
+            "display_name": "San Luis Obispo County, US, CA",
+            "admin_level": 20,
+            "ancestor_place_ids": [97394, 1, 14, 1251]
+          },
+          "list": {
+            "id": 70195,
+            "title": "Onagraceae of San Luis Obispo County, CA, US"
+          }
+        },
+        {
+          "id": 13795348,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 13525,
+            "name": "Carson City",
+            "display_name": "Carson City County, US, NV",
+            "admin_level": 20,
+            "ancestor_place_ids": [97394, 1, 50, 13525]
+          },
+          "list": {
+            "id": 16288,
+            "title": "Carson City Check List"
+          }
+        },
+        {
+          "id": 3179984,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 416,
+            "name": "Trinity",
+            "display_name": "Trinity County, CA, US",
+            "admin_level": 20,
+            "ancestor_place_ids": [97394, 1, 14, 416]
+          },
+          "list": {
+            "id": 70221,
+            "title": "Onagraceae of Trinity County, CA, US"
+          }
+        },
+        {
+          "id": 3179969,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 2281,
+            "name": "Modoc",
+            "display_name": "Modoc County, US, CA",
+            "admin_level": 20,
+            "ancestor_place_ids": [97394, 1, 14, 2281]
+          },
+          "list": {
+            "id": 70213,
+            "title": "Onagraceae of Modoc County, CA, US"
+          }
+        },
+        {
+          "id": 3179968,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 436,
+            "name": "Mendocino",
+            "display_name": "Mendocino County, CA, US",
+            "admin_level": 20,
+            "ancestor_place_ids": [97394, 1, 14, 436]
+          },
+          "list": {
+            "id": 70205,
+            "title": "Onagraceae of Mendocino County, CA, US"
+          }
+        },
+        {
+          "id": 3179985,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 1927,
+            "name": "Tulare",
+            "display_name": "Tulare County, CA, US",
+            "admin_level": 20,
+            "ancestor_place_ids": [97394, 1, 14, 1927]
+          },
+          "list": {
+            "id": 70198,
+            "title": "Onagraceae of Tulare County, CA, US"
+          }
+        },
+        {
+          "id": 3179972,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 1732,
+            "name": "Plumas",
+            "display_name": "Plumas County, US, CA",
+            "admin_level": 20,
+            "ancestor_place_ids": [97394, 1, 14, 1732]
+          },
+          "list": {
+            "id": 70215,
+            "title": "Onagraceae of Plumas County, CA, US"
+          }
+        },
+        {
+          "id": 3013075,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 2283,
+            "name": "Placer",
+            "display_name": "Placer County, CA, US",
+            "admin_level": 20,
+            "ancestor_place_ids": [97394, 1, 14, 2283]
+          },
+          "list": {
+            "id": 70225,
+            "title": "Onagraceae of Placer County, CA, US"
+          }
+        },
+        {
+          "id": 3015573,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 2278,
+            "name": "Alpine",
+            "display_name": "Alpine County, US, CA",
+            "admin_level": 20,
+            "ancestor_place_ids": [97394, 1, 14, 2278]
+          },
+          "list": {
+            "id": 70223,
+            "title": "Onagraceae of Alpine County, CA, US"
+          }
+        },
+        {
+          "id": 39507354,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 977,
+            "name": "Humboldt",
+            "display_name": "Humboldt County, US, NV",
+            "admin_level": 20,
+            "ancestor_place_ids": [97394, 1, 50, 977]
+          },
+          "list": {
+            "id": 1275,
+            "title": "Humboldt Check List"
+          }
+        },
+        {
+          "id": 3179956,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 775,
+            "name": "Amador",
+            "display_name": "Amador County, US, CA",
+            "admin_level": 20,
+            "ancestor_place_ids": [97394, 1, 14, 775]
+          },
+          "list": {
+            "id": 70210,
+            "title": "Onagraceae of Amador County, CA, US"
+          }
+        },
+        {
+          "id": 3179964,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 1883,
+            "name": "Inyo",
+            "display_name": "Inyo County, CA, US",
+            "admin_level": 20,
+            "ancestor_place_ids": [97394, 1, 14, 1883]
+          },
+          "list": {
+            "id": 70173,
+            "title": "Onagraceae of Inyo County, CA, US"
+          }
+        },
+        {
+          "id": 2978743,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 1916,
+            "name": "Mono",
+            "display_name": "Mono County, US, CA",
+            "admin_level": 20,
+            "ancestor_place_ids": [97394, 1, 14, 1916]
+          },
+          "list": {
+            "id": 70177,
+            "title": "Onagraceae of Mono County, CA, US"
+          }
+        },
+        {
+          "id": 3179973,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 917,
+            "name": "Riverside",
+            "display_name": "Riverside County, US, CA",
+            "admin_level": 20,
+            "ancestor_place_ids": [97394, 1, 14, 917]
+          },
+          "list": {
+            "id": 70178,
+            "title": "Onagraceae of Riverside County, CA, US"
+          }
+        },
+        {
+          "id": 4689808,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 1902,
+            "name": "Elko",
+            "display_name": "Elko County, US, NV",
+            "admin_level": 20,
+            "ancestor_place_ids": [97394, 1, 50, 1902]
+          },
+          "list": {
+            "id": 4877,
+            "title": "Elko Check List"
+          }
+        },
+        {
+          "id": 2986700,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 1795,
+            "name": "El Dorado",
+            "display_name": "El Dorado County, US, CA",
+            "admin_level": 20,
+            "ancestor_place_ids": [97394, 1, 14, 1795]
+          },
+          "list": {
+            "id": 70184,
+            "title": "Onagraceae of El Dorado County, CA, US"
+          }
+        },
+        {
+          "id": 3179971,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 281,
+            "name": "Nevada",
+            "display_name": "Nevada County, CA, US",
+            "admin_level": 20,
+            "ancestor_place_ids": [97394, 1, 14, 281]
+          },
+          "list": {
+            "id": 70224,
+            "title": "Onagraceae of Nevada County, CA, US"
+          }
+        },
+        {
+          "id": 9526890,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 9012,
+            "name": "Shenandoah National Park",
+            "display_name": "Shenandoah National Park, US, VA",
+            "admin_level": 100,
+            "ancestor_place_ids": [97394, 1, 7, 9012]
+          },
+          "list": {
+            "id": 454688,
+            "title": "Species Check List for Shenandoah National Park"
+          }
+        },
+        {
+          "id": 8186763,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 78789,
+            "name": "San Juan Island National Historical Park",
+            "display_name": "San Juan Island National Historical Park, US, WA",
+            "admin_level": 100,
+            "ancestor_place_ids": [97394, 1, 46, 78789]
+          },
+          "list": {
+            "id": 365960,
+            "title": "Species Check List for San Juan Island National Historical Park"
+          }
+        },
+        {
+          "id": 4617877,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 97435,
+            "name": "North Cascades National Park Service Complex",
+            "display_name": "North Cascades National Park Service Complex, US, WA",
+            "admin_level": 100,
+            "ancestor_place_ids": [97394, 1, 46, 97435]
+          },
+          "list": {
+            "id": 313222,
+            "title": "North Cascades National Park Service Complex Check List"
+          }
+        },
+        {
+          "id": 8225623,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 95304,
+            "name": "Saint Croix National Scenic Riverway",
+            "display_name": "Saint Croix National Scenic Riverway, US, MN",
+            "admin_level": 100,
+            "ancestor_place_ids": [97394, 1, 38, 95304]
+          },
+          "list": {
+            "id": 368956,
+            "title": "Species Check List for Saint Croix National Scenic Riverway"
+          }
+        },
+        {
+          "id": 8497589,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 95153,
+            "name": "Mississippi National River and Recreation Area",
+            "display_name": "Mississippi National River and Recreation Area, US, MN",
+            "admin_level": 100,
+            "ancestor_place_ids": [97394, 1, 38, 95153]
+          },
+          "list": {
+            "id": 384769,
+            "title": "Species Check List for Mississippi National River and Recreation Area"
+          }
+        },
+        {
+          "id": 43174006,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 143149,
+            "name": "Chitek Lake Anishinaabe Provincial Park",
+            "display_name": "Chitek Lake Anishinaabe Provincial Park, MB, CA",
+            "admin_level": null,
+            "ancestor_place_ids": [97394, 6712, 7590, 143149]
+          },
+          "list": {
+            "id": 2481798,
+            "title": "Chitek Lake Anishinaabe Provincial Park Check List"
+          }
+        },
+        {
+          "id": 29885271,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 133991,
+            "name": "Mondsee - Irrsee - Salzkammergut",
+            "display_name": "Mondsee - Irrsee - Salzkammergut",
+            "admin_level": null,
+            "ancestor_place_ids": [59614, 67952, 143465, 143473, 133991]
+          },
+          "list": {
+            "id": 1676150,
+            "title": "Mondsee - Irrsee - Salzkammergut Check List"
+          }
+        },
+        {
+          "id": 129866929,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 218021,
+            "name": "NE Stafford St Garden at 115",
+            "display_name": "NE Stafford St Garden at 115",
+            "admin_level": null,
+            "ancestor_place_ids": [97394, 218021]
+          },
+          "list": {
+            "id": 4524884,
+            "title": "Willamette Valley Natives"
+          }
+        },
+        {
+          "id": 44014164,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 143465,
+            "name": "Österreich",
+            "display_name": "Österreich",
+            "admin_level": null,
+            "ancestor_place_ids": [59614, 67952, 143465]
+          },
+          "list": {
+            "id": 2535617,
+            "title": "Österreich Check List"
+          }
+        },
+        {
+          "id": 50438658,
+          "taxon_id": 564969,
+          "establishment_means": "native",
+          "place": {
+            "id": 143473,
+            "name": "Oberösterreich",
+            "display_name": "Oberösterreich, Österreich, AT",
+            "admin_level": null,
+            "ancestor_place_ids": [59614, 67952, 143465, 143473]
+          },
+          "list": {
+            "id": 2802428,
+            "title": "Pflanzen in Oberösterreich"
+          }
+        }
+      ],
+      "wikipedia_summary": "\u003Ci\u003E\u003Cb\u003EChamaenerion angustifolium\u003C/b\u003E\u003C/i\u003E is a perennial herbaceous flowering plant in the willowherb family Onagraceae. It is known in North America as \u003Cb\u003Efireweed\u003C/b\u003E, in some parts of Canada as \u003Cb\u003Egreat willowherb\u003C/b\u003E, in Britain and Ireland as \u003Cb\u003Erosebay willowherb\u003C/b\u003E. In the United Kingdom it is also known as \u003Cb\u003Ebombweed\u003C/b\u003E, as a result of its rapid appearance on city bomb sites during the Blitz of World War II.: 112  It is also known by the synonyms \u003Ci\u003EChamerion angustifolium\u003C/i\u003E and \u003Ci\u003EEpilobium angustifolium\u003C/i\u003E....",
+      "vision": true
+    }
+  ]
+}

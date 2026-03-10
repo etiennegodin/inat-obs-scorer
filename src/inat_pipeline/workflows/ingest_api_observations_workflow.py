@@ -3,8 +3,8 @@ import logging
 from typing import Union
 
 from ..app.container import Dependencies
+from ..ingest import fields
 from ..ingest.api import inatApiClient, inatApiConfig
-from ..utils.config import read_config
 from ..utils.db import (
     SQL_Engine,
     _open_connection,
@@ -33,7 +33,7 @@ def execute(deps: Dependencies, limit: Union[None, int]) -> None:
 
     if items:
         # Read api fields to query
-        api_fields = read_config(deps.API_OBS_FIELDS_PATH)
+        api_fields = fields.load(deps.API_FIELDS_PATH / "observations.yaml")
 
         # Set up api configs
         config = inatApiConfig(fields=api_fields, limiter=10, per_page=CHUNK_SIZE)

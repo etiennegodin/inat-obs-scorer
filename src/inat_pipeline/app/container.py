@@ -30,5 +30,4 @@ class Dependencies:
         self.SQL_STAGE_PATH = self._QUERY_FOLDER / "stage"
         self.SQL_FEATURES_PATH = self._QUERY_FOLDER / "features"
 
-        self.API_OBS_FIELDS_PATH = self.project_root / "observations_fields.yaml"
-        self.API_TAXA_FIELDS_PATH = self.project_root / "taxa_fields.yaml"
+        self.API_FIELDS_PATH = self.package_root / "ingest" / "api_fields"
