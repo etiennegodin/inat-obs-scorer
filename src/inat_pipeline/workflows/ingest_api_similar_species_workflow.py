@@ -3,12 +3,18 @@ import logging
 from typing import Union
 
 from ..app.container import Dependencies
-from ..ingest.inat_client.base import inatApiClient
+from ..ingest.inat_client import (
+    DuckDbWriter,
+    EndpointConfig,
+    RateLimiterFetcher,
+    make_client,
+)
 from ..utils.db import (
     _open_connection,
     create_api_raw_table,
     get_remaining_items,
 )
+from ..utils.git import get_git_hash
 
 logger = logging.getLogger(__name__)
 
@@ -17,7 +23,6 @@ def execute(deps: Dependencies, limit: Union[None, int]) -> None:
     SOURCE_TABLE_NAME = "staged.species_list"
     TARGET_TABLE_NAME = "raw.api_similar_species"
     SOURCE_KEY = "taxon_id"
-    CHUNK_SIZE = 200
 
     con = _open_connection(deps.DB_PATH)
 
@@ -31,22 +36,12 @@ def execute(deps: Dependencies, limit: Union[None, int]) -> None:
 
     if items:
         # Read api fields to query
-        # api_fields = fields.load(deps.API_FIELDS_PATH / "taxa.yaml")
+        config = EndpointConfig("identifications/similar_species", id_param="taxon_id")
+        fetcher = RateLimiterFetcher(30)
 
-        # Setting params for this specific endpoint
-        params = {"taxon_id": None}
-        # Set up api configs
-        config = inatApiConfig(
-            endpoint="similar_species",
-            required_param=True,
-            params=params,
-            limiter=10,
-            per_page=None,
-        )
-
-        # Run api queries
-        api = inatApiClient(TARGET_TABLE_NAME, config=config)
-        asyncio.run(api.execute(items, con))
+        with DuckDbWriter(con, TARGET_TABLE_NAME, get_git_hash(short=True)) as writer:
+            client = make_client(config, fetcher, writer)
+            asyncio.run(client.execute(items))
     else:
         logger.info("All items already processed")
 

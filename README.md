@@ -10,6 +10,14 @@ Which “Needs ID” observations are most likely to reach Research Grade if rev
 time coverage
 
 
+## Api client
+
+context manager
+protocols for fetchers, writers
+variable endpoint formatting and params required
+
+
+
 ## Dataset Challenges
 
 Main challenge is to avoid temporal leakage and reconstruct features at point in time per observation
