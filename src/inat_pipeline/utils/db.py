@@ -13,7 +13,7 @@ from ..exceptions import InatPipelineError, SqlError
 logger = logging.getLogger(__name__)
 
 
-def _open_connection(db_path: str) -> duckdb.DuckDBPyConnection:
+def duckdb_con(db_path: str) -> duckdb.DuckDBPyConnection:
     # always create a fresh connection; use context manager where possible
     try:
         con = duckdb.connect(database=db_path)

@@ -9,7 +9,6 @@ This is the entry point for all use cases. It handles:
 """
 
 import logging
-from typing import Union
 
 from ..exceptions import InatPipelineError, WorkflowError
 from ..workflows import (
@@ -56,17 +55,19 @@ class ApplicationService:
     def ingest_api(self, args):
         logger.info("Starting api ingest workflow")
         try:
-            ingest_api_workflow.execute(self.deps, rate=args.rate)
+            ingest_api_workflow.execute(
+                self.deps, rate=args.rate, ignore_not_found=args.ignore_not_found
+            )
         except InatPipelineError as e:
             logger.error(f"Ingest downloads failed {e}")
             raise WorkflowError(f"Ingest downloads failed failed {e}") from e
         except Exception as e:
             logger.exception(e)
 
-    def features(self, limit: Union[int, None]):
+    def features(self):
         logger.info("Starting features workflow")
         try:
-            features_workflow.execute(self.deps, limit=limit)
+            features_workflow.execute(self.deps)
         except InatPipelineError as e:
             logger.error(f"Process_features failed {e}")
             raise WorkflowError(f"Process_features failed {e}") from e

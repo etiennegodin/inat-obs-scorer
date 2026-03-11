@@ -1,16 +1,5 @@
 from dataclasses import asdict, dataclass, field
-from pathlib import Path
-from typing import Any, Union
-
-import yaml
-
-
-def load_fields(file: Path) -> dict[Any, Any]:
-    try:
-        with open(file, "r") as file:
-            return yaml.safe_load(file)
-    except Exception as e:
-        raise e
+from typing import Union
 
 
 @dataclass

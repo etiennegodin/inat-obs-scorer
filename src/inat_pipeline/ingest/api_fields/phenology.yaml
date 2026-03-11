@@ -1,8 +1,0 @@
-controlled_attribute:
-  id: true
-  label: true
-controlled_value:
-  id: true
-  label: true
-count: true
-month_of_year: true

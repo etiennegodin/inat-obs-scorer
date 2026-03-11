@@ -38,19 +38,11 @@ class DuckDbWriter:
         self.version = version
         self._executor = ThreadPoolExecutor(max_workers=1)  # DuckDB isn't thread-safe
 
-    async def __aenter__(self):
-        return self
-
-    async def __aexit__(self, *_):
-        self.close()
-        self.con.close()  # explicitly release DuckDB
-
     def __enter__(self):
         return self
 
     def __exit__(self, exc_type, exc, tb):
-        self.close()
-        self.con.close()  # explicitly release DuckDB
+        self._executor.shutdown(wait=True)  # drain inflight inserts
 
     async def write(self, results: list[dict]):
         """Receive a ready batch, offload blocking insert to thread pool."""

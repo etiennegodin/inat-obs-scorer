@@ -1,3 +1,4 @@
+from . import registery
 from .config import EndpointConfig, load_fields
 from .factory import make_client
 from .fetchers import RateLimiterFetcher
@@ -10,4 +11,5 @@ __all__ = [
     "EndpointConfig",
     "load_fields",
     "make_client",
+    "registery",
 ]

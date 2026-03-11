@@ -1,14 +1,13 @@
 import logging
-from typing import Union
 
 from ..app.container import Dependencies
-from ..utils.db import SplitConfig, SQL_Engine, _open_connection
+from ..utils.db import SplitConfig, SQL_Engine, duckdb_con
 
 logger = logging.getLogger(__name__)
 
 
-def execute(deps: Dependencies, limit: Union[int, None]):
-    con = _open_connection(deps.DB_PATH)
+def execute(deps: Dependencies):
+    con = duckdb_con(deps.DB_PATH)
 
     # Transform data and create features
     sql_features = SQL_Engine(con, deps.SQL_FEATURES_PATH)

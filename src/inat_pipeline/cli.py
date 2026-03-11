@@ -34,7 +34,7 @@ def ingest_api_cmd(args: Namespace, app: ApplicationService):
 
 def features_cmd(args: Namespace, app: ApplicationService):
     try:
-        app.features(limit=args.limit)
+        app.features()
     except InatPipelineError as e:
         print(f"[red]✗ {e}[/red]")
         return 1
@@ -62,10 +62,6 @@ def create_parser() -> argparse.ArgumentParser:
         prog="inat_pipeline", description="Data pipeline for inaturalist observations"
     )
 
-    parser.add_argument(
-        "--verbose", "-v", action="store_true", help="Enable verbose logging"
-    )
-
     subparsers = parser.add_subparsers(
         title="commands", description="Available commands"
     )
@@ -73,7 +69,7 @@ def create_parser() -> argparse.ArgumentParser:
     # Ingest command
     ingest_parser = subparsers.add_parser(
         "ingest",
-        help="Ingests data sources, runs api queries, saves to db and stage data",
+        help="Ingests data sources [local, api]",
     )
 
     ingest_subparsers = ingest_parser.add_subparsers(
@@ -82,26 +78,32 @@ def create_parser() -> argparse.ArgumentParser:
 
     ingest_local_parser = ingest_subparsers.add_parser(
         "local",
-        help="Ingests local data sources",
+        help="Ingests data from prior downloads",
     )
     ingest_local_parser.set_defaults(func=ingest_local_cmd)
 
     ingest_api_parser = ingest_subparsers.add_parser(
         "api",
-        help="Run api collection",
+        help="Ingest data from inaturalist's api",
     )
-    ingest_api_parser.add_argument("--rate", "-r", default=30, type=int)
-    ingest_api_parser.add_argument("--ignore_not_found", "-i", action="store_true")
+    ingest_api_parser.add_argument(
+        "--rate", "-r", default=30, type=int, help="Requests per min"
+    )
+    ingest_api_parser.add_argument(
+        "--ignore_not_found",
+        "-i",
+        action="store_true",
+        help="Ignore not found requests",
+    )
 
     ingest_api_parser.set_defaults(func=ingest_api_cmd)
 
-    # Process command
+    # Features command
     process_parser = subparsers.add_parser("features", help="Creates features suite")
-    process_parser.add_argument("--limit", "-l", default=None)
     process_parser.set_defaults(func=features_cmd)
 
-    # Process command
-    train_parser = subparsers.add_parser("train", help="NotImplemented")
+    # Train command
+    train_parser = subparsers.add_parser("train", help="Train model")
     train_parser.add_argument(
         "--classifier", default="logistic", choices=CLASSIFIER_REGISTRY
     )
