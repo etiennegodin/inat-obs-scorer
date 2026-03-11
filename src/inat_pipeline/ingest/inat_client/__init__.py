@@ -1,5 +1,5 @@
 from . import registery
-from .config import EndpointConfig, load_fields
+from .config import EndpointConfig
 from .factory import make_client
 from .fetchers import RateLimiterFetcher
 from .writers import DuckDbWriter, NullWriter
@@ -9,7 +9,6 @@ __all__ = [
     "NullWriter",
     "DuckDbWriter",
     "EndpointConfig",
-    "load_fields",
     "make_client",
     "registery",
 ]
