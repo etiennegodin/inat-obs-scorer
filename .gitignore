@@ -27,6 +27,7 @@ obsidian/
 notebooks/*
 data/*
 temp/
+*.log
 
 # Ml Flow
 mlruns/*
