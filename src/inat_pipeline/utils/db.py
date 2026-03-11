@@ -83,7 +83,7 @@ def get_remaining_items(
         raise e
 
     if items:
-        return df_samples
+        return items
     else:
         return []
 

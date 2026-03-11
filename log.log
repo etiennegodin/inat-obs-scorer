@@ -1,9 +1,44 @@
-2026-03-10 11:34:53 - inat_pipeline.app.service - features - INFO - Starting features workflow
-2026-03-10 11:34:53 - inat_pipeline.utils.db - __init__ - INFO - Initialized sql engine for queries in features
-2026-03-10 11:34:53 - inat_pipeline.utils.db - _execute - INFO - Executed community_taxon_windowed.sql ,took 0.022s
-2026-03-10 11:34:53 - inat_pipeline.utils.db - _execute - INFO - Executed research_grade_windowed.sql ,took 0.013s
-2026-03-10 11:34:55 - inat_pipeline.utils.db - _execute - INFO - Executed identifications.sql ,took 1.485s
-2026-03-10 11:35:04 - inat_pipeline.utils.db - _execute - INFO - Executed identifiers.sql ,took 9.169s
-2026-03-10 11:35:05 - inat_pipeline.app.service - features - ERROR - Process_features failed Error executing sql query:
-/home/etienne/projects/inatML/src/inat_pipeline/queries/features/taxon.sql
-Query interrupted
+2026-03-10 20:34:25 - inat_pipeline.app.service - ingest_api - INFO - Starting api ingest workflow
+2026-03-10 20:34:25 - inat_pipeline.workflows.ingest_api_workflow - execute - INFO - Running sample strategy to select observations to query
+2026-03-10 20:34:25 - inat_pipeline.workflows.ingest_api_workflow - execute - INFO - Starting api observations workflow
+2026-03-10 20:34:25 - inat_pipeline.workflows.ingest_api_workflow - execute - INFO - Starting api taxa workflow
+2026-03-10 20:34:25 - inat_pipeline.utils.db - create_api_raw_table - INFO - Created table raw.api_similar_species
+2026-03-10 20:34:25 - inat_pipeline.ingest.inat_client.base - _consume_queue - INFO - Init consumer task
+2026-03-10 20:34:26 - inat_pipeline.ingest.inat_client.fetchers - fetch - DEBUG - https://api.inaturalist.org/v2/identifications/similar_species?taxon_id=79070&page=1&per_page=200
+2026-03-10 20:34:26 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-10 20:34:27 - inat_pipeline.ingest.inat_client.fetchers - fetch - DEBUG - https://api.inaturalist.org/v2/identifications/similar_species?taxon_id=159051&page=1&per_page=200
+2026-03-10 20:34:27 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 9 items
+2026-03-10 20:34:27 - inat_pipeline.ingest.inat_client.fetchers - fetch - DEBUG - https://api.inaturalist.org/v2/identifications/similar_species?taxon_id=155116&page=1&per_page=200
+2026-03-10 20:34:27 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 18 items
+2026-03-10 20:34:27 - inat_pipeline.ingest.inat_client.fetchers - fetch - DEBUG - https://api.inaturalist.org/v2/identifications/similar_species?taxon_id=68300&page=1&per_page=200
+2026-03-10 20:34:27 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 19 items
+2026-03-10 20:34:28 - inat_pipeline.ingest.inat_client.fetchers - fetch - DEBUG - https://api.inaturalist.org/v2/identifications/similar_species?taxon_id=165994&page=1&per_page=200
+2026-03-10 20:34:28 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-10 20:34:28 - inat_pipeline.ingest.inat_client.fetchers - fetch - DEBUG - https://api.inaturalist.org/v2/identifications/similar_species?taxon_id=54843&page=1&per_page=200
+2026-03-10 20:34:28 - inat_pipeline.ingest.inat_client.fetchers - fetch - DEBUG - https://api.inaturalist.org/v2/identifications/similar_species?taxon_id=51606&page=1&per_page=200
+2026-03-10 20:34:28 - inat_pipeline.ingest.inat_client.fetchers - fetch - DEBUG - https://api.inaturalist.org/v2/identifications/similar_species?taxon_id=154524&page=1&per_page=200
+2026-03-10 20:34:28 - inat_pipeline.ingest.inat_client.fetchers - fetch - DEBUG - https://api.inaturalist.org/v2/identifications/similar_species?taxon_id=64177&page=1&per_page=200
+2026-03-10 20:34:28 - inat_pipeline.ingest.inat_client.fetchers - fetch - DEBUG - https://api.inaturalist.org/v2/identifications/similar_species?taxon_id=54521&page=1&per_page=200
+2026-03-10 20:34:28 - inat_pipeline.ingest.inat_client.fetchers - fetch - DEBUG - https://api.inaturalist.org/v2/identifications/similar_species?taxon_id=58725&page=1&per_page=200
+2026-03-10 20:34:28 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 48 items
+2026-03-10 20:34:28 - inat_pipeline.ingest.inat_client.fetchers - fetch - DEBUG - https://api.inaturalist.org/v2/identifications/similar_species?taxon_id=130893&page=1&per_page=200
+2026-03-10 20:34:28 - inat_pipeline.ingest.inat_client.fetchers - fetch - DEBUG - https://api.inaturalist.org/v2/identifications/similar_species?taxon_id=430124&page=1&per_page=200
+2026-03-10 20:34:28 - inat_pipeline.ingest.inat_client.fetchers - fetch - DEBUG - https://api.inaturalist.org/v2/identifications/similar_species?taxon_id=169474&page=1&per_page=200
+2026-03-10 20:34:29 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 96 items
+2026-03-10 20:34:29 - inat_pipeline.ingest.inat_client.fetchers - fetch - DEBUG - https://api.inaturalist.org/v2/identifications/similar_species?taxon_id=132600&page=1&per_page=200
+2026-03-10 20:34:29 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 72 items
+2026-03-10 20:34:29 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-10 20:34:29 - inat_pipeline.ingest.inat_client.fetchers - fetch - DEBUG - https://api.inaturalist.org/v2/identifications/similar_species?taxon_id=54808&page=1&per_page=200
+2026-03-10 20:34:29 - inat_pipeline.ingest.inat_client.fetchers - fetch - DEBUG - https://api.inaturalist.org/v2/identifications/similar_species?taxon_id=53587&page=1&per_page=200
+2026-03-10 20:34:29 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-10 20:34:29 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-10 20:34:29 - inat_pipeline.ingest.inat_client.fetchers - fetch - DEBUG - https://api.inaturalist.org/v2/identifications/similar_species?taxon_id=47193&page=1&per_page=200
+2026-03-10 20:34:29 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-10 20:34:29 - inat_pipeline.ingest.inat_client.fetchers - fetch - DEBUG - https://api.inaturalist.org/v2/identifications/similar_species?taxon_id=55745&page=1&per_page=200
+2026-03-10 20:34:30 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-10 20:34:30 - inat_pipeline.ingest.inat_client.fetchers - fetch - DEBUG - https://api.inaturalist.org/v2/identifications/similar_species?taxon_id=47566&page=1&per_page=200
+2026-03-10 20:34:30 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-10 20:34:30 - inat_pipeline.ingest.inat_client.fetchers - fetch - DEBUG - https://api.inaturalist.org/v2/identifications/similar_species?taxon_id=51053&page=1&per_page=200
+2026-03-10 20:34:30 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-10 20:34:33 - inat_pipeline.ingest.inat_client.fetchers - fetch - DEBUG - https://api.inaturalist.org/v2/identifications/similar_species?taxon_id=53597&page=1&per_page=200
+2026-03-10 20:34:33 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items

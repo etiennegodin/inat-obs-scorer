@@ -37,7 +37,7 @@ def execute(deps: Dependencies, limit: Union[None, int]) -> None:
     if items:
         # Read api fields to query
         config = EndpointConfig("identifications/similar_species", id_param="taxon_id")
-        fetcher = RateLimiterFetcher(30)
+        fetcher = RateLimiterFetcher(20)
 
         with DuckDbWriter(con, TARGET_TABLE_NAME, get_git_hash(short=True)) as writer:
             client = make_client(config, fetcher, writer)

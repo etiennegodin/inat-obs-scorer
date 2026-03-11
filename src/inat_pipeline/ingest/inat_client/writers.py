@@ -45,9 +45,15 @@ class DuckDbWriter:
         self.close()
         self.con.close()  # explicitly release DuckDB
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc, tb):
+        self.close()
+        self.con.close()  # explicitly release DuckDB
+
     async def write(self, results: list[dict]):
         """Receive a ready batch, offload blocking insert to thread pool."""
-        logger.info("Init writer task")
         loop = asyncio.get_running_loop()
         await loop.run_in_executor(self._executor, self._insert_batch, results)
 
@@ -67,7 +73,7 @@ class DuckDbWriter:
                     ),
                 )
             self.con.commit()
-            logger.info("Inserted batch of %d items", len(results))
+            logger.debug("Inserted batch of %d items", len(results))
         except Exception as e:
             logger.error("Failed to insert batch: %s", e)
             raise

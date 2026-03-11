@@ -99,6 +99,8 @@ class BaseInatClient(ABC):
             page += 1
 
     async def _consume_queue(self) -> None:
+        logger.info("Init consumer task")
+
         """Consumer: drain the queue and delegate to writer."""
         processed = 0
 

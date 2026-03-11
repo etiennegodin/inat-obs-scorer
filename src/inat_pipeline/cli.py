@@ -90,7 +90,7 @@ def create_parser() -> argparse.ArgumentParser:
         "api",
         help="Run api collection",
     )
-    ingest_api_parser.add_argument("--api_limit", default=None)
+    ingest_api_parser.add_argument("--limit", default=None)
     ingest_api_parser.set_defaults(func=ingest_api_cmd)
 
     # Process command
