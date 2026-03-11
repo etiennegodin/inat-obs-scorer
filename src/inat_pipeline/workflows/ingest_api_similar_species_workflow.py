@@ -10,6 +10,7 @@ from ..ingest.inat_client import (
     make_client,
 )
 from ..utils.db import (
+    SQL_Engine,
     _open_connection,
     create_api_raw_table,
     get_remaining_items,
@@ -37,7 +38,7 @@ def execute(deps: Dependencies, limit: Union[None, int]) -> None:
     if items:
         # Read api fields to query
         config = EndpointConfig("identifications/similar_species", id_param="taxon_id")
-        fetcher = RateLimiterFetcher(20)
+        fetcher = RateLimiterFetcher(15)
 
         with DuckDbWriter(con, TARGET_TABLE_NAME, get_git_hash(short=True)) as writer:
             client = make_client(config, fetcher, writer)
@@ -46,5 +47,5 @@ def execute(deps: Dependencies, limit: Union[None, int]) -> None:
         logger.info("All items already processed")
 
     # 3 Stage collected data in db
-    # sql_ingest = SQL_Engine(con, deps.SQL_STAGE_PATH)
-    # sql_ingest.execute()
+    sql_ingest = SQL_Engine(con, deps.SQL_STAGE_PATH)
+    sql_ingest.execute("stage_similar_species")
