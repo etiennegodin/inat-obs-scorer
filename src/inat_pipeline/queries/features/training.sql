@@ -54,16 +54,21 @@ SELECT
     t.rank_level,
     t.taxon_popularity_rank,
     t.rg_rate_source,
-    t.taxon_rg_rate,
     t.taxon_avg_ids_to_rg,
-    t.taxon_cold_start
+    t.taxon_cold_start,
     --t.is_difficult_group,
     --t.iconic_taxon_name,
 
+    -- Fixed Taxon confusion stats
+    IFNULL(c.has_similar_species, FALSE)    AS has_similar_species,
+    IFNULL(c.similar_species_count,0)       AS similar_species_count,
+    COALESCE(c.neighborhood_difficulty,0)   AS neighborhood_difficulty
+
 FROM features.observations o
-JOIN features.splits s ON s.observation_id = o.observation_id
-LEFT JOIN features.observers ob ON o.observation_id = ob.observation_id
-LEFT JOIN features.identifications i ON o.observation_id = i.observation_id
+JOIN features.splits                     s  ON o.observation_id = s.observation_id
+LEFT JOIN features.observers             ob ON o.observation_id = ob.observation_id
+LEFT JOIN features.identifications       i  ON o.observation_id = i.observation_id
 --LEFT JOIN features.identifiers id ON o.observation_id = id.observation_id
-LEFT JOIN features.taxon t ON o.observation_id = t.observation_id
+LEFT JOIN features.taxon                 t  ON o.observation_id = t.observation_id
+LEFT JOIN features.taxa_confusion        c  ON o.taxon_id = c.taxon_id
 WHERE o.label IS NOT NULL

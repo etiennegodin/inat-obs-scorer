@@ -94,19 +94,16 @@ rates AS(
         ELSE 'insufficient'
     END AS rg_rate_source,
     CASE WHEN taxon_obs_count  < 30 THEN TRUE ELSE FALSE END AS taxon_cold_start,
+
     COALESCE(taxon_rg_rate, 0) AS taxon_rg_rate_safe,
     CASE rg_rate_source
         WHEN 'species' THEN taxon_obs_count
         WHEN 'genus'   THEN genus_obs_count
         WHEN 'family'  THEN family_obs_count
         WHEN 'order'   THEN order_obs_count
-    END AS rg_rate_source_obs_count,
+    END AS source_obs_count,
 
-    LOG(rg_rate_source_obs_count + 1) AS taxon_popularity_rank,
-
-    -- Difficulty flags
-    -- is_difficult_group          BOOLEAN,
-    -- fungi, lichens, bryophytes, micro-invertebrates
+    LOG(source_obs_count + 1) AS taxon_popularity_rank,
 
     FROM aggregates
 
