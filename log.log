@@ -1,40 +1,343 @@
-2026-03-10 21:59:19 - inat_pipeline.app.service - ingest_api - INFO - Starting api ingest workflow
-2026-03-10 21:59:19 - inat_pipeline.workflows.ingest_api_workflow - execute - INFO - Running sample strategy to select observations to query
-2026-03-10 21:59:20 - inat_pipeline.utils.db - __init__ - INFO - Initialized sql engine for queries in queries/api
-2026-03-10 21:59:22 - inat_pipeline.utils.db - _execute - INFO - Executed sample.sql ,took 2.279s
-2026-03-10 21:59:22 - inat_pipeline.workflows.ingest_api_workflow - execute - INFO - Starting api observations workflow
-2026-03-10 21:59:22 - inat_pipeline.workflows.ingest_api_workflow - execute - INFO - Starting api taxa workflow
-2026-03-10 21:59:22 - inat_pipeline.utils.db - create_api_raw_table - INFO - Created table raw.api_similar_species
-2026-03-10 21:59:22 - inat_pipeline.ingest.inat_client.base - _consume_queue - INFO - Init consumer task
-2026-03-10 21:59:22 - inat_pipeline.ingest.inat_client.fetchers - fetch - DEBUG - https://api.inaturalist.org/v2/identifications/similar_species?taxon_id=1079067&page=1&per_page=200
-2026-03-10 21:59:22 - inat_pipeline.ingest.inat_client.base - _fetch_all_pages - WARNING - No results found for IDs {'taxon_id': 1079067, 'page': 1, 'per_page': 200}
-2026-03-10 21:59:22 - inat_pipeline.ingest.inat_client.fetchers - fetch - DEBUG - https://api.inaturalist.org/v2/identifications/similar_species?taxon_id=67812&page=1&per_page=200
-2026-03-10 21:59:22 - inat_pipeline.ingest.inat_client.base - _fetch_all_pages - WARNING - No results found for IDs {'taxon_id': 67812, 'page': 1, 'per_page': 200}
-2026-03-10 21:59:22 - inat_pipeline.ingest.inat_client.fetchers - fetch - DEBUG - https://api.inaturalist.org/v2/identifications/similar_species?taxon_id=241080&page=1&per_page=200
-2026-03-10 21:59:22 - inat_pipeline.ingest.inat_client.base - _fetch_all_pages - WARNING - No results found for IDs {'taxon_id': 241080, 'page': 1, 'per_page': 200}
-2026-03-10 21:59:22 - inat_pipeline.ingest.inat_client.fetchers - fetch - DEBUG - https://api.inaturalist.org/v2/identifications/similar_species?taxon_id=242973&page=1&per_page=200
-2026-03-10 21:59:22 - inat_pipeline.ingest.inat_client.base - _fetch_all_pages - WARNING - No results found for IDs {'taxon_id': 242973, 'page': 1, 'per_page': 200}
-2026-03-10 21:59:22 - inat_pipeline.ingest.inat_client.fetchers - fetch - DEBUG - https://api.inaturalist.org/v2/identifications/similar_species?taxon_id=243257&page=1&per_page=200
-2026-03-10 21:59:22 - inat_pipeline.ingest.inat_client.base - _fetch_all_pages - WARNING - No results found for IDs {'taxon_id': 243257, 'page': 1, 'per_page': 200}
-2026-03-10 21:59:22 - inat_pipeline.ingest.inat_client.fetchers - fetch - DEBUG - https://api.inaturalist.org/v2/identifications/similar_species?taxon_id=84364&page=1&per_page=200
-2026-03-10 21:59:22 - inat_pipeline.ingest.inat_client.fetchers - fetch - DEBUG - https://api.inaturalist.org/v2/identifications/similar_species?taxon_id=64155&page=1&per_page=200
-2026-03-10 21:59:22 - inat_pipeline.ingest.inat_client.base - _fetch_all_pages - WARNING - No results found for IDs {'taxon_id': 64155, 'page': 1, 'per_page': 200}
-2026-03-10 21:59:22 - inat_pipeline.ingest.inat_client.fetchers - fetch - DEBUG - https://api.inaturalist.org/v2/identifications/similar_species?taxon_id=239758&page=1&per_page=200
-2026-03-10 21:59:22 - inat_pipeline.ingest.inat_client.base - _fetch_all_pages - WARNING - No results found for IDs {'taxon_id': 239758, 'page': 1, 'per_page': 200}
-2026-03-10 21:59:22 - inat_pipeline.ingest.inat_client.fetchers - fetch - DEBUG - https://api.inaturalist.org/v2/identifications/similar_species?taxon_id=159601&page=1&per_page=200
-2026-03-10 21:59:23 - inat_pipeline.ingest.inat_client.fetchers - fetch - DEBUG - https://api.inaturalist.org/v2/identifications/similar_species?taxon_id=866841&page=1&per_page=200
-2026-03-10 21:59:23 - inat_pipeline.ingest.inat_client.base - _fetch_all_pages - WARNING - No results found for IDs {'taxon_id': 866841, 'page': 1, 'per_page': 200}
-2026-03-10 21:59:23 - inat_pipeline.ingest.inat_client.fetchers - fetch - DEBUG - https://api.inaturalist.org/v2/identifications/similar_species?taxon_id=124458&page=1&per_page=200
-2026-03-10 21:59:23 - inat_pipeline.ingest.inat_client.fetchers - fetch - DEBUG - https://api.inaturalist.org/v2/identifications/similar_species?taxon_id=1642788&page=1&per_page=200
-2026-03-10 21:59:23 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
-2026-03-10 21:59:23 - inat_pipeline.ingest.inat_client.fetchers - fetch - DEBUG - https://api.inaturalist.org/v2/identifications/similar_species?taxon_id=168531&page=1&per_page=200
-2026-03-10 21:59:23 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 51 items
-2026-03-10 21:59:23 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 3 items
-2026-03-10 21:59:23 - inat_pipeline.ingest.inat_client.fetchers - fetch - DEBUG - https://api.inaturalist.org/v2/identifications/similar_species?taxon_id=78718&page=1&per_page=200
-2026-03-10 21:59:23 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 16 items
-2026-03-10 21:59:24 - inat_pipeline.ingest.inat_client.fetchers - fetch - DEBUG - https://api.inaturalist.org/v2/identifications/similar_species?taxon_id=72290&page=1&per_page=200
-2026-03-10 21:59:24 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
-2026-03-10 21:59:26 - inat_pipeline.ingest.inat_client.fetchers - fetch - DEBUG - https://api.inaturalist.org/v2/identifications/similar_species?taxon_id=56498&page=1&per_page=200
-2026-03-10 21:59:26 - inat_pipeline.ingest.inat_client.base - _fetch_all_pages - WARNING - No results found for IDs {'taxon_id': 56498, 'page': 1, 'per_page': 200}
-2026-03-10 21:59:32 - inat_pipeline.ingest.inat_client.fetchers - fetch - DEBUG - https://api.inaturalist.org/v2/identifications/similar_species?taxon_id=167993&page=1&per_page=200
-2026-03-10 21:59:32 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:13:48 - inat_pipeline.app.service - ingest_api - INFO - Starting api ingest workflow
+2026-03-11 08:13:48 - inat_pipeline.workflows.ingest_api_workflow - execute - INFO - Running sample strategy to select observations to query
+2026-03-11 08:13:49 - inat_pipeline.utils.db - __init__ - INFO - Initialized sql engine for queries in queries/api
+2026-03-11 08:13:54 - inat_pipeline.utils.db - _execute - INFO - Executed sample.sql ,took 4.943s
+2026-03-11 08:13:54 - inat_pipeline.workflows.ingest_api_workflow - execute - INFO - Starting api observations workflow
+2026-03-11 08:13:54 - inat_pipeline.workflows.ingest_api_workflow - execute - INFO - Starting api taxa workflow
+2026-03-11 08:13:54 - inat_pipeline.utils.db - create_api_raw_table - INFO - Created table raw.api_similar_species
+2026-03-11 08:13:54 - inat_pipeline.ingest.inat_client.base - _consume_queue - INFO - Init consumer task
+2026-03-11 08:13:54 - inat_pipeline.ingest.inat_client.base - _fetch_all_pages - WARNING - No results found for IDs {'taxon_id': 243262, 'page': 1, 'per_page': 200}
+2026-03-11 08:13:54 - inat_pipeline.ingest.inat_client.base - _fetch_all_pages - WARNING - No results found for IDs {'taxon_id': 1275079, 'page': 1, 'per_page': 200}
+2026-03-11 08:13:54 - inat_pipeline.ingest.inat_client.base - _fetch_all_pages - WARNING - No results found for IDs {'taxon_id': 165177, 'page': 1, 'per_page': 200}
+2026-03-11 08:13:54 - inat_pipeline.ingest.inat_client.base - _fetch_all_pages - WARNING - No results found for IDs {'taxon_id': 239089, 'page': 1, 'per_page': 200}
+2026-03-11 08:13:54 - inat_pipeline.ingest.inat_client.base - _fetch_all_pages - WARNING - No results found for IDs {'taxon_id': 80369, 'page': 1, 'per_page': 200}
+2026-03-11 08:13:54 - inat_pipeline.ingest.inat_client.base - _fetch_all_pages - WARNING - No results found for IDs {'taxon_id': 56500, 'page': 1, 'per_page': 200}
+2026-03-11 08:13:54 - inat_pipeline.ingest.inat_client.base - _fetch_all_pages - WARNING - No results found for IDs {'taxon_id': 242968, 'page': 1, 'per_page': 200}
+2026-03-11 08:13:54 - inat_pipeline.ingest.inat_client.base - _fetch_all_pages - WARNING - No results found for IDs {'taxon_id': 235906, 'page': 1, 'per_page': 200}
+2026-03-11 08:13:56 - inat_pipeline.ingest.inat_client.base - _fetch_all_pages - WARNING - No results found for IDs {'taxon_id': 1569249, 'page': 1, 'per_page': 200}
+2026-03-11 08:13:56 - inat_pipeline.ingest.inat_client.base - _fetch_all_pages - WARNING - No results found for IDs {'taxon_id': 1556345, 'page': 1, 'per_page': 200}
+2026-03-11 08:14:00 - inat_pipeline.ingest.inat_client.base - _fetch_all_pages - WARNING - No results found for IDs {'taxon_id': 1446176, 'page': 1, 'per_page': 200}
+2026-03-11 08:14:06 - inat_pipeline.ingest.inat_client.base - _fetch_all_pages - WARNING - No results found for IDs {'taxon_id': 239998, 'page': 1, 'per_page': 200}
+2026-03-11 08:14:12 - inat_pipeline.ingest.inat_client.base - _fetch_all_pages - WARNING - No results found for IDs {'taxon_id': 64157, 'page': 1, 'per_page': 200}
+2026-03-11 08:14:18 - inat_pipeline.ingest.inat_client.base - _fetch_all_pages - WARNING - No results found for IDs {'taxon_id': 239017, 'page': 1, 'per_page': 200}
+2026-03-11 08:14:24 - inat_pipeline.ingest.inat_client.base - _fetch_all_pages - WARNING - No results found for IDs {'taxon_id': 81355, 'page': 1, 'per_page': 200}
+2026-03-11 08:14:30 - inat_pipeline.ingest.inat_client.base - _fetch_all_pages - WARNING - No results found for IDs {'taxon_id': 1480454, 'page': 1, 'per_page': 200}
+2026-03-11 08:14:36 - inat_pipeline.ingest.inat_client.base - _fetch_all_pages - WARNING - No results found for IDs {'taxon_id': 1543295, 'page': 1, 'per_page': 200}
+2026-03-11 08:14:42 - inat_pipeline.ingest.inat_client.base - _fetch_all_pages - WARNING - No results found for IDs {'taxon_id': 512235, 'page': 1, 'per_page': 200}
+2026-03-11 08:14:48 - inat_pipeline.ingest.inat_client.base - _fetch_all_pages - WARNING - No results found for IDs {'taxon_id': 240872, 'page': 1, 'per_page': 200}
+2026-03-11 08:14:54 - inat_pipeline.ingest.inat_client.base - _fetch_all_pages - WARNING - No results found for IDs {'taxon_id': 58746, 'page': 1, 'per_page': 200}
+2026-03-11 08:15:00 - inat_pipeline.ingest.inat_client.base - _fetch_all_pages - WARNING - No results found for IDs {'taxon_id': 167334, 'page': 1, 'per_page': 200}
+2026-03-11 08:15:06 - inat_pipeline.ingest.inat_client.base - _fetch_all_pages - WARNING - No results found for IDs {'taxon_id': 80658, 'page': 1, 'per_page': 200}
+2026-03-11 08:15:12 - inat_pipeline.ingest.inat_client.base - _fetch_all_pages - WARNING - No results found for IDs {'taxon_id': 238341, 'page': 1, 'per_page': 200}
+2026-03-11 08:15:18 - inat_pipeline.ingest.inat_client.base - _fetch_all_pages - WARNING - No results found for IDs {'taxon_id': 712205, 'page': 1, 'per_page': 200}
+2026-03-11 08:15:24 - inat_pipeline.ingest.inat_client.base - _fetch_all_pages - WARNING - No results found for IDs {'taxon_id': 1132105, 'page': 1, 'per_page': 200}
+2026-03-11 08:15:30 - inat_pipeline.ingest.inat_client.base - _fetch_all_pages - WARNING - No results found for IDs {'taxon_id': 239401, 'page': 1, 'per_page': 200}
+2026-03-11 08:15:36 - inat_pipeline.ingest.inat_client.base - _fetch_all_pages - WARNING - No results found for IDs {'taxon_id': 1409189, 'page': 1, 'per_page': 200}
+2026-03-11 08:15:42 - inat_pipeline.ingest.inat_client.base - _fetch_all_pages - WARNING - No results found for IDs {'taxon_id': 319662, 'page': 1, 'per_page': 200}
+2026-03-11 08:15:48 - inat_pipeline.ingest.inat_client.base - _fetch_all_pages - WARNING - No results found for IDs {'taxon_id': 240008, 'page': 1, 'per_page': 200}
+2026-03-11 08:15:54 - inat_pipeline.ingest.inat_client.base - _fetch_all_pages - WARNING - No results found for IDs {'taxon_id': 1280301, 'page': 1, 'per_page': 200}
+2026-03-11 08:16:00 - inat_pipeline.ingest.inat_client.base - _fetch_all_pages - WARNING - No results found for IDs {'taxon_id': 157440, 'page': 1, 'per_page': 200}
+2026-03-11 08:16:07 - inat_pipeline.ingest.inat_client.base - _fetch_all_pages - WARNING - No results found for IDs {'taxon_id': 319690, 'page': 1, 'per_page': 200}
+2026-03-11 08:16:14 - inat_pipeline.ingest.inat_client.base - _fetch_all_pages - WARNING - No results found for IDs {'taxon_id': 743180, 'page': 1, 'per_page': 200}
+2026-03-11 08:16:18 - inat_pipeline.ingest.inat_client.base - _fetch_all_pages - WARNING - No results found for IDs {'taxon_id': 235717, 'page': 1, 'per_page': 200}
+2026-03-11 08:16:24 - inat_pipeline.ingest.inat_client.base - _fetch_all_pages - WARNING - No results found for IDs {'taxon_id': 234288, 'page': 1, 'per_page': 200}
+2026-03-11 08:16:30 - inat_pipeline.ingest.inat_client.base - _fetch_all_pages - WARNING - No results found for IDs {'taxon_id': 1021945, 'page': 1, 'per_page': 200}
+2026-03-11 08:16:36 - inat_pipeline.ingest.inat_client.base - _fetch_all_pages - WARNING - No results found for IDs {'taxon_id': 167786, 'page': 1, 'per_page': 200}
+2026-03-11 08:16:42 - inat_pipeline.ingest.inat_client.base - _fetch_all_pages - WARNING - No results found for IDs {'taxon_id': 164182, 'page': 1, 'per_page': 200}
+2026-03-11 08:16:51 - inat_pipeline.ingest.inat_client.base - _fetch_all_pages - WARNING - No results found for IDs {'taxon_id': 48571, 'page': 1, 'per_page': 200}
+2026-03-11 08:16:54 - inat_pipeline.ingest.inat_client.base - _fetch_all_pages - WARNING - No results found for IDs {'taxon_id': 340756, 'page': 1, 'per_page': 200}
+2026-03-11 08:17:01 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:17:08 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:17:13 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:17:19 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:17:26 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:17:30 - inat_pipeline.ingest.inat_client.base - _fetch_all_pages - WARNING - No results found for IDs {'taxon_id': 355617, 'page': 1, 'per_page': 200}
+2026-03-11 08:17:38 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:17:42 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:17:48 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 2 items
+2026-03-11 08:17:57 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:18:00 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 2 items
+2026-03-11 08:18:07 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 2 items
+2026-03-11 08:18:13 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:18:19 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:18:26 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:18:30 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 16 items
+2026-03-11 08:18:37 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:18:44 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 7 items
+2026-03-11 08:18:49 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:18:55 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:19:00 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 1 items
+2026-03-11 08:19:08 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:19:13 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:19:21 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 21 items
+2026-03-11 08:19:25 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:19:30 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 1 items
+2026-03-11 08:19:36 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 10 items
+2026-03-11 08:19:42 - inat_pipeline.ingest.inat_client.base - _fetch_all_pages - WARNING - No results found for IDs {'taxon_id': 118426, 'page': 1, 'per_page': 200}
+2026-03-11 08:19:49 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:19:54 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 17 items
+2026-03-11 08:20:02 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:20:06 - inat_pipeline.ingest.inat_client.base - _fetch_all_pages - WARNING - No results found for IDs {'taxon_id': 239019, 'page': 1, 'per_page': 200}
+2026-03-11 08:20:13 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:20:19 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 2 items
+2026-03-11 08:20:24 - inat_pipeline.ingest.inat_client.base - _fetch_all_pages - WARNING - No results found for IDs {'taxon_id': 553149, 'page': 1, 'per_page': 200}
+2026-03-11 08:20:32 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:20:38 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 8 items
+2026-03-11 08:20:43 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:20:48 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 1 items
+2026-03-11 08:20:54 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 4 items
+2026-03-11 08:21:01 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:21:07 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:21:13 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 17 items
+2026-03-11 08:21:18 - inat_pipeline.ingest.inat_client.base - _fetch_all_pages - WARNING - No results found for IDs {'taxon_id': 200024, 'page': 1, 'per_page': 200}
+2026-03-11 08:21:24 - inat_pipeline.ingest.inat_client.base - _fetch_all_pages - WARNING - No results found for IDs {'taxon_id': 53586, 'page': 1, 'per_page': 200}
+2026-03-11 08:21:30 - inat_pipeline.ingest.inat_client.base - _fetch_all_pages - WARNING - No results found for IDs {'taxon_id': 242531, 'page': 1, 'per_page': 200}
+2026-03-11 08:21:36 - inat_pipeline.ingest.inat_client.base - _fetch_all_pages - WARNING - No results found for IDs {'taxon_id': 962877, 'page': 1, 'per_page': 200}
+2026-03-11 08:21:42 - inat_pipeline.ingest.inat_client.base - _fetch_all_pages - WARNING - No results found for IDs {'taxon_id': 239829, 'page': 1, 'per_page': 200}
+2026-03-11 08:21:48 - inat_pipeline.ingest.inat_client.base - _fetch_all_pages - WARNING - No results found for IDs {'taxon_id': 234863, 'page': 1, 'per_page': 200}
+2026-03-11 08:21:54 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 2 items
+2026-03-11 08:22:02 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:22:07 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:22:13 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:22:18 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 19 items
+2026-03-11 08:22:25 - inat_pipeline.ingest.inat_client.base - _fetch_all_pages - WARNING - No results found for IDs {'taxon_id': 1196065, 'page': 1, 'per_page': 200}
+2026-03-11 08:22:30 - inat_pipeline.ingest.inat_client.base - _fetch_all_pages - WARNING - No results found for IDs {'taxon_id': 1627771, 'page': 1, 'per_page': 200}
+2026-03-11 08:22:36 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 5 items
+2026-03-11 08:22:42 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 21 items
+2026-03-11 08:22:49 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:22:55 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:23:02 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 7 items
+2026-03-11 08:23:06 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 1 items
+2026-03-11 08:23:12 - inat_pipeline.ingest.inat_client.base - _fetch_all_pages - WARNING - No results found for IDs {'taxon_id': 80510, 'page': 1, 'per_page': 200}
+2026-03-11 08:23:19 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:23:25 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:23:30 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 1 items
+2026-03-11 08:23:36 - inat_pipeline.ingest.inat_client.base - _fetch_all_pages - WARNING - No results found for IDs {'taxon_id': 1058871, 'page': 1, 'per_page': 200}
+2026-03-11 08:23:43 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:23:48 - inat_pipeline.ingest.inat_client.base - _fetch_all_pages - WARNING - No results found for IDs {'taxon_id': 1034756, 'page': 1, 'per_page': 200}
+2026-03-11 08:23:54 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 5 items
+2026-03-11 08:24:02 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:24:08 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:24:12 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:24:19 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:24:25 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:24:31 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:24:37 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:24:44 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 4 items
+2026-03-11 08:24:49 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:24:56 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:25:02 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:25:07 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:25:14 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:25:19 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:25:25 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:25:32 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:25:36 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 20 items
+2026-03-11 08:25:42 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 17 items
+2026-03-11 08:25:49 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:25:55 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:26:01 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:26:06 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:26:13 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:26:18 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 3 items
+2026-03-11 08:26:26 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:26:31 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:26:36 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 1 items
+2026-03-11 08:26:43 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:26:49 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:26:56 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:27:00 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 3 items
+2026-03-11 08:27:08 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:27:13 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:27:18 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 4 items
+2026-03-11 08:27:26 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:27:31 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 1 items
+2026-03-11 08:27:36 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 1 items
+2026-03-11 08:27:42 - inat_pipeline.ingest.inat_client.base - _fetch_all_pages - WARNING - No results found for IDs {'taxon_id': 1183904, 'page': 1, 'per_page': 200}
+2026-03-11 08:27:49 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:27:55 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:28:02 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:28:08 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:28:15 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:28:20 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:28:26 - inat_pipeline.ingest.inat_client.fetchers - fetch - DEBUG - https://api.inaturalist.org/v2/identifications/similar_species?taxon_id=47602&page=1&per_page=200
+2026-03-11 08:28:26 - inat_pipeline.ingest.inat_client.fetchers - fetch - ERROR - API request FAILED for IDs {'taxon_id': 47602, 'page': 1, 'per_page': 200}:
+500, message='Internal Server Error', url='https://api.inaturalist.org/v2/identifications/similar_species?taxon_id=47602&page=1&per_page=200'
+2026-03-11 08:28:26 - inat_pipeline.ingest.inat_client.fetchers - fetch - DEBUG - https://api.inaturalist.org/v2/identifications/similar_species?taxon_id=47602&page=1&per_page=200
+2026-03-11 08:28:26 - inat_pipeline.ingest.inat_client.base - _fetch_all_pages - ERROR - Unexpcted error getting response for {'taxon_id': 47602, 'page': 1, 'per_page': 200}
+2026-03-11 08:28:32 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:28:37 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:28:44 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:28:49 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:28:56 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:29:02 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 23 items
+2026-03-11 08:29:07 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:29:13 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 3 items
+2026-03-11 08:29:20 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:29:26 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:29:32 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:29:38 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:29:42 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 9 items
+2026-03-11 08:29:51 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:29:55 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:30:01 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 4 items
+2026-03-11 08:30:08 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:30:16 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:30:19 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:30:24 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 2 items
+2026-03-11 08:30:32 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:30:37 - inat_pipeline.ingest.inat_client.base - _fetch_all_pages - WARNING - No results found for IDs {'taxon_id': 79673, 'page': 1, 'per_page': 200}
+2026-03-11 08:30:43 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:30:48 - inat_pipeline.ingest.inat_client.base - _fetch_all_pages - WARNING - No results found for IDs {'taxon_id': 236156, 'page': 1, 'per_page': 200}
+2026-03-11 08:30:55 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 15 items
+2026-03-11 08:31:00 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 1 items
+2026-03-11 08:31:07 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:31:13 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:31:19 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:31:25 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:31:31 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:31:36 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 2 items
+2026-03-11 08:31:44 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 8 items
+2026-03-11 08:31:49 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:31:54 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 7 items
+2026-03-11 08:32:00 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 1 items
+2026-03-11 08:32:08 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:32:12 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 2 items
+2026-03-11 08:32:19 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 10 items
+2026-03-11 08:32:25 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:32:31 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:32:36 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 16 items
+2026-03-11 08:32:42 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:32:49 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 13 items
+2026-03-11 08:32:55 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:33:00 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 11 items
+2026-03-11 08:33:07 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:33:12 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 1 items
+2026-03-11 08:33:19 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 17 items
+2026-03-11 08:33:25 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:33:30 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 4 items
+2026-03-11 08:33:38 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:33:43 - inat_pipeline.ingest.inat_client.base - _fetch_all_pages - WARNING - No results found for IDs {'taxon_id': 51822, 'page': 1, 'per_page': 200}
+2026-03-11 08:33:51 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:33:56 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:34:02 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 16 items
+2026-03-11 08:34:06 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 16 items
+2026-03-11 08:34:13 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:34:20 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:34:26 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 22 items
+2026-03-11 08:34:31 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:34:37 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:34:42 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 21 items
+2026-03-11 08:34:48 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:34:55 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 8 items
+2026-03-11 08:35:01 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:35:06 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 13 items
+2026-03-11 08:35:13 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 21 items
+2026-03-11 08:35:19 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:35:26 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:35:30 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 10 items
+2026-03-11 08:35:37 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 10 items
+2026-03-11 08:35:42 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 1 items
+2026-03-11 08:35:49 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 22 items
+2026-03-11 08:35:55 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 11 items
+2026-03-11 08:36:00 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 11 items
+2026-03-11 08:36:07 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 17 items
+2026-03-11 08:36:12 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 1 items
+2026-03-11 08:36:19 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:36:25 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:36:31 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 6 items
+2026-03-11 08:36:37 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 16 items
+2026-03-11 08:36:43 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:36:48 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 1 items
+2026-03-11 08:36:56 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:37:02 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:37:08 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:37:12 - inat_pipeline.ingest.inat_client.base - _fetch_all_pages - WARNING - No results found for IDs {'taxon_id': 241878, 'page': 1, 'per_page': 200}
+2026-03-11 08:37:19 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:37:24 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 1 items
+2026-03-11 08:37:31 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:37:38 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:37:42 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 9 items
+2026-03-11 08:37:49 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:37:55 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:38:01 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:38:07 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 23 items
+2026-03-11 08:38:14 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:38:18 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 19 items
+2026-03-11 08:38:24 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 18 items
+2026-03-11 08:38:31 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:38:36 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 15 items
+2026-03-11 08:38:44 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 17 items
+2026-03-11 08:38:50 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 17 items
+2026-03-11 08:38:56 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:39:01 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:39:07 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:39:14 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:39:21 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:39:24 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 12 items
+2026-03-11 08:39:30 - inat_pipeline.ingest.inat_client.base - _fetch_all_pages - WARNING - No results found for IDs {'taxon_id': 80908, 'page': 1, 'per_page': 200}
+2026-03-11 08:39:37 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:39:43 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 23 items
+2026-03-11 08:39:50 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:39:55 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:40:01 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 12 items
+2026-03-11 08:40:07 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:40:13 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:40:18 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 1 items
+2026-03-11 08:40:24 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 1 items
+2026-03-11 08:40:30 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 15 items
+2026-03-11 08:40:36 - inat_pipeline.ingest.inat_client.base - _fetch_all_pages - WARNING - No results found for IDs {'taxon_id': 496452, 'page': 1, 'per_page': 200}
+2026-03-11 08:40:44 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:40:49 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 22 items
+2026-03-11 08:40:54 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 1 items
+2026-03-11 08:41:01 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:41:08 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:41:14 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:41:20 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:41:24 - inat_pipeline.ingest.inat_client.base - _fetch_all_pages - WARNING - No results found for IDs {'taxon_id': 157439, 'page': 1, 'per_page': 200}
+2026-03-11 08:41:30 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:41:36 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 8 items
+2026-03-11 08:41:45 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 6 items
+2026-03-11 08:41:50 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:41:56 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:42:01 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:42:07 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:42:12 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 9 items
+2026-03-11 08:42:20 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:42:25 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:42:32 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 12 items
+2026-03-11 08:42:36 - inat_pipeline.ingest.inat_client.base - _fetch_all_pages - WARNING - No results found for IDs {'taxon_id': 1397878, 'page': 1, 'per_page': 200}
+2026-03-11 08:42:43 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:42:49 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:42:54 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 8 items
+2026-03-11 08:43:00 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 3 items
+2026-03-11 08:43:08 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:43:14 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:43:19 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:43:24 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 3 items
+2026-03-11 08:43:31 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 14 items
+2026-03-11 08:43:36 - inat_pipeline.ingest.inat_client.base - _fetch_all_pages - WARNING - No results found for IDs {'taxon_id': 169451, 'page': 1, 'per_page': 200}
+2026-03-11 08:43:42 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 5 items
+2026-03-11 08:43:50 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:43:54 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 4 items
+2026-03-11 08:44:00 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:44:08 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:44:13 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:44:19 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:44:27 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:44:31 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 20 items
+2026-03-11 08:44:37 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:44:44 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:44:49 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 16 items
+2026-03-11 08:44:54 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 4 items
+2026-03-11 08:45:01 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:45:08 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 16 items
+2026-03-11 08:45:14 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:45:18 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 4 items
+2026-03-11 08:45:25 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:45:32 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 23 items
+2026-03-11 08:45:39 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:45:43 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:45:50 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items
+2026-03-11 08:45:54 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 7 items
+2026-03-11 08:46:03 - inat_pipeline.ingest.inat_client.writers - _insert_batch - DEBUG - Inserted batch of 24 items

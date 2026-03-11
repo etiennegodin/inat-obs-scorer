@@ -1,6 +1,7 @@
 import logging
 
 import aiohttp
+from aiohttp.client_exceptions import ClientResponseError
 from aiolimiter import AsyncLimiter
 
 logger = logging.getLogger(__name__)
@@ -17,12 +18,17 @@ class RateLimiterFetcher:
         async with self.limiter:
             try:
                 async with session.get(url, params=params, timeout=10) as resp:
-                    logger.debug(resp.url)
                     resp.raise_for_status()
                     return await resp.json()
-
+            except ClientResponseError as e:
+                logger.debug(resp.url)
+                logger.error(f"API request FAILED for IDs {params}:\n{e}")
+                if e.code == 500:
+                    logger.debug(resp.url)
+                    return
             except Exception as e:
-                logger.error(f"API request FAILED for IDs {params}: {e}")
+                logger.error(f"API request FAILED for IDs {params}:\n{e}")
+                raise
 
 
 class MockFetcher:

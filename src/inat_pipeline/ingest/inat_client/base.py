@@ -75,7 +75,7 @@ class BaseInatClient(ABC):
             response = await self.fetcher.fetch(session, self.config.url, params)
 
             if not isinstance(response, dict):
-                logger.debug(f"Unexpcted error getting response for {params}")
+                logger.error(f"Unexpcted error getting response for {params}")
                 break
 
             results = response.get("results", [])
