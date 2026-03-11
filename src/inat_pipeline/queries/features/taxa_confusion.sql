@@ -25,27 +25,36 @@ GROUP BY s.taxon_id
 
 aggregates AS(
 
-SELECT s.taxon_id,
+SELECT s.taxon_id::INT AS taxon_id,
+-- N neighbords
+COUNT(DISTINCT(s.similar_taxon_id)) AS similar_species_count,
+-- Neigbors counts aggregates
+SUM(n.similar_species_obs_count) AS nbor_obs_count_sum,
+ROUND(AVG(n.similar_species_obs_count),2) AS nbor_obs_count_mean,
+MAX(n.similar_species_obs_count) AS  nbor_obs_count_max,
 
-COUNT(DISTINCT(s.similar_taxon_id)) as similar_species_count,
-SUM(n.similar_species_obs_count) nbor_obs_count_sum,
-ROUND(AVG(n.similar_species_obs_count),2) nbor_obs_count_mean,
-MAX(n.similar_species_obs_count) nbor_obs_count_max,
+
+-- Neighbors taxo distance
+MAX(d.taxonomic_distance) AS nbor_dist_max,
+ROUND(AVG(d.taxonomic_distance),2) AS nbor_dist_mean,
 
 
 FROM staged.similar_species s
 JOIN nbor_obs_counts n on s.similar_taxon_id = n.similar_taxon_id
-JOIN features.taxa_assymetry a ON s.taxon_id = a.taxon_id
+JOIN features.taxa_distance d ON d.taxon_id = s.taxon_id
 GROUP BY s.taxon_id
 
 )
 
 
 SELECT a.*,
-s.out_degree,
-s.in_degree,
-s.magnet_score,
-n.neighbor_genus_diversity,
-n.neighbor_rank_min
-FROM aggregates a, nbor_taxa_diversity n
+
+-- Neighbor diversity
+n.*EXCLUDE(n.taxon_id),
+
+-- Assymetry
+s.*EXCLUDE(s.taxon_id),
+
+FROM aggregates a
+JOIN nbor_taxa_diversity n ON n.taxon_id = a.taxon_id
 JOIN features.taxa_assymetry s ON a.taxon_id = s.taxon_id

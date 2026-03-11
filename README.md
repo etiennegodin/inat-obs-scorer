@@ -19,7 +19,10 @@ variable endpoint formatting and params required
 
 ## Similar species
 
-
+- confusion graph
+    - node assymetry
+- taxonomic distance
+- neighbors aggregates
 
 ## Dataset Challenges
 

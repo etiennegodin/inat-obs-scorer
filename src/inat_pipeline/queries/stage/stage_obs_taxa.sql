@@ -124,3 +124,12 @@ WITH rank_ids AS (
 
 )
 SELECT * FROM rank_ids;
+
+# Indexing
+CREATE INDEX IF NOT EXISTS idx_taxo_hierarchy ON staged.taxa (phylum_id, class_id, order_id, family_id, genus_id);
+CREATE INDEX IF NOT EXISTS idx_genus ON staged.taxa (genus_id);
+CREATE INDEX IF NOT EXISTS idx_family ON staged.taxa (family_id);
+CREATE INDEX IF NOT EXISTS idx_order ON staged.taxa (order_id);
+
+CREATE INDEX IF NOT EXISTS idx_taxa_lookup
+ON staged.taxa (species_id, phylum_id, class_id, order_id, family_id, genus_id);

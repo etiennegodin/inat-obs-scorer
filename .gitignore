@@ -28,11 +28,6 @@ notebooks/*
 data/*
 temp/
 
-
 # Ml Flow
 mlruns/*
 mlruns.db
-
-# Temp
-
-workflows/*
