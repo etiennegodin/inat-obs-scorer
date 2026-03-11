@@ -17,19 +17,15 @@ class BatchEndpointClient(BaseInatClient):
 
     def _iter_requests(self, ids: list) -> Iterator[tuple[Any, dict]]:
         for chunk in _chunked(ids, self.config.chunk_size):
+            id_string = ",".join(str(id_) for id_ in chunk)
+            logger.debug(id_string)
             # Get params from config
-            params = {
-                **self.config.params,
-            }
+            params = {**self.config.params, "id": id_string}
 
             # Add fields string to params
             if self.config.fields:
                 params["fields"] = self.config.fields
 
-            # Modify url to append listed ids
-            self.config.url + ",".join(map(str, chunk))
-
-            logger.debug(self.config.url)
             # Add first id of chunk as fallback id
             yield chunk[0], params
 
