@@ -2,17 +2,17 @@ import asyncio
 import logging
 
 from ..app.container import Dependencies
+from ..db.utils import (
+    DuckDBConnection,
+    SQLEngine,
+    create_api_raw_table,
+    get_remaining_items,
+)
 from ..ingest.inat_client import (
     DuckDbWriter,
     EndpointConfig,
     RateLimiterFetcher,
     make_client,
-)
-from ..utils.db import (
-    SQL_Engine,
-    create_api_raw_table,
-    duckdb_con,
-    get_remaining_items,
 )
 from ..utils.git import get_git_hash
 
@@ -24,7 +24,7 @@ def execute(deps: Dependencies, rate: int, ignore_not_found: bool) -> None:
     TARGET_TABLE_NAME = "raw.api_similar_species"
     SOURCE_KEY = "taxon_id"
 
-    with duckdb_con(deps.DB_PATH) as con:
+    with DuckDBConnection(deps.DB_PATH) as con:
         # 1 Create table to receive api data
         create_api_raw_table(con, TARGET_TABLE_NAME)
 
@@ -51,5 +51,5 @@ def execute(deps: Dependencies, rate: int, ignore_not_found: bool) -> None:
             logger.info("All items already requested")
 
         # 3 Stage collected data in db
-        sql_ingest = SQL_Engine(con, deps.SQL_STAGE_PATH)
+        sql_ingest = SQLEngine(con, deps.SQL_STAGE_PATH)
         sql_ingest.execute("stage_similar_species")

@@ -5,7 +5,7 @@ import pandas as pd
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 
-from ..utils.db import duckdb_con
+from ..db.connections import DuckDBConnection
 from ..utils.git import get_git_hash
 from .config import PipelineConfig
 from .registery import (
@@ -30,9 +30,9 @@ def load_and_split(
     pd.DataFrame,
     dict,
 ]:
-    con = duckdb_con(db_path)
+    with DuckDBConnection(db_path) as con:
+        df = con.execute("SELECT * FROM features.training").df()
 
-    df = con.execute("SELECT * FROM features.training").df()
     train = df[df["split"] == "train"]
     val = df[df["split"] == "val"]
     test = df[df["split"] == "test"]

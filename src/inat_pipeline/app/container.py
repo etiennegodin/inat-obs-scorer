@@ -25,9 +25,8 @@ class Dependencies:
         self.DOWNLOADS_FOLDER = self._RAW_DATA_FOLDER / "downloads"
         self.DB_PATH = self._DATA_FOLDER / "inat.duckdb"
 
-        self._QUERY_FOLDER = self.package_root / "queries"
-        self.SQL_API_PATH = self._QUERY_FOLDER / "api"
-        self.SQL_STAGE_PATH = self._QUERY_FOLDER / "stage"
-        self.SQL_FEATURES_PATH = self._QUERY_FOLDER / "features"
-
-        self.API_FIELDS_PATH = self.package_root / "ingest" / "api_fields"
+        self.QUERY_FOLDER = self.package_root / "queries"
+        self.SQL_API_PATH = self.QUERY_FOLDER / "api"
+        self.SQL_STAGE_PATH = self.QUERY_FOLDER / "stage"
+        self.SQL_FEATURES_PATH = self.QUERY_FOLDER / "features"
+        self.SQL_INGEST_PATH = self.QUERY_FOLDER / "ingest"
