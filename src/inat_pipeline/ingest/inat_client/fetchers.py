@@ -20,6 +20,7 @@ class RateLimiterFetcher:
                     logger.debug(resp.url)
                     resp.raise_for_status()
                     return await resp.json()
+
             except Exception as e:
                 logger.error(f"API request FAILED for IDs {params}: {e}")
 

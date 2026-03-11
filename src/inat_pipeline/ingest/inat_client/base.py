@@ -73,6 +73,11 @@ class BaseInatClient(ABC):
         while True:
             params = {**base_params, "page": page, "per_page": self.config.per_page}
             response = await self.fetcher.fetch(session, self.config.url, params)
+
+            if not isinstance(response, dict):
+                logger.debug(f"Unexpcted error getting response for {params}")
+                break
+
             results = response.get("results", [])
 
             if not results:
