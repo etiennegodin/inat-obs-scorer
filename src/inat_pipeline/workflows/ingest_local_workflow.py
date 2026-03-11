@@ -16,12 +16,13 @@ def execute(deps: Dependencies):
 
         # Ingest observations csv files
         source = "downloads"
-        sql.execute("stage_csv", [True], table_name=source, source=data_dir / source)
+        sql.execute("ingest_csv", [True], table_name=source, source=data_dir / source)
 
         # Ingest taxa
         source = "taxa"
-        sql.execute("stage_csv", [True], table_name=source, source=data_dir / source)
+        sql.execute("ingest_csv", [True], table_name=source, source=data_dir / source)
+        sql.execute("stage_taxa")
 
         # Ingest places
         source = "places"
-        sql.execute("stage_csv", [True], table_name=source, source=data_dir / source)
+        sql.execute("ingest_csv", [True], table_name=source, source=data_dir / source)
