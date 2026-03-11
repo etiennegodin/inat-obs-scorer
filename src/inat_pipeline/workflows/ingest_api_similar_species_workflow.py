@@ -1,6 +1,5 @@
 import asyncio
 import logging
-from typing import Union
 
 from ..app.container import Dependencies
 from ..ingest.inat_client import (
@@ -20,7 +19,7 @@ from ..utils.git import get_git_hash
 logger = logging.getLogger(__name__)
 
 
-def execute(deps: Dependencies, limit: Union[None, int]) -> None:
+def execute(deps: Dependencies, limiter: int) -> None:
     SOURCE_TABLE_NAME = "staged.species_list"
     TARGET_TABLE_NAME = "raw.api_similar_species"
     SOURCE_KEY = "taxon_id"
@@ -31,14 +30,12 @@ def execute(deps: Dependencies, limit: Union[None, int]) -> None:
     create_api_raw_table(con, TARGET_TABLE_NAME)
 
     # 2 Get missing items not collected
-    items = get_remaining_items(
-        con, SOURCE_TABLE_NAME, TARGET_TABLE_NAME, SOURCE_KEY, limit
-    )
+    items = get_remaining_items(con, SOURCE_TABLE_NAME, TARGET_TABLE_NAME, SOURCE_KEY)
 
     if items:
         # Read api fields to query
         config = EndpointConfig("identifications/similar_species", id_param="taxon_id")
-        fetcher = RateLimiterFetcher(15)
+        fetcher = RateLimiterFetcher(limiter)
 
         with DuckDbWriter(con, TARGET_TABLE_NAME, get_git_hash(short=True)) as writer:
             client = make_client(config, fetcher, writer)

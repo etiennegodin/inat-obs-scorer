@@ -56,7 +56,7 @@ class ApplicationService:
     def ingest_api(self, args):
         logger.info("Starting api ingest workflow")
         try:
-            ingest_api_workflow.execute(self.deps, api_limit=args.limit)
+            ingest_api_workflow.execute(self.deps, limiter=args.limiter)
         except InatPipelineError as e:
             logger.error(f"Ingest downloads failed {e}")
             raise WorkflowError(f"Ingest downloads failed failed {e}") from e

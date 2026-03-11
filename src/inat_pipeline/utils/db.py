@@ -61,7 +61,6 @@ def get_remaining_items(
     SOURCE_TABLE_NAME: str,
     TARGET_TABLE_NAME: str,
     SOURCE_KEY: str,
-    limit: int,
 ) -> list[Any]:
     # Get rows from source table that are not already collected
     try:
@@ -71,7 +70,7 @@ def get_remaining_items(
             FROM {SOURCE_TABLE_NAME} s
             LEFT JOIN {TARGET_TABLE_NAME} t ON s.{SOURCE_KEY}  = t.raw_id
             WHERE t.raw_id IS NULL
-            {f"LIMIT {limit}" if limit is not None else ""}"""
+            """
         ).df()
     except CatalogException:
         raise

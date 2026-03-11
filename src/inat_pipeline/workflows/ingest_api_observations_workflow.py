@@ -1,5 +1,4 @@
 import logging
-from typing import Union
 
 from ..app.container import Dependencies
 from ..utils.db import (
@@ -12,7 +11,7 @@ from ..utils.db import (
 logger = logging.getLogger(__name__)
 
 
-def execute(deps: Dependencies, limit: Union[None, int]) -> None:
+def execute(deps: Dependencies, limiter: int) -> None:
     SOURCE_TABLE_NAME = "raw.obs_sample"
     TARGET_TABLE_NAME = "raw.inat_api"
     SOURCE_KEY = "uuid"
@@ -24,9 +23,7 @@ def execute(deps: Dependencies, limit: Union[None, int]) -> None:
     create_api_raw_table(con, TARGET_TABLE_NAME)
 
     # 2 Get missing items not collected
-    items = get_remaining_items(
-        con, SOURCE_TABLE_NAME, TARGET_TABLE_NAME, SOURCE_KEY, limit
-    )
+    items = get_remaining_items(con, SOURCE_TABLE_NAME, TARGET_TABLE_NAME, SOURCE_KEY)
 
     if items:
         # Read api fields to query
