@@ -62,7 +62,6 @@ def execute(deps: Dependencies, rate: int, ignore_not_found: bool) -> None:
         sql_ingest.execute("stage_obs_identifications")
         sql_ingest.execute("stage_obs_photos")
         sql_ingest.execute("stage_obs_users")
-        sql_ingest.execute("stage_obs_taxa")
 
         # Extract species list to feed in taxa api module
         sql_ingest.execute("extract_species_list")
