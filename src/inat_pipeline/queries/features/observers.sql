@@ -29,73 +29,88 @@ WITH base_obs AS(
     -- Unbounded window = all identifications ever, for current-state scoring
     LEFT JOIN research_grade_windowed(INTERVAL '999 years') rg
         ON rg.observation_id = o.id
+),
+
+aggregates AS(
+    SELECT
+        -- Keys
+        observation_id,
+        user_id,
+        taxon_id,
+        created_at,
+
+        -- Temporal & status
+        created_at - user_created_at     AS observer_tenure,
+        CASE WHEN observer_tenure > INTERVAL '730 days' THEN TRUE ELSE FALSE END AS is_veteran,
+        orcid IS NOT NULL AS has_orcid,
+
+
+        -- All-time observer history (excluding current observation)
+        COALESCE(COUNT(*)           OVER observer_history, 0) AS observer_obs_count_at_t,
+        COALESCE(SUM(is_rg::INT)    OVER observer_history, 0) AS observer_rg_count_at_t,
+        COALESCE(observer_rg_count_at_t::FLOAT
+                / NULLIF(observer_obs_count_at_t, 0), 0)          AS observer_rg_rate_at_t,
+
+        observer_obs_count_at_t >= 20 AS rg_rate_is_reliable,
+
+        -- Rolling 12-month window
+        COALESCE(COUNT(*)           OVER observer_12m, 0) AS observer_obs_count_12m,
+        COALESCE(SUM(is_rg::INT)                OVER observer_12m, 0)       AS observer_rg_count_12m,
+        COALESCE(observer_rg_count_12m::FLOAT
+            / NULLIF(observer_obs_count_12m, 0),0)              AS observer_rg_rate_12m,
+
+
+
+        -- Observer reputation score (v0.2 definition)
+        expected_rg_rate,
+        COALESCE(observer_rg_rate_at_t /  NULLIF(expected_rg_rate, 0),0) AS observer_reputation_raw,
+        -- (observer_reputation_raw - MIN(observer_reputation_raw) OVER ()) * 1.0 / NULLIF(MAX(observer_reputation_raw) OVER() - MIN(observer_reputation_raw) OVER (),0 ) AS observer_reputation_score,
+
+        -- Taxonomic behaviour
+        COUNT(DISTINCT("order")) FILTER (WHERE "order" IS NOT NULL) OVER observer_history AS taxon_diversity_order,
+        COUNT(DISTINCT(family)) FILTER (WHERE family IS NOT NULL) OVER observer_history AS taxon_diversity_family,
+        COUNT(DISTINCT(genus)) FILTER (WHERE genus IS NOT NULL) OVER observer_history AS taxon_diversity_genus,
+        COALESCE(COUNT(DISTINCT(species)) FILTER (WHERE species IS NOT NULL) OVER observer_history,0) AS taxon_diversity_species,
+
+        -- Documentation quality
+        COALESCE(
+            AVG(LENGTH(observation_photos)) OVER observer_history,0) AS avg_photo_count,
+        COALESCE(COUNT(DISTINCT(observation_id)) FILTER (
+            WHERE description IS NOT NULL
+            ) OVER observer_history / NULLIF(observer_obs_count_at_t,0),0) AS pct_obs_with_description,
+        COALESCE(COUNT(DISTINCT(observation_id)) FILTER (
+            WHERE license IS NOT NULL
+            ) OVER observer_history / NULLIF(observer_obs_count_at_t,0),0)  AS pct_obs_with_license,
+        COALESCE(COUNT(DISTINCT(observation_id)) FILTER (
+            WHERE oauth_application_id = 3
+            OR oauth_application_id = 4
+            ) OVER observer_history / NULLIF(observer_obs_count_at_t,0),0)   AS pct_obs_from_mobile,
+
+
+    FROM base_obs
+
+    WINDOW
+        observer_history AS (
+            PARTITION BY user_id
+            ORDER BY created_at
+            ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING
+        ),
+        observer_12m AS (
+            PARTITION BY user_id
+            ORDER BY created_at
+            RANGE BETWEEN INTERVAL 12 MONTHS PRECEDING AND INTERVAL 1 MICROSECOND PRECEDING
+        )
+),
+
+ranked AS (
+    SELECT
+        *,
+        -- leaky but approximation point-in-time rank among observers active in same period
+        PERCENT_RANK() OVER (
+            PARTITION BY DATE_TRUNC('month', created_at)
+            ORDER BY observer_reputation_raw
+            ) AS observer_reputation_rank
+    FROM aggregates
 )
 
-SELECT
-    -- Keys
-    observation_id,
-    user_id,
-    taxon_id,
-    created_at,
-
-    -- Temporal & status
-    created_at - user_created_at     AS observer_tenure,
-    CASE WHEN observer_tenure > INTERVAL '730 days' THEN TRUE ELSE FALSE END AS is_veteran,
-    orcid IS NOT NULL AS has_orcid,
-
-
-    -- All-time observer history (excluding current observation)
-    COALESCE(COUNT(*)           OVER observer_history, 0) AS observer_obs_count_at_t,
-    COALESCE(SUM(is_rg::INT)    OVER observer_history, 0) AS observer_rg_count_at_t,
-    COALESCE(observer_rg_count_at_t::FLOAT
-            / NULLIF(observer_obs_count_at_t, 0), 0)          AS observer_rg_rate_at_t,
-
-    observer_obs_count_at_t >= 20 AS rg_rate_is_reliable,
-
-    -- Rolling 12-month window
-    COALESCE(COUNT(*)           OVER observer_12m, 0) AS observer_obs_count_12m,
-    COALESCE(SUM(is_rg::INT)                OVER observer_12m, 0)       AS observer_rg_count_12m,
-    COALESCE(observer_rg_count_12m::FLOAT
-        / NULLIF(observer_obs_count_12m, 0),0)              AS observer_rg_rate_12m,
-
-
-
-    -- Observer reputation score (v0.2 definition)
-    expected_rg_rate,
-    COALESCE(observer_rg_rate_at_t /  NULLIF(expected_rg_rate, 0),0) as observer_reputation_raw,
--- (observer_reputation_raw - MIN(observer_reputation_raw) OVER ()) * 1.0 / NULLIF(MAX(observer_reputation_raw) OVER() - MIN(observer_reputation_raw) OVER (),0 ) AS observer_reputation_score,
-
-    -- Taxonomic behaviour
-    COUNT(DISTINCT("order")) FILTER (WHERE "order" IS NOT NULL) OVER observer_history AS taxon_diversity_order,
-    COUNT(DISTINCT(family)) FILTER (WHERE family IS NOT NULL) OVER observer_history AS taxon_diversity_family,
-    COUNT(DISTINCT(genus)) FILTER (WHERE genus IS NOT NULL) OVER observer_history AS taxon_diversity_genus,
-    COALESCE(COUNT(DISTINCT(species)) FILTER (WHERE species IS NOT NULL) OVER observer_history,0) AS taxon_diversity_species,
-
-    -- Documentation quality
-    COALESCE(
-        AVG(LENGTH(observation_photos)) OVER observer_history,0) AS avg_photo_count,
-    COALESCE(COUNT(DISTINCT(observation_id)) FILTER (
-        WHERE description IS NOT NULL
-        ) OVER observer_history / NULLIF(observer_obs_count_at_t,0),0) AS pct_obs_with_description,
-    COALESCE(COUNT(DISTINCT(observation_id)) FILTER (
-        WHERE license IS NOT NULL
-        ) OVER observer_history / NULLIF(observer_obs_count_at_t,0),0)  AS pct_obs_with_license,
-    COALESCE(COUNT(DISTINCT(observation_id)) FILTER (
-        WHERE oauth_application_id = 3 
-        OR oauth_application_id = 4
-        ) OVER observer_history / NULLIF(observer_obs_count_at_t,0),0)   AS pct_obs_from_mobile,
-
-
-FROM base_obs
-
-WINDOW
-    observer_history AS (
-        PARTITION BY user_id
-        ORDER BY created_at
-        ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING
-    ),
-    observer_12m AS (
-        PARTITION BY user_id
-        ORDER BY created_at
-        RANGE BETWEEN INTERVAL 12 MONTHS PRECEDING AND INTERVAL 1 MICROSECOND PRECEDING
-    )
+SELECT * FROM ranked;

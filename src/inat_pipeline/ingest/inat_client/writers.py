@@ -61,11 +61,14 @@ class DuckDbWriter:
         try:
             for item in results:
                 source_id = item["_source_id"]  # resolved in base
+                is_empty = item.get("_empty", False)
                 self.con.execute(
                     f"INSERT INTO {self.table_name} VALUES (?, ?, ?, ?)",
                     (
                         source_id,
-                        json.dumps(
+                        None
+                        if is_empty
+                        else json.dumps(
                             {k: v for k, v in item.items() if k != "_source_id"}
                         ),  # since results is tagged
                         str(datetime.now()),

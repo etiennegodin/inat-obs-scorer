@@ -74,14 +74,19 @@ class BaseInatClient(ABC):
             params = {**base_params, "page": page, "per_page": self.config.per_page}
             response = await self.fetcher.fetch(session, self.config.url, params)
 
-            if not isinstance(response, dict):
-                logger.error(f"Unexpcted error getting response for {params}")
-                break
-
             results = response.get("results", [])
 
             if not results:
-                logger.warning(f"No results found for IDs {params}")
+                if self.config.write_empty_rows:  # optional flag on config
+                    await self.queue.put(
+                        [
+                            {
+                                "_source_id": source_id,
+                                "_empty": True,  # signals downstream it's a placeholder
+                            }
+                        ]
+                    )
+                logger.debug("No results for source_id %s", source_id)
                 break
 
             # Try to find id in response, otherwise fall back on source_id

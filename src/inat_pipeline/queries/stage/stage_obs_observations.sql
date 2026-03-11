@@ -95,7 +95,7 @@ t.rank_level
 
 FROM unpacked u
 JOIN raw.downloads d ON u.id = d.id
-JOIN staged.taxa t on d.taxon_id = t.taxon_id
+JOIN staged.taxa t ON d.taxon_id = t.taxon_id
 --LEFT JOIN raw.obs_sample s ON u.uuid = s.uuid
 ;
 
@@ -103,7 +103,7 @@ JOIN staged.taxa t on d.taxon_id = t.taxon_id
 -- Time filter for static set
 CREATE OR REPLACE TABLE staged.observations AS
 WITH max_date AS(
-    SELECT MAX(created_at) - INTERVAL '90 days' as max_date
+    SELECT MAX(created_at) - INTERVAL '90 days' AS max_date
     FROM staged.observations
 )
 

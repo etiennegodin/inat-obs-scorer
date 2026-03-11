@@ -45,7 +45,7 @@ WITH rank_ids AS (
             WHEN 'infrahybrid'  THEN 5
 
             WHEN 'species'      THEN 10
-            WHEN 'hybrid'       THEN 10  -- treat as species-equivalent
+            WHEN 'hybrid'       THEN 10  -- treat AS species-equivalent
             WHEN 'genushybrid'  THEN 10  -- debatable, see note below
 
             WHEN 'complex'      THEN 10  -- species complex, sits just above species
@@ -76,7 +76,7 @@ WITH rank_ids AS (
 
             WHEN 'kingdom'      THEN 70
 
-            ELSE 99  -- unknown, treat as coarsest
+            ELSE 99  -- unknown, treat AS coarsest
         END AS rank_level
 
     FROM staged.taxa_raw t

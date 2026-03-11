@@ -109,8 +109,6 @@ rates AS(
 
 )
 
-
-
 SELECT
     r.*,
     t.phylum,

@@ -4,8 +4,8 @@ CREATE OR REPLACE TABLE staged.similar_species AS
 
 WITH unpacked AS (
     SELECT
-    taxon_id,
-    data."count" as "count",
+    taxon_id::INT AS taxon_id,
+    data."count" AS "count",
     UNNEST(data.taxon, RECURSIVE := true)
 
     FROM (
@@ -27,4 +27,5 @@ SELECT * EXCLUDE('id'),
 
 id AS similar_taxon_id
 FROM unpacked
+LIMIT 100
 ;

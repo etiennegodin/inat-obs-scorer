@@ -18,7 +18,7 @@ SELECT i.*,
     t.rank
 
 FROM staged.identifications i
-JOIN staged.taxa t on i.taxon_id = t.taxon_id;
+JOIN staged.taxa t ON i.taxon_id = t.taxon_id;
 
 
 ALTER TABLE staged.identifications

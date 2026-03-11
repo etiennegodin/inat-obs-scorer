@@ -18,7 +18,7 @@ nodes AS (
 out_degree AS(
     SELECT
     taxon_id AS node_id,
-    COUNT(similar_taxon_id) as out_degree
+    COUNT(similar_taxon_id) AS out_degree
     FROM staged.similar_species
     GROUP BY taxon_id
 ),
@@ -26,7 +26,7 @@ out_degree AS(
 in_degree AS (
     SELECT
     similar_taxon_id AS node_id,
-    COUNT(taxon_id) as in_degree
+    COUNT(taxon_id) AS in_degree
     FROM staged.similar_species
     GROUP BY similar_taxon_id
 )

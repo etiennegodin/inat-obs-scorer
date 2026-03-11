@@ -11,7 +11,7 @@ from ..utils.db import (
 logger = logging.getLogger(__name__)
 
 
-def execute(deps: Dependencies, limiter: int) -> None:
+def execute(deps: Dependencies, rate: int, ignore_not_found: bool) -> None:
     SOURCE_TABLE_NAME = "raw.obs_sample"
     TARGET_TABLE_NAME = "raw.inat_api"
     SOURCE_KEY = "uuid"

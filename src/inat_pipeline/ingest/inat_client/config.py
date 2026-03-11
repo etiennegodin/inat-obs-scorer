@@ -24,6 +24,7 @@ class EndpointConfig:
     api_version: int = 2
     url: str = field(init=False)
     id_fields: list[str] = field(default_factory=lambda: ["uuid", "id"])
+    write_empty_rows: bool = False
 
     def __post_init__(self):
         print("post")

@@ -5,7 +5,7 @@ CREATE OR REPLACE TABLE eda.obs_per_taxon AS
 WITH agg AS(
     SELECT o.taxon_id,
 
-    COUNT(*) as obs_per_taxon
+    COUNT(*) AS obs_per_taxon
 
 
     FROM staged.observations o
@@ -16,4 +16,4 @@ WITH agg AS(
 SELECT *,
 
 CASE WHEN obs_per_taxon < 30 THEN TRUE ELSE FALSE END AS fallback
-FROM agg 
+FROM agg

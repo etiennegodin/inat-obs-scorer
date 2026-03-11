@@ -35,8 +35,9 @@ SELECT
     ob.observer_obs_count_at_t AS obv_obs_count_total,
     ob.observer_rg_rate_at_t AS obv_rg_rate_lifetime,
     ob.observer_rg_rate_12m AS obv_rg_rate_last_12m,
-    ob.rg_rate_is_reliable AS obv_rg_rate_is_reliable,
     ob.observer_reputation_raw AS obv_reputation_score,
+    ob.observer_reputation_rank,
+    ob.rg_rate_is_reliable AS obv_rg_rate_is_reliable,
     ob.taxon_diversity_family AS obv_taxon_diversity_family,
     ob.taxon_diversity_genus AS obv_taxon_diversity_genus,
     ob.taxon_diversity_species AS obv_taxon_diversity_species,
@@ -61,8 +62,8 @@ SELECT
 
     -- Fixed Taxon confusion stats
     IFNULL(c.has_similar_species, FALSE)    AS has_similar_species,
-    IFNULL(c.similar_species_count,0)       AS similar_species_count,
-    COALESCE(c.neighborhood_difficulty,0)   AS neighborhood_difficulty
+    COALESCE(c.neighborhood_difficulty,0)   AS neighborhood_difficulty,
+    c.rg_rate_vs_neighbors,
 
 FROM features.observations o
 JOIN features.splits                     s  ON o.observation_id = s.observation_id

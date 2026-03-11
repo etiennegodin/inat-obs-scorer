@@ -62,10 +62,10 @@ CREATE OR REPLACE TABLE staged.users AS
 
 WITH agg AS(
     SELECT DISTINCT(u.user_id) AS user_id,
-    MAX(created_at) as created_at,
-    MAX(orcid) as orcid,
-    MAX(observer) as observer,
-    MAX(identifier) as identifier,
+    MAX(created_at) AS created_at,
+    MAX(orcid) AS orcid,
+    MAX(observer) AS observer,
+    MAX(identifier) AS identifier,
     FROM staged.users u
     GROUP BY user_id
 )

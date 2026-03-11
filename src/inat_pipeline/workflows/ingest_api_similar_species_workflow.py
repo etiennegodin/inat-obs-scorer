@@ -19,7 +19,7 @@ from ..utils.git import get_git_hash
 logger = logging.getLogger(__name__)
 
 
-def execute(deps: Dependencies, limiter: int) -> None:
+def execute(deps: Dependencies, rate: int, ignore_not_found: bool) -> None:
     SOURCE_TABLE_NAME = "staged.species_list"
     TARGET_TABLE_NAME = "raw.api_similar_species"
     SOURCE_KEY = "taxon_id"
@@ -34,8 +34,12 @@ def execute(deps: Dependencies, limiter: int) -> None:
 
     if items:
         # Read api fields to query
-        config = EndpointConfig("identifications/similar_species", id_param="taxon_id")
-        fetcher = RateLimiterFetcher(limiter)
+        config = EndpointConfig(
+            "identifications/similar_species",
+            id_param="taxon_id",
+            write_empty_rows=ignore_not_found,
+        )
+        fetcher = RateLimiterFetcher(rate=rate, ignore_not_found=ignore_not_found)
 
         with DuckDbWriter(con, TARGET_TABLE_NAME, get_git_hash(short=True)) as writer:
             client = make_client(config, fetcher, writer)

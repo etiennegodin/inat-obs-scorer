@@ -1,9 +1,9 @@
 CREATE OR REPLACE TABLE tests.reasearch_grade AS
 
-SELECT 
+SELECT
     rg.observation_id,
     rg.is_rg,
-    o.quality_grade = 'research' as o_rg
+    o.quality_grade = 'research' AS o_rg
 
 
 FROM research_grade_windowed(INTERVAL '999 years') rg
@@ -13,7 +13,7 @@ LEFT JOIN staged.observations o ON o.id = rg.observation_id;
 
 CREATE OR REPLACE TABLE tests.reasearch_grade_cm AS
 
-SELECT 
+SELECT
 
     COUNT(CASE WHEN o.quality_grade = 'research' AND rg.is_rg THEN 1 END) AS True_Positive,
     COUNT(CASE WHEN o.quality_grade != 'research' AND rg.is_rg THEN 1 END) AS False_Positive,
@@ -23,4 +23,3 @@ SELECT
 
 FROM research_grade_windowed(INTERVAL '999 years') rg
 LEFT JOIN staged.observations o ON o.id = rg.observation_id;
-
