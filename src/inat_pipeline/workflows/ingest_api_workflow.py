@@ -1,7 +1,7 @@
 import logging
 
 from ..app.container import Dependencies
-from ..db.utils import DuckDBConnection, SQLEngine
+from ..db import DuckDBConnection, SQLEngine
 from . import (
     ingest_api_similar_species_workflow,
 )

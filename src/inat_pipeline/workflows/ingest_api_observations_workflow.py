@@ -2,19 +2,18 @@ import asyncio
 import logging
 
 from ..app.container import Dependencies
+from ..db import DuckDBConnection, SQLEngine
 from ..db.utils import (
-    DuckDBConnection,
-    SQLEngine,
     create_api_raw_table,
     get_remaining_items,
 )
-from ..ingest.inat_client import (
+from ..inat_client import (
     DuckDbWriter,
     EndpointConfig,
     RateLimiterFetcher,
     make_client,
 )
-from ..ingest.inat_client.registery import OBSERVATIONS_FIELDS
+from ..inat_client.registery import OBSERVATIONS_FIELDS
 from ..utils.git import get_git_hash
 
 logger = logging.getLogger(__name__)

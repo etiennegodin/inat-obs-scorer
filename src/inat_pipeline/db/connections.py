@@ -31,8 +31,8 @@ class DuckDBConnection:
 
     def _load_spatial_extension(self) -> None:
         try:
-            self.con.execute("INSTALL spatial;")
-            self.con.execute("LOAD spatial;")
+            self._con.execute("INSTALL spatial;")
+            self._con.execute("LOAD spatial;")
         except Exception as e:
             logger.error(f"Error loading spatial extension : {e}")
             raise e

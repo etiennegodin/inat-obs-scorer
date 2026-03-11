@@ -1,7 +1,8 @@
 import logging
 
 from ..app.container import Dependencies
-from ..db.utils import DuckDBConnection, SQLEngine, TrainingSplitParams
+from ..db import DuckDBConnection, SQLEngine
+from ..db.params import TrainingSplitParams
 
 logger = logging.getLogger(__name__)
 

@@ -8,7 +8,7 @@ from typing import Any, Iterator
 import aiohttp
 from tqdm.asyncio import tqdm_asyncio
 
-from ...utils.git import get_git_hash
+from ..utils.git import get_git_hash
 from .config import EndpointConfig
 from .protocols import Fetcher, Writer
 

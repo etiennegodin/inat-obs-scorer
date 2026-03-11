@@ -1,30 +1,27 @@
 import logging
 
 from ..app.container import Dependencies
-from ..db.utils import DuckDBConnection
-from ..ingest.downloads import ingest_downloads
+from ..db import DuckDBConnection, SQLEngine
 
 logger = logging.getLogger(__name__)
 
 
 def execute(deps: Dependencies):
     with DuckDBConnection(deps.DB_PATH) as con:
+        data_dir = deps._RAW_DATA_FOLDER
+
         con.execute("CREATE SCHEMA IF NOT EXISTS raw")
+
+        sql = SQLEngine(con, deps.SQL_STAGE_PATH)
 
         # Ingest observations csv files
         source = "downloads"
-
-        ingested = ingest_downloads(con, "downloads", deps.DOWNLOADS_FOLDER)
-        logger.info(f"Ingested {len(ingested)} files from raw/{source}")
+        sql.execute("stage_csv", [True], table_name=source, source=data_dir / source)
 
         # Ingest taxa
         source = "taxa"
-        ingested = ingest_downloads(con, source, deps._RAW_DATA_FOLDER / source)
-        logger.info(f"Ingested {len(ingested)} files from raw/{source} ")
+        sql.execute("stage_csv", [True], table_name=source, source=data_dir / source)
 
         # Ingest places
         source = "places"
-        ingested = ingest_downloads(
-            con, source, deps._RAW_DATA_FOLDER / source, ignore_error=False
-        )
-        logger.info(f"Ingested {len(ingested)} files from raw/{source}")
+        sql.execute("stage_csv", [True], table_name=source, source=data_dir / source)

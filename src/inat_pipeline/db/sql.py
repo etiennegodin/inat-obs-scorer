@@ -7,18 +7,24 @@ from .protocols import DBConnection
 logger = logging.getLogger(__name__)
 
 
-class SQL_Engine:
+class SQLEngine:
     def __init__(self, con: DBConnection, sql_dir: Path):
         self.con = con
         self.sql_dir = Path(sql_dir)
 
-    def execute(self, script_name: str, params: str) -> None:
+    def execute(self, script_name: str, params: tuple = (), **identifiers) -> None:
         path = self.sql_dir / f"{script_name}.sql"
 
         if not path.exists():
             raise FileNotFoundError(f"SQL script not found: {path}")
 
         query = path.read_text()
+
+        if identifiers:
+            print(identifiers)
+            query = query.format(**identifiers)  # replace {table_name} etc.
+
+        print(query)
         logger.debug("Executing SQL: %s", path.name)
         start = time.monotonic()
 
