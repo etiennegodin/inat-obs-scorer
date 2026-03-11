@@ -27,5 +27,4 @@ SELECT * EXCLUDE('id'),
 
 id AS similar_taxon_id
 FROM unpacked
-LIMIT 100
 ;

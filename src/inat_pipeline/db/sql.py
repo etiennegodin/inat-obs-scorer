@@ -21,10 +21,8 @@ class SQLEngine:
         query = path.read_text()
 
         if identifiers:
-            print(identifiers)
             query = query.format(**identifiers)  # replace {table_name} etc.
 
-        print(query)
         logger.debug("Executing SQL: %s", path.name)
         start = time.monotonic()
 
