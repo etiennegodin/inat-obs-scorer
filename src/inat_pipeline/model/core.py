@@ -106,7 +106,7 @@ def build_preprocessor(config: PipelineConfig) -> ColumnTransformer:
             ("cat", categorical_transformer, config.categorical_features),
         ],
         remainder="drop",  # drop any unlisted columns
-        verbose_feature_names_out=True,  # keeps feature names for inspection
+        verbose_feature_names_out=config.ct_verbose_feature_names_out,
     )
     return preprocessor
 

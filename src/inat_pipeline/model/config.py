@@ -33,6 +33,9 @@ class PipelineConfig:
     cv_folds: int = 5  # cross-validation folds per trial
     scoring_metric: str = "roc_auc"  # what Optuna optimizes for
 
+    # Flags
+    ct_verbose_feature_names_out: bool = False
+
     def set_features(self, df: pd.DataFrame) -> None:
         try:
             df.pop(self.target_column)

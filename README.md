@@ -8,7 +8,6 @@ Which “Needs ID” observations are most likely to reach Research Grade if rev
 
 - Data Pipeline orchestrator from terminal*
 
-
 ## Domain Model
 ```
 Observer quality     → Observation documentation quality
@@ -71,6 +70,8 @@ From all observations records based on observers, using these metrics:
 ## Data pipeline orchestrator
 
 Used to ensure reproducibility
+Agnostic Sql db with protocols
+
 
 ```bash
 pip install inat_pipeline
@@ -143,6 +144,7 @@ inat_pipe inference*
 [Model Registry]
     MLflow tracking (params, metrics, artifacts)
     Optuna studies to run Cv
+    Explainability module*
           ↓
 [Serving Layer]*
     FastAPI endpoint: POST /score → returns {observation_id, rg_probability, rank}

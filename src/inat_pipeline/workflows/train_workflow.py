@@ -115,7 +115,6 @@ def execute(
         final_model = model.train_final_model(config, best_params, X_train, y_train)
 
         # ── 5. Evaluate on held-out test set ──────────────────────────────────
-
         y_pred = final_model.predict(X_val)
         y_pred_proba = final_model.predict_proba(X_val)[:, 1]
 
@@ -142,6 +141,10 @@ def execute(
         Path("classification_report.txt").unlink()
 
         # ── 6. Log the final model ─────────────────────────────────────────────
+        # Saves features explainability artifacts to mlflow
+        model.create_explainability_report(final_model, X_train, config)
+
+        # ── 7. Log the final model ─────────────────────────────────────────────
         # This saves the *entire pipeline* (preprocessor + reducer + classifier)
         # as a single artifact. Load it anywhere with:
         #   pipeline = mlflow.sklearn.load_model("runs:/<run_id>/model")
