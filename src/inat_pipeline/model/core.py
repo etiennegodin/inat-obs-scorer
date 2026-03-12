@@ -33,6 +33,8 @@ def load_and_split(
     with DuckDBConnection(db_path) as con:
         df = con.execute("SELECT * FROM features.training").df()
 
+    df.drop(columns=["observation_id", "user_id"], inplace=True)
+
     train = df[df["split"] == "train"]
     val = df[df["split"] == "val"]
     test = df[df["split"] == "test"]

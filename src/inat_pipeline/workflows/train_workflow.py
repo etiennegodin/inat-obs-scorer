@@ -15,6 +15,8 @@ from sklearn.metrics import (
 )
 
 from .. import model
+from ..app.container import Dependencies
+from ..model import eda
 
 logger = logging.getLogger(__name__)
 
@@ -26,7 +28,7 @@ mlflow.set_tracking_uri("sqlite:///mlruns.db")  # single file, easy to inspect
 
 
 def execute(
-    db_path: Path,
+    deps: Dependencies,
     classifier: str,
     reducer: str,
     scaler: str,
@@ -48,7 +50,7 @@ def execute(
     # ── 1. Data ───────────────────────────────────────────────────────────────
 
     X_train, y_train, X_val, y_val, X_test, y_test, data_stats = model.load_and_split(
-        db_path, config
+        deps.DB_PATH, config
     )
 
     # ── 2. MLflow setup ───────────────────────────────────────────────────────
@@ -69,6 +71,9 @@ def execute(
 
         # Log data statistics
         mlflow.log_metrics(data_stats)
+
+        # Log plot of feature correlation
+        eda.log_feature_corr(X_train)
 
         # Log pipeline structure as a JSON artifact
         sample_pipeline = model.build_pipeline(config)
@@ -140,7 +145,7 @@ def execute(
         mlflow.log_artifact("classification_report.txt")
         Path("classification_report.txt").unlink()
 
-        # ── 6. Log the final model ─────────────────────────────────────────────
+        # ── 6. Features explainability ─────────────────────────────────────────────
         # Saves features explainability artifacts to mlflow
         model.create_explainability_report(final_model, X_train, config)
 
@@ -171,6 +176,8 @@ def execute(
             f"  To load: mlflow.sklearn.load_model('runs:/{parent_run_id}/model')"
         )
         logger.info("  View UI: mlflow ui  (then open http://localhost:5000)\n")
+
+        mlflow.log_artifact(deps.log_path)
 
         return {
             "run_id": parent_run_id,

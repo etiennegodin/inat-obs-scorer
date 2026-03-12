@@ -24,12 +24,12 @@ class PipelineConfig:
     categorical_imputer: str = "most_frequent"
     encoder: str = "onehot"
     scaler: str = "standard"
-    reducer: str = "pca"  # set to "pca" to enable
+    reducer: str = "none"
     classifier: str = "logistic"
 
     # ── Experiment tracking ───────────────────────────────────────────────────
     experiment_name: str = "inat_obs_scorer_v0_1"
-    n_trials: int = 50  # Optuna: number of hyperparameter combos to try
+    n_trials: int = 10  # Optuna: number of hyperparameter combos to try
     cv_folds: int = 5  # cross-validation folds per trial
     scoring_metric: str = "roc_auc"  # what Optuna optimizes for
 
@@ -55,11 +55,11 @@ class PipelineConfig:
             try:
                 self.categorical_features.append(feature_name)
                 self.numeric_features.remove(feature_name)
-                logger.info(f"Moved '{feature_name}' to categorical features")
+                logger.info(f"Changed '{feature_name}' to categorical type")
             except ValueError:
                 self.numeric_features.append(feature_name)
                 self.categorical_features.remove(feature_name)
-                logger.info(f"Moved '{feature_name}' to numeric features")
+                logger.info(f"Changed '{feature_name}' to numerical type")
         else:
             logger.warning(f"{feature_name} not found in features list")
 

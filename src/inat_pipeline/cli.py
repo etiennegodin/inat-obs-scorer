@@ -107,7 +107,7 @@ def create_parser() -> argparse.ArgumentParser:
     train_parser.add_argument(
         "--classifier", default="logistic", choices=CLASSIFIER_REGISTRY
     )
-    train_parser.add_argument("--reducer", default="pca", choices=REDUCER_REGISTRY)
+    train_parser.add_argument("--reducer", default="none", choices=REDUCER_REGISTRY)
     train_parser.add_argument("--scaler", default="standard", choices=SCALER_REGISTRY)
     train_parser.add_argument("--encoder", default="onehot", choices=ENCODER_REGISTRY)
     train_parser.add_argument("--imputer", default="median", choices=IMPUTER_REGISTRY)
@@ -122,19 +122,13 @@ def create_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def min_cv_folds(x):
-    x = int(x)
-    if x < 2:
-        raise argparse.ArgumentTypeError("Minimum cv folds is 2")
-    return x
-
-
 def main():
     parser = create_parser()
     args = parser.parse_args()
 
     # Setup logging
-    logger = init_logger(Path.cwd() / "log.log", logging.INFO)
+    log_path = Path.cwd() / "log.log"
+    logger = init_logger(log_path, logging.INFO)
 
     # Create dependencies
     try:
@@ -142,6 +136,7 @@ def main():
             logger=logger,
             project_root=Path(__file__).parents[2],
             package_root=Path(__file__).parents[0],
+            log_path=log_path,
         )
     except Exception as e:
         print(f"[red]Configuration error: {e}[/red]")
@@ -165,3 +160,10 @@ def main():
         logger.exception("Unexpected error")
         print(f"[red]Unexpected error: {e}[/red]")
         sys.exit(1)
+
+
+def min_cv_folds(x):
+    x = int(x)
+    if x < 2:
+        raise argparse.ArgumentTypeError("Minimum cv folds is 2")
+    return x

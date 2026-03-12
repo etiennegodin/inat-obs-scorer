@@ -42,9 +42,9 @@ REDUCER_REGISTRY = {
     "pca": (
         "sklearn.decomposition",
         "PCA",
-        {"n_components": 0.95},
+        {"n_components": 0.99},
     ),  # keep 95% variance
-    "svd": ("sklearn.decomposition", "TruncatedSVD", {"n_components": 50}),
+    "svd": ("sklearn.decomposition", "TruncatedSVD", {"n_components": 20}),
     "none": None,  # skip reduction entirely
 }
 
@@ -99,7 +99,7 @@ SEARCH_SPACES = {
         "classifier__solver": {"type": "categorical", "choices": ["lbfgs", "saga"]},
     },
     "lightgbm": {
-        "classifier__n_estimators": {"type": "int", "low": 10, "high": 120, "step": 10},
+        "classifier__n_estimators": {"type": "int", "low": 10, "high": 300, "step": 50},
         "classifier__learning_rate": {
             "type": "float",
             "low": 1e-3,

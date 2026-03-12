@@ -14,7 +14,7 @@ SELECT
     o.has_tags,
     o.tag_count,
     o.has_license,
-    o.positional_accuracy_m,
+    --o.positional_accuracy_m,
     o.obscured,
     o.geoprivacy IS NOT NULL                AS geoprivacy_set,
     o.captive,                              -- should be FALSE for all training rows
@@ -30,13 +30,13 @@ SELECT
     o.submitted_year,
 
     -- Observer features (from observer_features, computed at observation time)
-    date_part('day',ob.observer_tenure) AS observer_tenure_days,
+    date_part('day',ob.observer_tenure) AS obv_tenure_days,
     ob.is_veteran AS obv_is_veteran,
     ob.observer_obs_count_at_t AS obv_obs_count_total,
     ob.observer_rg_rate_at_t AS obv_rg_rate_lifetime,
     ob.observer_rg_rate_12m AS obv_rg_rate_last_12m,
     ob.observer_reputation_raw AS obv_reputation_score,
-    ob.observer_reputation_rank,
+    ob.observer_reputation_rank AS obv_reputation_rank,
     ob.rg_rate_is_reliable AS obv_rg_rate_is_reliable,
     ob.taxon_diversity_family AS obv_taxon_diversity_family,
     ob.taxon_diversity_genus AS obv_taxon_diversity_genus,

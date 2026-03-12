@@ -17,6 +17,7 @@ import matplotlib
 import mlflow
 import numpy as np
 import pandas as pd
+import seaborn as sns
 
 matplotlib.use("Agg")  # non-interactive backend — safe for logging, no window pops up
 import matplotlib.pyplot as plt
@@ -29,7 +30,7 @@ from .config import PipelineConfig
 logger = logging.getLogger(__name__)
 
 
-def log_feature_importance(pipeline: Pipeline, config: PipelineConfig, top_n: int = 20):
+def log_feature_importance(pipeline: Pipeline, config: PipelineConfig, top_n: int = 30):
     """
     Logs a bar chart of feature importances for tree-based classifiers.
     Works for: RandomForest, GradientBoosting, XGBoost, LightGBM.
@@ -109,10 +110,17 @@ def log_pca_loadings(pipeline, config, top_n: int = 8, n_components: int = 8):
         index=[f"PC{i+1} ({v:.1%})" for i, v in enumerate(explained_var)],
         columns=[feature_names[i] for i in top_feature_idx],
     )
-
     fig, ax = plt.subplots(figsize=(max(12, top_n * 1.5), n_components * 0.9 + 2))
-    im = ax.imshow(loadings_df.values, aspect="auto", cmap="RdBu_r", vmin=-1, vmax=1)
-    plt.colorbar(im, ax=ax, label="Loading")
+    sns.heatmap(
+        loadings_df.values,
+        ax=ax,
+        cbar=True,
+        cmap="RdBu_r",
+        vmin=-1,
+        vmax=1,
+        linewidths=0.5,  # Add lines between cells
+    )
+
     ax.set_xticks(range(len(loadings_df.columns)))
     ax.set_xticklabels(loadings_df.columns, rotation=40, ha="right", fontsize=8)
     ax.set_yticks(range(len(loadings_df.index)))
@@ -134,12 +142,16 @@ def log_pca_loadings(pipeline, config, top_n: int = 8, n_components: int = 8):
 
 def create_explainability_report(
     pipeline: Pipeline, X_train: pd.DataFrame, config: PipelineConfig
-):
+) -> None:
     """
     Call this inside an active MLflow run after training.
     Logs whichever plots are applicable given the pipeline config.
     """
-    print("\nLogging explainability artifacts...")
-    log_feature_importance(pipeline, config)
-    log_pca_loadings(pipeline, config)
-    # log_shap_summary(pipeline, X_train, config)
+    try:
+        print("\nLogging explainability artifacts...")
+        log_feature_importance(pipeline, config)
+        log_pca_loadings(pipeline, config)
+        # log_shap_summary(pipeline, X_train, config)
+    except Exception as e:
+        logger.error(f"Error creating explainability report: {e}")
+        return
