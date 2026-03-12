@@ -31,7 +31,7 @@ def execute(deps: Dependencies, rate: int, ignore_not_found: bool) -> None:
         # 2 Get missing items not collected
         df = sql_api.fetch_df(
             "fetch_missing_items",
-            params=(SOURCE_KEY),
+            source_key=SOURCE_KEY,
             source_table_name=SOURCE_TABLE_NAME,
             target_table_name=TARGET_TABLE_NAME,
         )

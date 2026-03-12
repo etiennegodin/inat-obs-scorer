@@ -11,19 +11,17 @@ def execute(deps: Dependencies):
         # Transform data and create features
         sql = SQLEngine(con, deps.SQL_FEATURES_PATH)
         sql.execute_many(
-            [
-                "community_taxon_windowed",
-                "research_grade_windowed",
-                "identifications",
-                "identifiers",
-                "taxon",
-                "label",
-                "observations",
-                "observers",
-                "taxa_assymetry",
-                "taxa_distance",
-                "taxa_confusion",
-            ]
+            "community_taxon_windowed",
+            "research_grade_windowed",
+            "identifications",
+            "identifiers",
+            "taxon",
+            "label",
+            "observations",
+            "observers",
+            "taxa_assymetry",
+            "taxa_distance",
+            "taxa_confusion",
         )
 
         # Build params for interactive sql

@@ -32,7 +32,7 @@ class SQLEngine:
         start = time.monotonic()
         self.con.execute(query, params)
         logger.info(
-            f"Executed {script_name}.sql ,"
+            f"Executed {script_name}.sql, "
             f"took {round((time.monotonic() - start), 3)}s"
         )
 
@@ -56,5 +56,7 @@ class SQLEngine:
 
     def execute_many(self, *script_names: str) -> None:
         """Run multiple scripts in order — useful for staged pipelines."""
+        logger.debug(script_names)
         for name in script_names:
+            logger.debug(name)
             self.execute(name)

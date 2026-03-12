@@ -3,9 +3,6 @@ import logging
 
 from ..app.container import Dependencies
 from ..db import DuckDBConnection, SQLEngine
-from ..db.utils import (
-    get_remaining_items,
-)
 from ..inat_client import (
     DuckDbWriter,
     EndpointConfig,
@@ -32,15 +29,11 @@ def execute(deps: Dependencies, rate: int, ignore_not_found: bool) -> None:
 
         df = sql_api.fetch_df(
             "fetch_missing_items",
-            params=(SOURCE_KEY),
+            source_key=SOURCE_KEY,
             source_table_name=SOURCE_TABLE_NAME,
             target_table_name=TARGET_TABLE_NAME,
         )
         items = df[SOURCE_KEY].to_list()
-
-        items = get_remaining_items(
-            con, SOURCE_TABLE_NAME, TARGET_TABLE_NAME, SOURCE_KEY
-        )
 
         if items:
             # Set up configs
@@ -67,10 +60,8 @@ def execute(deps: Dependencies, rate: int, ignore_not_found: bool) -> None:
         sql_stage = SQLEngine(con, deps.SQL_STAGE_PATH)
 
         sql_stage.execute_many(
-            [
-                "stage_obs_observations",
-                "stage_obs_identifications",
-                "stage_obs_photos",
-                "stage_obs_users",
-            ]
+            "stage_obs_observations",
+            "stage_obs_identifications",
+            "stage_obs_photos",
+            "stage_obs_users",
         )
