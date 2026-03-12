@@ -52,11 +52,11 @@ class PipelineConfig:
             try:
                 self.categorical_features.append(feature_name)
                 self.numeric_features.remove(feature_name)
-                logger.info(f"Moved {feature_name} to categorical features")
+                logger.info(f"Moved '{feature_name}' to categorical features")
             except ValueError:
                 self.numeric_features.append(feature_name)
                 self.categorical_features.remove(feature_name)
-                logger.info(f"Moved {feature_name} to numeric features")
+                logger.info(f"Moved '{feature_name}' to numeric features")
         else:
             logger.warning(f"{feature_name} not found in features list")
 

@@ -3,10 +3,6 @@ import logging
 
 from ..app.container import Dependencies
 from ..db import DuckDBConnection, SQLEngine
-from ..db.utils import (
-    create_api_raw_table,
-    get_remaining_items,
-)
 from ..inat_client import (
     DuckDbWriter,
     EndpointConfig,
@@ -24,13 +20,22 @@ def execute(deps: Dependencies, rate: int, ignore_not_found: bool) -> None:
     SOURCE_KEY = "taxon_id"
 
     with DuckDBConnection(deps.DB_PATH) as con:
+        # Extract species list to feed in taxa api module
+        sql_api = SQLEngine(con, deps.SQL_API_PATH)
+        logger.info("Listing species from observations to request taxa confusion data")
+        sql_api.execute("extract_species_list")
+
         # 1 Create table to receive api data
-        create_api_raw_table(con, TARGET_TABLE_NAME)
+        sql_api.execute("create_api_raw_table", params=(), table_name=TARGET_TABLE_NAME)
 
         # 2 Get missing items not collected
-        items = get_remaining_items(
-            con, SOURCE_TABLE_NAME, TARGET_TABLE_NAME, SOURCE_KEY
+        df = sql_api.fetch_df(
+            "fetch_missing_items",
+            params=(SOURCE_KEY),
+            source_table_name=SOURCE_TABLE_NAME,
+            target_table_name=TARGET_TABLE_NAME,
         )
+        items = df[SOURCE_KEY].to_list()
 
         if items:
             # Set up configs
@@ -50,5 +55,5 @@ def execute(deps: Dependencies, rate: int, ignore_not_found: bool) -> None:
             logger.info("All items already requested")
 
         # 3 Stage collected data in db
-        sql_ingest = SQLEngine(con, deps.SQL_STAGE_PATH)
-        sql_ingest.execute("stage_similar_species")
+        sql_stage = SQLEngine(con, deps.SQL_STAGE_PATH)
+        sql_stage.execute("stage_similar_species")

@@ -4,7 +4,6 @@ import logging
 from ..app.container import Dependencies
 from ..db import DuckDBConnection, SQLEngine
 from ..db.utils import (
-    create_api_raw_table,
     get_remaining_items,
 )
 from ..inat_client import (
@@ -27,9 +26,18 @@ def execute(deps: Dependencies, rate: int, ignore_not_found: bool) -> None:
 
     with DuckDBConnection(deps.DB_PATH) as con:
         # 1 Create table to receive api data
-        create_api_raw_table(con, TARGET_TABLE_NAME)
 
-        # 2 Get missing items not collected
+        sql_api = SQLEngine(con, deps.SQL_API_PATH)
+        sql_api.execute("create_api_raw_table", params=(), table_name=TARGET_TABLE_NAME)
+
+        df = sql_api.fetch_df(
+            "fetch_missing_items",
+            params=(SOURCE_KEY),
+            source_table_name=SOURCE_TABLE_NAME,
+            target_table_name=TARGET_TABLE_NAME,
+        )
+        items = df[SOURCE_KEY].to_list()
+
         items = get_remaining_items(
             con, SOURCE_TABLE_NAME, TARGET_TABLE_NAME, SOURCE_KEY
         )
@@ -56,12 +64,13 @@ def execute(deps: Dependencies, rate: int, ignore_not_found: bool) -> None:
             logger.info("All items already requested")
 
         # 3 Stage collected data in db
-        sql_ingest = SQLEngine(con, deps.SQL_STAGE_PATH)
-        # sql_features.execute("clean_inat_api")
-        sql_ingest.execute("stage_obs_observations")
-        sql_ingest.execute("stage_obs_identifications")
-        sql_ingest.execute("stage_obs_photos")
-        sql_ingest.execute("stage_obs_users")
+        sql_stage = SQLEngine(con, deps.SQL_STAGE_PATH)
 
-        # Extract species list to feed in taxa api module
-        sql_ingest.execute("extract_species_list")
+        sql_stage.execute_many(
+            [
+                "stage_obs_observations",
+                "stage_obs_identifications",
+                "stage_obs_photos",
+                "stage_obs_users",
+            ]
+        )
