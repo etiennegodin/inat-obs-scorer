@@ -78,6 +78,57 @@ def log_feature_importance(pipeline: Pipeline, config: PipelineConfig, top_n: in
     logger.info("Logged feature_importance.png")
 
 
+def log_pca_loadings(pipeline, config, top_n: int = 8, n_components: int = 8):
+    """
+    Heatmap of which input features drive each PCA component.
+    Only runs when config.reducer != "none".
+
+    Reading the heatmap:
+      - Each column is a principal component (PC1, PC2, ...)
+      - Each row is an original feature
+      - Color intensity = how much that feature contributes to that component
+      - Warm colors = positive loading, cool = negative
+    """
+    if config.reducer == "none" or "reducer" not in pipeline.named_steps:
+        return
+
+    preprocessor = pipeline.named_steps["preprocessor"]
+    reducer = pipeline.named_steps["reducer"]
+    feature_names = preprocessor.get_feature_names_out()
+    components = reducer.components_[:n_components]  # (n_components, n_features)
+    explained_var = reducer.explained_variance_ratio_[:n_components]
+
+    # For each component, find the top_n features by absolute loading
+    top_feature_idx = set()
+    for comp in components:
+        top_feature_idx.update(np.argsort(np.abs(comp))[::-1][:top_n])
+    top_feature_idx = sorted(top_feature_idx)
+
+    loadings_df = pd.DataFrame(
+        components[:, top_feature_idx],
+        index=[f"PC{i+1} ({v:.1%})" for i, v in enumerate(explained_var)],
+        columns=[feature_names[i] for i in top_feature_idx],
+    )
+
+    fig, ax = plt.subplots(figsize=(max(12, top_n * 1.5), n_components * 0.9 + 2))
+    im = ax.imshow(loadings_df.values, aspect="auto", cmap="RdBu_r", vmin=-1, vmax=1)
+    plt.colorbar(im, ax=ax, label="Loading")
+    ax.set_xticks(range(len(loadings_df.columns)))
+    ax.set_xticklabels(loadings_df.columns, rotation=40, ha="right", fontsize=8)
+    ax.set_yticks(range(len(loadings_df.index)))
+    ax.set_yticklabels(loadings_df.index, fontsize=9)
+    ax.set_title(f"PCA Loadings — top {top_n} features per component")
+    fig.tight_layout()
+
+    mlflow.log_figure(fig, "pca_loadings.png")
+    plt.close(fig)
+
+    # Also log the raw numbers as a CSV for further analysis
+    loadings_df.T.to_csv("/tmp/_pca_loadings.csv")
+    mlflow.log_artifact("/tmp/_pca_loadings.csv", artifact_path="tables")
+    logger.info("Logged pca_loadings.png + pca_loadings.csv")
+
+
 # ── MAIN ENTRY POINT ──────────────────────────────────────────────────────────
 
 
@@ -90,5 +141,5 @@ def create_explainability_report(
     """
     print("\nLogging explainability artifacts...")
     log_feature_importance(pipeline, config)
-    # log_pca_loadings(pipeline, config)
+    log_pca_loadings(pipeline, config)
     # log_shap_summary(pipeline, X_train, config)

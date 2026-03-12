@@ -48,7 +48,7 @@ def train_cmd(args: Namespace, app: ApplicationService):
         return 1
 
     print("\n✓ Model run passed!")
-    print(f"  Test ROC-AUC: {result['test_metrics']['test_roc_auc']:.4f}")
+    print(f"  Test ROC-AUC: {result['test_metrics']['test/test_roc_auc']:.4f}")
 
 
 def create_parser() -> argparse.ArgumentParser:
@@ -112,7 +112,7 @@ def create_parser() -> argparse.ArgumentParser:
     train_parser.add_argument("--encoder", default="onehot", choices=ENCODER_REGISTRY)
     train_parser.add_argument("--imputer", default="median", choices=IMPUTER_REGISTRY)
     train_parser.add_argument("--n_trials", "-n", default=10, type=int)
-    train_parser.add_argument("--cv_folds", default=5)
+    train_parser.add_argument("--cv_folds", "-cv", default=5, type=min_cv_folds)
 
     train_parser.add_argument(
         "--test", "-t", default=False, action="store_true", help="Run a quick test"
@@ -120,6 +120,13 @@ def create_parser() -> argparse.ArgumentParser:
     train_parser.set_defaults(func=train_cmd)
 
     return parser
+
+
+def min_cv_folds(x):
+    x = int(x)
+    if x < 2:
+        raise argparse.ArgumentTypeError("Minimum cv folds is 2")
+    return x
 
 
 def main():

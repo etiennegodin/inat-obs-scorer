@@ -108,7 +108,7 @@ def execute(
 
         # Log best params and best CV score to the parent run
         mlflow.log_params({f"best_{k}": v for k, v in best_params.items()})
-        mlflow.log_metric(f"best_cv_{config.scoring_metric}", best_cv_score)
+        mlflow.log_metric(f"cv/best_cv_{config.scoring_metric}", best_cv_score)
 
         # ── 4. Final model training ────────────────────────────────────────────
         logger.info("Training final model on full training set...")
@@ -119,10 +119,10 @@ def execute(
         y_pred_proba = final_model.predict_proba(X_val)[:, 1]
 
         test_metrics = {
-            "test_roc_auc": roc_auc_score(y_val, y_pred_proba),
-            "test_avg_precision": average_precision_score(y_val, y_pred_proba),
-            "test_f1": f1_score(y_val, y_pred),
-            "test_accuracy": accuracy_score(y_val, y_pred),
+            "test/test_roc_auc": roc_auc_score(y_val, y_pred_proba),
+            "test/test_avg_precision": average_precision_score(y_val, y_pred_proba),
+            "test/test_f1": f1_score(y_val, y_pred),
+            "test/test_accuracy": accuracy_score(y_val, y_pred),
         }
 
         mlflow.log_metrics(test_metrics)

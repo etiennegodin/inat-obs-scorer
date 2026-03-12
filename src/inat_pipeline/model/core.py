@@ -62,10 +62,10 @@ def load_and_split(
 
     # ── Log basic data stats (will be passed to MLflow by experiment.py) ──────
     data_stats = {
-        "n_rows_total": len(df),
-        "n_features_numeric": len(config.numeric_features),
-        "n_features_cat": len(config.categorical_features),
-        "target_positive_rate": float(df[config.target_column].mean()),
+        "data/n_rows_total": len(df),
+        "data/n_features_numeric": len(config.numeric_features),
+        "data/n_features_cat": len(config.categorical_features),
+        "data/target_positive_rate": float(df[config.target_column].mean()),
     }
 
     return train, y_train, val, y_val, test, y_test, data_stats
