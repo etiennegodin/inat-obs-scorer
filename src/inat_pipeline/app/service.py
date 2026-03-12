@@ -88,7 +88,7 @@ class ApplicationService:
             cv_folds = args.cv_folds
         try:
             return train_workflow.execute(
-                self.deps.DB_PATH,
+                self.deps,
                 classifier=args.classifier,
                 reducer=args.reducer,
                 scaler=args.scaler,

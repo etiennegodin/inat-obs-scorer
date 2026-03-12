@@ -1,23 +1,13 @@
-"""
-explainability.py
-─────────────────
-Generates and logs feature importance visualizations to MLflow.
-Called at the end of experiment.py after the final model is trained.
-
-Three levels of explainability:
-  1. Native importance  — fast, built into tree models (not model-agnostic)
-  2. PCA loadings       — which input features drive each component
-  3. SHAP values        — model-agnostic, shows per-prediction contribution
-                          (pip install shap)
-"""
-
 import logging
 
 import matplotlib
 import mlflow
 import numpy as np
+import optuna
+import optuna.visualization
 import pandas as pd
 import seaborn as sns
+from optuna.importance import get_param_importances
 
 matplotlib.use("Agg")  # non-interactive backend — safe for logging, no window pops up
 import matplotlib.pyplot as plt
@@ -30,6 +20,26 @@ from .config import PipelineConfig
 logger = logging.getLogger(__name__)
 
 
+## Features correlation
+
+
+def log_feature_corr(features: pd.DataFrame):
+    features.shape[1]
+    corr = features.corr(numeric_only=True)
+    upper_tri = corr.where(np.triu(np.ones(corr.shape), k=1).astype(bool))
+
+    fig, ax = plt.subplots(figsize=(10, 10))
+    sns.heatmap(upper_tri, cmap="Blues", ax=ax)
+    ax.set_title("Training feature correlation")
+    fig.tight_layout()
+
+    # ← key call: no file written to disk, goes straight to MLflow
+    mlflow.log_figure(fig, "feature_correlation.png")
+    plt.close(fig)
+    logger.info("Logged feature_correlation.png")
+
+
+## Features importance
 def log_feature_importance(pipeline: Pipeline, config: PipelineConfig, top_n: int = 30):
     """
     Logs a bar chart of feature importances for tree-based classifiers.
@@ -79,6 +89,7 @@ def log_feature_importance(pipeline: Pipeline, config: PipelineConfig, top_n: in
     logger.info("Logged feature_importance.png")
 
 
+# PCA interpretability
 def log_pca_loadings(pipeline, config, top_n: int = 8, n_components: int = 8):
     """
     Heatmap of which input features drive each PCA component.
@@ -137,10 +148,7 @@ def log_pca_loadings(pipeline, config, top_n: int = 8, n_components: int = 8):
     logger.info("Logged pca_loadings.png + pca_loadings.csv")
 
 
-# ── MAIN ENTRY POINT ──────────────────────────────────────────────────────────
-
-
-def create_explainability_report(
+def log_feature_importance_report(
     pipeline: Pipeline, X_train: pd.DataFrame, config: PipelineConfig
 ) -> None:
     """
@@ -155,3 +163,19 @@ def create_explainability_report(
     except Exception as e:
         logger.error(f"Error creating explainability report: {e}")
         return
+
+
+def log_hyperparam_importance(study: optuna.Study) -> None:
+    importances = get_param_importances(study)
+    logger.info("\nHyperparameter importances (fANOVA):")
+    for param, score in importances.items():
+        bar = "█" * int(score * 40)
+        logger.info(f"  {param:<40} {bar} {score:.3f}")
+
+    # Log to MLflow so it's saved with the run
+    mlflow.log_dict(importances, "hyperparameter_importance.json")
+
+    # Optional: matplotlib figure version
+    fig = optuna.visualization.matplotlib.plot_param_importances(study)
+    mlflow.log_figure(fig, "hyperparameter_importance.png")
+    plt.close(fig)

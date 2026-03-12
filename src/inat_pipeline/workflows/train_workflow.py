@@ -16,7 +16,7 @@ from sklearn.metrics import (
 
 from .. import model
 from ..app.container import Dependencies
-from ..model import eda
+from ..model import explainability
 
 logger = logging.getLogger(__name__)
 
@@ -47,6 +47,7 @@ def execute(
         n_trials=n_trials,
         cv_folds=cv_folds,
     )
+
     # ── 1. Data ───────────────────────────────────────────────────────────────
 
     X_train, y_train, X_val, y_val, X_test, y_test, data_stats = model.load_and_split(
@@ -73,7 +74,7 @@ def execute(
         mlflow.log_metrics(data_stats)
 
         # Log plot of feature correlation
-        eda.log_feature_corr(X_train)
+        explainability.log_feature_corr(X_train)
 
         # Log pipeline structure as a JSON artifact
         sample_pipeline = model.build_pipeline(config)
@@ -102,6 +103,7 @@ def execute(
             n_trials=config.n_trials,
             show_progress_bar=False,
         )
+        explainability.log_hyperparam_importance(study)
 
         best_params = study.best_params
         best_cv_score = study.best_value
@@ -147,7 +149,7 @@ def execute(
 
         # ── 6. Features explainability ─────────────────────────────────────────────
         # Saves features explainability artifacts to mlflow
-        model.create_explainability_report(final_model, X_train, config)
+        explainability.log_feature_importance_report(final_model, X_train, config)
 
         # ── 7. Log the final model ─────────────────────────────────────────────
         # This saves the *entire pipeline* (preprocessor + reducer + classifier)
