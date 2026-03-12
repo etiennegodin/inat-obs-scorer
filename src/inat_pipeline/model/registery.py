@@ -23,12 +23,7 @@ ENCODER_REGISTRY = {
         "sklearn.preprocessing",
         "OneHotEncoder",
         {"handle_unknown": "ignore", "sparse_output": False},
-    ),
-    "ordinal": (
-        "sklearn.preprocessing",
-        "OrdinalEncoder",
-        {"handle_unknown": "use_encoded_value", "unknown_value": -1},
-    ),
+    )
 }
 
 SCALER_REGISTRY = {
@@ -52,19 +47,19 @@ CLASSIFIER_REGISTRY = {
     "random_forest": (
         "sklearn.ensemble",
         "RandomForestClassifier",
-        {"random_state": 42},
+        {},
     ),
     "gradient_boost": (
         "sklearn.ensemble",
         "GradientBoostingClassifier",
-        {"random_state": 42},
+        {},
     ),
     "logistic": (
         "sklearn.linear_model",
         "LogisticRegression",
-        {"max_iter": 500, "random_state": 42},
+        {"max_iter": 500},
     ),
-    "lightgbm": ("lightgbm", "LGBMClassifier", {"random_state": 42, "verbose": -1}),
+    "lightgbm": ("lightgbm", "LGBMClassifier", {"verbose": -1}),
 }
 
 
@@ -102,7 +97,7 @@ SEARCH_SPACES = {
         # The three that matter most — search these hard
         "classifier__learning_rate": {
             "type": "float",
-            "low": 0.01,
+            "low": 0.05,
             "high": 0.2,
             "log": True,
             # log=True means Optuna samples 0.01, 0.012, 0.015...
@@ -125,9 +120,9 @@ SEARCH_SPACES = {
         # Secondary — worth including but narrow the range
         "classifier__n_estimators": {
             "type": "int",
-            "low": 100,
-            "high": 500,
-            "step": 50,
+            "low": 10,
+            "high": 50,
+            "step": 10,
         },
         "classifier__reg_alpha": {
             "type": "float",

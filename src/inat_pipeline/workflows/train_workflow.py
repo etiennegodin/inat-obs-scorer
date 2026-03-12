@@ -36,6 +36,7 @@ def execute(
     imputer: str,
     n_trials: int,
     cv_folds: int,
+    random_seed: int,
 ):
     # Initialise pipeline configs
     config = model.PipelineConfig(
@@ -46,6 +47,7 @@ def execute(
         encoder=encoder,
         n_trials=n_trials,
         cv_folds=cv_folds,
+        random_seed=random_seed,
     )
 
     # ── 1. Data ───────────────────────────────────────────────────────────────

@@ -23,6 +23,9 @@ def train_final_model(
         k.replace("classifier__", ""): v for k, v in best_params.items()
     }
 
+    # Inject random state
+    classifier_params["random_state"] = config.random_seed
+
     final_pipeline = build_pipeline(config, classifier_params=classifier_params)
     final_pipeline.fit(X_train, y_train)
 

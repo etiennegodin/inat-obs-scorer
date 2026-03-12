@@ -96,6 +96,7 @@ class ApplicationService:
                 imputer=args.imputer,
                 n_trials=n_trials,
                 cv_folds=cv_folds,
+                random_seed=args.seed,
             )
         except InatPipelineError as e:
             logger.error(f"Process_features failed {e}")

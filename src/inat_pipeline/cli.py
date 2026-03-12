@@ -1,5 +1,6 @@
 import argparse
 import logging
+import random
 import sys
 from argparse import Namespace
 from pathlib import Path
@@ -105,14 +106,58 @@ def create_parser() -> argparse.ArgumentParser:
     # Train command
     train_parser = subparsers.add_parser("train", help="Train model")
     train_parser.add_argument(
-        "--classifier", default="logistic", choices=CLASSIFIER_REGISTRY
+        "--classifier",
+        default="logistic",
+        choices=CLASSIFIER_REGISTRY,
+        help="Classifier algorithm",
     )
-    train_parser.add_argument("--reducer", default="none", choices=REDUCER_REGISTRY)
-    train_parser.add_argument("--scaler", default="standard", choices=SCALER_REGISTRY)
-    train_parser.add_argument("--encoder", default="onehot", choices=ENCODER_REGISTRY)
-    train_parser.add_argument("--imputer", default="median", choices=IMPUTER_REGISTRY)
-    train_parser.add_argument("--n_trials", "-n", default=10, type=int)
-    train_parser.add_argument("--cv_folds", "-cv", default=5, type=min_cv_folds)
+    train_parser.add_argument(
+        "--reducer",
+        default="none",
+        choices=REDUCER_REGISTRY,
+        help="Dimensionality reducer choice",
+    )
+    train_parser.add_argument(
+        "--scaler",
+        default="standard",
+        choices=SCALER_REGISTRY,
+        help="Numerical scaler choice",
+    )
+    train_parser.add_argument(
+        "--encoder",
+        default="onehot",
+        choices=ENCODER_REGISTRY,
+        help="Categorical data encoder choice",
+    )
+    train_parser.add_argument(
+        "--imputer",
+        default="median",
+        choices=IMPUTER_REGISTRY,
+        help="Missing data imputer choice",
+    )
+    train_parser.add_argument(
+        "--n_trials",
+        "-n",
+        default=10,
+        type=min_trials_folds,
+        help="Number of hyperparameters combinations to test",
+    )
+    train_parser.add_argument(
+        "--cv_folds",
+        "-cv",
+        default=5,
+        type=min_cv_folds,
+        help="Number of cross validation folds",
+    )
+    train_parser.add_argument(
+        "--seed",
+        "-r",
+        default=42,
+        type=int,
+        nargs="?",
+        const=random_seed(),
+        help="Randomize training seed",
+    )
 
     train_parser.add_argument(
         "--test", "-t", default=False, action="store_true", help="Run a quick test"
@@ -126,6 +171,7 @@ def main():
     parser = create_parser()
     args = parser.parse_args()
 
+    print(f"Seed: {args.seed}")
     # Setup logging
     log_path = Path.cwd() / "log.log"
     logger = init_logger(log_path, logging.INFO)
@@ -167,3 +213,14 @@ def min_cv_folds(x):
     if x < 2:
         raise argparse.ArgumentTypeError("Minimum cv folds is 2")
     return x
+
+
+def min_trials_folds(x):
+    x = int(x)
+    if x < 2:
+        raise argparse.ArgumentTypeError("Minimum trials is 2")
+    return x
+
+
+def random_seed() -> int:
+    return random.randint(1, 1000)

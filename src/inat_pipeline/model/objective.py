@@ -67,6 +67,8 @@ def make_objective(
 
         logger.debug("Optuna objective")
         trial_params = {}
+        trial_params["random_state"] = config.random_seed
+
         for param_name, spec in search_space.items():
             suggest_type = spec["type"]
             kwargs = {k: v for k, v in spec.items() if k != "type"}

@@ -1,3 +1,4 @@
+import logging
 from pathlib import Path
 from typing import Optional
 
@@ -17,6 +18,8 @@ from .registery import (
     SCALER_REGISTRY,
 )
 from .utils import _instantiate
+
+logger = logging.getLogger(__name__)
 
 
 def load_and_split(

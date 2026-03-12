@@ -176,6 +176,7 @@ def log_hyperparam_importance(study: optuna.Study) -> None:
     mlflow.log_dict(importances, "hyperparameter_importance.json")
 
     # Optional: matplotlib figure version
-    fig = optuna.visualization.matplotlib.plot_param_importances(study)
+    ax = optuna.visualization.matplotlib.plot_param_importances(study)
+    fig = ax.figure  # Access the figure object from the axes
     mlflow.log_figure(fig, "hyperparameter_importance.png")
     plt.close(fig)
