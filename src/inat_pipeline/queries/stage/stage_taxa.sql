@@ -123,9 +123,10 @@ WITH rank_ids AS (
         AND species_t."taxonRank" = 'species'
 
 )
+
 SELECT * FROM rank_ids;
 
-# Indexing
+-- Indexing
 CREATE INDEX IF NOT EXISTS idx_taxo_hierarchy ON staged.taxa (phylum_id, class_id, order_id, family_id, genus_id);
 CREATE INDEX IF NOT EXISTS idx_genus ON staged.taxa (genus_id);
 CREATE INDEX IF NOT EXISTS idx_family ON staged.taxa (family_id);

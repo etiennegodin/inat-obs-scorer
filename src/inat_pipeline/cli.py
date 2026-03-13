@@ -171,7 +171,6 @@ def main():
     parser = create_parser()
     args = parser.parse_args()
 
-    print(f"Seed: {args.seed}")
     # Setup logging
     log_path = Path.cwd() / "log.log"
     logger = init_logger(log_path, logging.INFO)

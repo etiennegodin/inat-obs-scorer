@@ -1,3 +1,4 @@
+-- Active: 1773234434007@@127.0.0.1@3306
 CREATE OR REPLACE TABLE features.observers AS
 
 WITH base_obs AS(
@@ -59,7 +60,8 @@ aggregates AS(
         COALESCE(observer_rg_count_12m::FLOAT
             / NULLIF(observer_obs_count_12m, 0),0)              AS observer_rg_rate_12m,
 
-
+        -- Observer last
+        created_at - LAG (created_at, 1, NULL ) OVER observer_history AS lag_since_last_obs,
 
         -- Observer reputation score (v0.2 definition)
         expected_rg_rate,

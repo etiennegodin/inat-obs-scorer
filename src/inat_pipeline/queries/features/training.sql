@@ -14,7 +14,7 @@ SELECT
     o.has_tags,
     o.tag_count,
     o.has_license,
-    --o.positional_accuracy_m,
+    o.positional_accuracy_m,
     o.obscured,
     o.geoprivacy IS NOT NULL                AS geoprivacy_set,
     o.captive,                              -- should be FALSE for all training rows
@@ -35,6 +35,7 @@ SELECT
     ob.observer_obs_count_at_t AS obv_obs_count_total,
     ob.observer_rg_rate_at_t AS obv_rg_rate_lifetime,
     ob.observer_rg_rate_12m AS obv_rg_rate_last_12m,
+    date_part('day',ob.lag_since_last_obs) AS obv_lag_days_since_last_post,
     ob.observer_reputation_raw AS obv_reputation_score,
     ob.observer_reputation_rank AS obv_reputation_rank,
     ob.rg_rate_is_reliable AS obv_rg_rate_is_reliable,
