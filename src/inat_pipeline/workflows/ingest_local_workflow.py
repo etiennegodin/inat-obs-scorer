@@ -1,7 +1,8 @@
 import logging
 
 from ..app.container import Dependencies
-from ..db import DuckDBConnection, SQLEngine
+from ..db import DuckDBConnection, DuckDbSQL
+from ..db.params import IngestCSVParams
 
 logger = logging.getLogger(__name__)
 
@@ -10,38 +11,26 @@ def execute(deps: Dependencies):
     with DuckDBConnection(deps.DB_PATH) as con:
         data_dir = deps._RAW_DATA_FOLDER
 
-        con.execute("CREATE SCHEMA IF NOT EXISTS raw")
+        # con.execute("CREATE SCHEMA IF NOT EXISTS raw")
 
-        sql = SQLEngine(con, deps.SQL_STAGE_PATH)
+        sql = DuckDbSQL(con, deps.SQL_STAGE_PATH)
 
         # Ingest observations csv files
         source = "downloads"
-        sql.execute(
-            "ingest_csv",
-            [True],
-            table_name=source,
-            columns="*",
-            source=data_dir / source,
-        )
+        downloads_params = IngestCSVParams(columns="*", source_dir=data_dir / source)
+        sql.execute("ingest_csv", params=downloads_params, table_name=f"raw.{source}")
 
         # Ingest taxa
         source = "taxa"
-        sql.execute(
-            "ingest_csv",
-            [True],
-            table_name=source,
-            columns="*",
-            source=data_dir / source,
-        )
+        downloads_params = IngestCSVParams(columns="*", source_dir=data_dir / source)
+        sql.execute("ingest_csv", params=downloads_params, table_name=f"raw.{source}")
         sql.execute("stage_taxa")
 
         # Ingest places
         source = "places"
-        sql.execute(
-            "ingest_csv",
-            [False],
-            table_name=source,
-            columns="""id, slug, admin_level, latitude,
-                longitude,swlat,swlng,nelat,nelng,place_type,bbox_area, uuid""",
-            source=data_dir / source,
+        downloads_params = IngestCSVParams(
+            columns="id, slug, admin_level, latitude,"
+            "longitude,swlat,swlng,nelat,nelng,place_type,bbox_area, uuid",
+            source_dir=data_dir / source,
         )
+        sql.execute("ingest_csv", params=downloads_params, table_name=f"raw.{source}")

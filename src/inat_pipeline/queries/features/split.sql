@@ -1,13 +1,19 @@
--- Injected by Python at runtime — do not edit this block manually
+CREATE OR REPLACE TABLE tests.splits AS
 
-CREATE OR REPLACE TABLE features.splits AS
+WITH params AS (
+    SELECT
+        DATE '?'                     AS cutoff_date,
+        ?                          AS gap_days,
+        DATE '?'                     AS train_val_boundary,
+        DATE '?'                     AS val_test_boundary,
+        ?                          AS train_frac,
+        ?                          AS val_frac,
+        train_frac + val_frac      AS train_val_frac
 
-{params_cte}
+),
 
-
-,
 base AS(
-    SELECT 
+    SELECT
         observation_id,
         created_at,
         submitted_year

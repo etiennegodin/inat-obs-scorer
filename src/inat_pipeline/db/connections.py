@@ -1,4 +1,5 @@
 import logging
+from typing import Any
 
 import duckdb
 
@@ -23,7 +24,7 @@ class DuckDBConnection:
             logger.debug("DuckDB connection closed")
         return False
 
-    def execute(self, query: str, params: tuple = ()):
+    def execute(self, query: str, params: Any):
         return self._con.execute(query, params)
 
     def executemany(self, query: str, params: list[tuple]):

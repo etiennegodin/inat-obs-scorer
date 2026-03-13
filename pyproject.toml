@@ -18,7 +18,8 @@ dependencies = [
     "optuna",
     "mlflow",
     "tqdm",
-    "shap"
+    "shap",
+    "sqlparams",
 
 ]
 

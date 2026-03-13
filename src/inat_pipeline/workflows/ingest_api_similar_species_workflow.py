@@ -2,7 +2,7 @@ import asyncio
 import logging
 
 from ..app.container import Dependencies
-from ..db import DuckDBConnection, SQLEngine
+from ..db import DuckDBConnection, DuckDbSQL
 from ..inat_client import (
     DuckDbWriter,
     EndpointConfig,
@@ -20,7 +20,7 @@ def execute(deps: Dependencies, rate: int, ignore_not_found: bool) -> None:
 
     with DuckDBConnection(deps.DB_PATH) as con:
         # Extract species list to feed in taxa api module
-        sql_api = SQLEngine(con, deps.SQL_API_PATH)
+        sql_api = DuckDbSQL(con, deps.SQL_API_PATH)
         logger.info("Listing species from observations to request taxa confusion data")
         sql_api.execute("extract_species_list")
 
@@ -52,5 +52,5 @@ def execute(deps: Dependencies, rate: int, ignore_not_found: bool) -> None:
             logger.info("All items already requested")
 
         # 3 Stage collected data in db
-        sql_stage = SQLEngine(con, deps.SQL_STAGE_PATH)
+        sql_stage = DuckDbSQL(con, deps.SQL_STAGE_PATH)
         sql_stage.execute("stage_similar_species")

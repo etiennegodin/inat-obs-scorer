@@ -17,6 +17,7 @@ class Dependencies:
     project_root: Path
     package_root: Path
     log_path: Path
+    version: str
 
     def __post_init__(self):
         self._DATA_FOLDER = self.project_root / "data"
