@@ -17,20 +17,36 @@ def execute(deps: Dependencies):
 
         # Ingest observations csv files
         source = "downloads"
-        downloads_params = IngestCSVParams(columns="*", source_dir=data_dir / source)
-        sql.execute("ingest_csv", params=downloads_params, table_name=f"raw.{source}")
+        downloads_params = IngestCSVParams(source_dir=data_dir / source)
+        sql.execute(
+            "ingest_csv",
+            params=downloads_params,
+            table_name=f"raw.{source}",
+            columns="*",
+        )
 
         # Ingest taxa
         source = "taxa"
-        downloads_params = IngestCSVParams(columns="*", source_dir=data_dir / source)
-        sql.execute("ingest_csv", params=downloads_params, table_name=f"raw.{source}")
+        downloads_params = IngestCSVParams(source_dir=data_dir / source)
+        sql.execute(
+            "ingest_csv",
+            params=downloads_params,
+            table_name=f"raw.{source}",
+            columns="*",
+        )
+
+        # Assert needed columns
         sql.execute("stage_taxa")
 
         # Ingest places
         source = "places"
         downloads_params = IngestCSVParams(
-            columns="id, slug, admin_level, latitude,"
-            "longitude,swlat,swlng,nelat,nelng,place_type,bbox_area, uuid",
             source_dir=data_dir / source,
         )
-        sql.execute("ingest_csv", params=downloads_params, table_name=f"raw.{source}")
+        sql.execute(
+            "ingest_csv",
+            params=downloads_params,
+            table_name=f"raw.{source}",
+            columns="id, slug, admin_level, latitude,"
+            "longitude,swlat,swlng,nelat,nelng,place_type,bbox_area, uuid",
+        )

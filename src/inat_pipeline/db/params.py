@@ -1,6 +1,5 @@
 from dataclasses import dataclass
 from datetime import date
-from typing import Union
 
 
 @dataclass
@@ -12,15 +11,10 @@ class SqlParams:
 
 @dataclass
 class IngestCSVParams:
-    columns: Union[str, list]
     source_dir: str
     ignore: bool = True
 
     def __post_init__(self):
-        # convert optionnal list to string
-        if isinstance(self.columns, list):
-            self.columns = ",".join(self.columns)
-
         # Format csv files path in source dir
         self.source_dir = f"{self.source_dir}/*.csv"
 

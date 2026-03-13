@@ -10,7 +10,7 @@ import sqlparams
 
 from .protocols import DBConnection
 
-ALLOWED_TABLES = ["raw.downloads", "raw.taxa", "raw.places"]
+# ALLOWED_TABLES = ["raw.downloads", "raw.taxa", "raw.places"]
 
 logger = logging.getLogger(__name__)
 
@@ -34,11 +34,13 @@ class SQLEngine(ABC):
 
     def _identifiers(self, query: str, **identifiers) -> str:
         # Insert identifiers
+        """
         if any(value not in ALLOWED_TABLES for value in identifiers.values()):
             logger.debug(
                 [value for value in identifiers.values() if value not in ALLOWED_TABLES]
             )
             raise ValueError("Invalid table access!")
+        """
         return query.format(**identifiers) if identifiers else query
 
     def _load(self, script_name: str, params: Any, **identifiers) -> tuple[str, Any]:
@@ -55,6 +57,8 @@ class SQLEngine(ABC):
         query, values = self._parametrise_query(query, params)
         # Inject identitifers
         identified = self._identifiers(query, **identifiers)
+        logger.debug(identified)
+        logger.debug(str(values))
         return identified, values
 
     def execute(self, script_name: str, params: Any = None, **identifiers) -> None:
