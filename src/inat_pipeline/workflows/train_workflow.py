@@ -51,6 +51,7 @@ def execute(
         cv_folds=cv_folds,
         random_seed=random_seed,
         use_gpu=use_gpu,
+        version=deps.version,
     )
 
     # ── 1. Data ───────────────────────────────────────────────────────────────

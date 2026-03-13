@@ -14,7 +14,7 @@ from .model.registery import (
     REDUCER_REGISTRY,
     SCALER_REGISTRY,
 )
-from .utils.logger import init_logger
+from .utils import get_git_hash, init_logger
 
 
 def ingest_local_cmd(args: Namespace, app: ApplicationService):
@@ -188,6 +188,7 @@ def main():
             project_root=Path(__file__).parents[2],
             package_root=Path(__file__).parents[0],
             log_path=log_path,
+            version=get_git_hash(short=True),
         )
     except Exception as e:
         print(f"[red]Configuration error: {e}[/red]")

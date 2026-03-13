@@ -9,7 +9,6 @@ from ..inat_client import (
     RateLimiterFetcher,
     make_client,
 )
-from ..utils.git import get_git_hash
 
 logger = logging.getLogger(__name__)
 
@@ -46,9 +45,7 @@ def execute(deps: Dependencies, rate: int, ignore_not_found: bool) -> None:
             )
             fetcher = RateLimiterFetcher(rate=rate, ignore_not_found=ignore_not_found)
 
-            with DuckDbWriter(
-                con, TARGET_TABLE_NAME, get_git_hash(short=True)
-            ) as writer:
+            with DuckDbWriter(con, TARGET_TABLE_NAME, version=deps.version) as writer:
                 client = make_client(config, fetcher, writer)
                 asyncio.run(client.execute(items))
         else:

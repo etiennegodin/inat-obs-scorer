@@ -14,6 +14,7 @@ class PipelineConfig:
     # data_path:          str = "data/observations.csv"
     target_column: str = "label"  # what we're predicting
     random_seed: int = 42  # controls ALL randomness
+    version: str = "na"
 
     # ── Column groups ─────────────────────────────────────────────────────────
     # List columns explicitly so the pipeline is transparent about what it uses.

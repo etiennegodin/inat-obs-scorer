@@ -8,7 +8,6 @@ from typing import Any, Iterator
 import aiohttp
 from tqdm.asyncio import tqdm_asyncio
 
-from ..utils.git import get_git_hash
 from .config import EndpointConfig
 from .protocols import Fetcher, Writer
 
@@ -35,9 +34,6 @@ class BaseInatClient(ABC):
         self.writer = writer
         # Init writer
         self.queue = Queue()
-
-        # Get git has for version
-        self.version = get_git_hash(short=True)
 
     @abstractmethod
     def _iter_requests(self, ids: list) -> Iterator[tuple[Any, dict]]:

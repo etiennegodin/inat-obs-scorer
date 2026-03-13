@@ -7,7 +7,6 @@ from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 
 from ..db.connections import DuckDBConnection
-from ..utils.git import get_git_hash
 from .config import PipelineConfig
 from .registery import (
     CATEGORICAL_IMPUTER_REGISTRY,
@@ -56,10 +55,6 @@ def load_and_split(
 
     y_test = test["label"]
     test.pop("label")
-
-    git_hash = get_git_hash(short=True)
-
-    config.set_git_hash(git_hash)
 
     # Store features from dataframe
     config.set_features(test)
