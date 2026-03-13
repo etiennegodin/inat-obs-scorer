@@ -19,6 +19,7 @@ def execute(deps: Dependencies):
             "label",
             "observations",
             "observers",
+            "observers_entropy",
             "taxa_assymetry",
             "taxa_distance",
             "taxa_confusion",

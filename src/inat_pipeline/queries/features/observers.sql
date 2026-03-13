@@ -1,4 +1,3 @@
--- Active: 1773234434007@@127.0.0.1@3306
 CREATE OR REPLACE TABLE features.observers AS
 
 WITH base_obs AS(
@@ -73,6 +72,7 @@ aggregates AS(
         COUNT(DISTINCT(family)) FILTER (WHERE family IS NOT NULL) OVER observer_history AS taxon_diversity_family,
         COUNT(DISTINCT(genus)) FILTER (WHERE genus IS NOT NULL) OVER observer_history AS taxon_diversity_genus,
         COALESCE(COUNT(DISTINCT(species)) FILTER (WHERE species IS NOT NULL) OVER observer_history,0) AS taxon_diversity_species,
+
 
         -- Documentation quality
         COALESCE(

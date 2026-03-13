@@ -42,6 +42,7 @@ SELECT
     ob.taxon_diversity_family AS obv_taxon_diversity_family,
     ob.taxon_diversity_genus AS obv_taxon_diversity_genus,
     ob.taxon_diversity_species AS obv_taxon_diversity_species,
+    oe.observer_species_entropy_norm AS obv_taxon_entropy,
     ob.avg_photo_count AS obv_avg_photo_count,
     ob.pct_obs_with_description AS obv_pct_obs_with_description,
     ob.pct_obs_with_license AS obv_pct_obs_with_license,
@@ -69,6 +70,8 @@ SELECT
 FROM features.observations o
 JOIN features.splits                     s  ON o.observation_id = s.observation_id
 LEFT JOIN features.observers             ob ON o.observation_id = ob.observation_id
+LEFT JOIN features.observers_entropy     oe ON o.observation_id = oe.observation_id
+
 LEFT JOIN features.identifications       i  ON o.observation_id = i.observation_id
 --LEFT JOIN features.identifiers id ON o.observation_id = id.observation_id
 LEFT JOIN features.taxon                 t  ON o.observation_id = t.observation_id
