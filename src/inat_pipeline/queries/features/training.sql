@@ -56,14 +56,9 @@ SELECT
         ob.has_orcid AS obv_has_orcid,
 
         -- Identifications history
-        i.ids_received_total,
-        i.ids_received_agreeing,
-        i.ids_received_improving,
-        i.ids_received_maverick,
-        i.ids_received_vision,
 
         -- Identifiers
-        ir.identifiers_total,
+        --ir.identifiers_total,
         ir.identifiers_agreeing,
         ir.identifiers_improving,
         ir.identifiers_maverick,
@@ -89,8 +84,8 @@ JOIN features.splits                     s  ON o.observation_id = s.observation_
 LEFT JOIN features.observers             ob ON o.observation_id = ob.observation_id
 LEFT JOIN features.observers_entropy     oe ON o.observation_id = oe.observation_id
 
-LEFT JOIN features.identifications       i  ON o.observation_id = i.observation_id
-LEFT JOIN features.identifiers ir ON o.observation_id = ir.observation_id
+--LEFT JOIN features.identifications       i  ON o.observation_id = i.observation_id
+LEFT JOIN features.identifiers           ir ON o.observation_id = ir.observation_id
 LEFT JOIN features.taxon                 t  ON o.observation_id = t.observation_id
 LEFT JOIN features.taxa_confusion        c  ON o.taxon_id = c.taxon_id
 WHERE o.label IS NOT NULL
