@@ -28,24 +28,37 @@ SELECT
     o.submitted_year,
 
     -- Observer features (from observer_features, computed at observation time)
-    date_part('day',ob.observer_tenure) AS obv_tenure_days,
-    ob.is_veteran AS obv_is_veteran,
-    ob.observer_obs_count_at_t AS obv_obs_count_total,
-    ob.observer_rg_rate_at_t AS obv_rg_rate_lifetime,
-    date_part('day',ob.lag_since_last_obs) AS obv_lag_days_since_last_post,
-    ob.observer_reputation_raw AS obv_reputation_score,
-    ob.observer_reputation_rank AS obv_reputation_rank,
-    ob.rg_rate_is_reliable AS obv_rg_rate_is_reliable,
-    ob.taxon_diversity_species AS obv_taxon_diversity_species,
-    oe.observer_species_entropy_norm AS obv_taxon_entropy,
-    ob.avg_photo_count AS obv_avg_photo_count,
-    ob.pct_obs_with_description AS obv_pct_obs_with_description,
-    ob.pct_obs_with_license AS obv_pct_obs_with_license,
-    ob.pct_obs_from_mobile AS obv_pct_obs_from_mobile,
-    ob.has_orcid AS obv_has_orcid,
+        -- Temporal
+        date_part('day',ob.observer_tenure) AS obv_tenure_days,
+        ob.is_veteran AS obv_is_veteran,
+        date_part('day',ob.lag_since_last_obs) AS obv_lag_days_since_last_post,
 
-    -- v2 identifiers scores
-    --id.ids_given_count,
+        -- Observations
+        ob.observer_obs_count_at_t AS obv_obs_count_total,
+        ob.observer_rg_rate_at_t AS obv_rg_rate_lifetime,
+        ob.observer_reputation_raw AS obv_reputation_score,
+        ob.observer_reputation_rank AS obv_reputation_rank,
+        ob.rg_rate_is_reliable AS obv_rg_rate_is_reliable,
+
+        -- Identifiers
+
+        ob.n_identifiers_mean AS obv_n_identifiers_mean,
+        ob.n_identifiers_mean_rank AS obv_n_identifiers_mean_rank,
+        ob.n_identifiers_agree_mean AS obv_n_identifiers_agree_mean,
+        ob.n_identifiers_agree_mean_rank AS obv_n_identifiers_agree_mean_rank,
+
+
+        -- Taxonomic
+        ob.taxon_diversity_species AS obv_taxon_diversity_species,
+        oe.observer_species_entropy_norm AS obv_taxon_entropy,
+
+        -- Metadata
+        ob.avg_photo_count AS obv_avg_photo_count,
+        ob.pct_obs_with_description AS obv_pct_obs_with_description,
+        ob.pct_obs_with_license AS obv_pct_obs_with_license,
+        ob.pct_obs_from_mobile AS obv_pct_obs_from_mobile,
+        ob.has_orcid AS obv_has_orcid,
+
 
     -- Taxon features (fixed lookup)
     t.taxon_rg_rate,

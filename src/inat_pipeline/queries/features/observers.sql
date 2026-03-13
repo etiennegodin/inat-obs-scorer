@@ -18,6 +18,7 @@ WITH base_obs AS(
         u.orcid,
         t.taxon_rg_rate           AS expected_rg_rate,
         rg.n_identifiers_at_window,
+        rg.n_identifiers_agree_at_window,
 
         -- Honest RG label from macro (no leakage)
         COALESCE(rg.is_rg, FALSE)           AS is_rg
@@ -71,6 +72,7 @@ aggregates AS(
         -- logic, if lots of ids observers observation is either
         -- popular, easy,might be reviewed faster than avg
         AVG(n_identifiers_at_window) OVER observer_history AS n_identifiers_mean,
+        AVG(n_identifiers_agree_at_window) OVER observer_history AS n_identifiers_agree_mean,
 
         -- Documentation quality
         COALESCE(
@@ -110,9 +112,14 @@ ranked AS (
         PERCENT_RANK() OVER (
             PARTITION BY DATE_TRUNC('month', created_at)
             ORDER BY n_identifiers_mean
-            ) AS n_identifiers_mean_rank
+            ) AS n_identifiers_mean_rank,
 
-    FROM aggregates
+        PERCENT_RANK() OVER (
+            PARTITION BY DATE_TRUNC('month', created_at)
+                ORDER BY n_identifiers_agree_mean
+                ) AS n_identifiers_agree_mean_rank,
+
+        FROM aggregates
 )
 
 SELECT * FROM ranked;

@@ -12,17 +12,23 @@ SELECT
         WHERE i.own_observation IS FALSE
         AND i.created_at <= o.created_at + eval_interval
         ) AS n_identifiers_at_window,
+    COUNT(DISTINCT(i.user_id)) FILTER (
+        WHERE i.created_at BETWEEN o.created_at AND o.created_at + eval_interval
+        AND i.own_observation IS FALSE
+        AND i.category = 'supporting'
+    ) AS n_identifiers_agree_at_window,
+
     -- n ids
     COUNT(i.id) FILTER (
         WHERE i.created_at BETWEEN o.created_at AND o.created_at + eval_interval
         AND i.own_observation IS FALSE
     ) AS n_ids_at_window,
 
-
     COUNT(i.id) FILTER (
         WHERE i.created_at BETWEEN o.created_at AND o.created_at + eval_interval
         AND i.own_observation IS FALSE
-    ) AS n_ids_at_window,
+        AND i.category = 'supporting'
+    ) AS n_ids_agree_at_window,
 
     -- research grade label
     CASE
