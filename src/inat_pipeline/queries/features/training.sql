@@ -40,13 +40,9 @@ SELECT
         ob.observer_reputation_rank AS obv_reputation_rank,
         ob.rg_rate_is_reliable AS obv_rg_rate_is_reliable,
 
-        -- Identifiers
-
-        ob.n_identifiers_mean AS obv_n_identifiers_mean,
+        -- Identifiers interactions
         ob.n_identifiers_mean_rank AS obv_n_identifiers_mean_rank,
-        ob.n_identifiers_agree_mean AS obv_n_identifiers_agree_mean,
         ob.n_identifiers_agree_mean_rank AS obv_n_identifiers_agree_mean_rank,
-
 
         -- Taxonomic
         ob.taxon_diversity_species AS obv_taxon_diversity_species,
@@ -59,6 +55,19 @@ SELECT
         ob.pct_obs_from_mobile AS obv_pct_obs_from_mobile,
         ob.has_orcid AS obv_has_orcid,
 
+        -- Identifications history
+        i.ids_received_total,
+        i.ids_received_agreeing,
+        i.ids_received_improving,
+        i.ids_received_maverick,
+        i.ids_received_vision,
+
+        -- Identifiers
+        ir.identifiers_total,
+        ir.identifiers_agreeing,
+        ir.identifiers_improving,
+        ir.identifiers_maverick,
+        ir.identifiers_vision,
 
     -- Taxon features (fixed lookup)
     t.taxon_rg_rate,
@@ -81,7 +90,7 @@ LEFT JOIN features.observers             ob ON o.observation_id = ob.observation
 LEFT JOIN features.observers_entropy     oe ON o.observation_id = oe.observation_id
 
 LEFT JOIN features.identifications       i  ON o.observation_id = i.observation_id
---LEFT JOIN features.identifiers id ON o.observation_id = id.observation_id
+LEFT JOIN features.identifiers ir ON o.observation_id = ir.observation_id
 LEFT JOIN features.taxon                 t  ON o.observation_id = t.observation_id
 LEFT JOIN features.taxa_confusion        c  ON o.taxon_id = c.taxon_id
 WHERE o.label IS NOT NULL

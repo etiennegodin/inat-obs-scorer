@@ -1,45 +1,47 @@
+CREATE OR REPLACE TABLE staged.identifiers_summary AS
+    SELECT
+        observation_id,
+        COUNT(DISTINCT(user_id))                        AS total_identifiers,
+        COUNT(DISTINCT(user_id)) FILTER (WHERE category = 'supporting') AS agreeing_identifiers,
+        COUNT(DISTINCT(user_id)) FILTER (WHERE category = 'improving')  AS improving_identifiers,
+        COUNT(DISTINCT(user_id)) FILTER (WHERE category = 'maverick')   AS maverick_identifiers,
+        COUNT(DISTINCT(user_id)) FILTER (WHERE vision IS TRUE)          AS vision_identifiers,
+    FROM staged.identifications
+    WHERE own_observation IS FALSE
+    GROUP BY observation_id;
+
+
 CREATE OR REPLACE TABLE features.identifiers AS
 
-SELECT 
--- Keys
-i.observation_id,
-i.user_id,
-u.identifier_only,
+WITH base_obs AS(
+    SELECT
+        o.id                      AS observation_id,
+        o.user_id,
+        o.created_at,
+        s.total_identifiers,
+        s.agreeing_identifiers,
+        s.improving_identifiers,
+        s.maverick_identifiers,
+        s.vision_identifiers,
 
--- Volume 
-COUNT(*) OVER identifier_history AS total_id_count,
-COUNT(*) FILTER (WHERE i.own_observation IS FALSE) OVER identifier_history AS ids_given_count,
-CASE WHEN ids_given_count > 0 THEN TRUE ELSE FALSE END AS gave_id,
+    FROM staged.observations o
+    LEFT JOIN staged.identifiers_summary s ON s.observation_id = o.id
 
--- Community 
-COUNT(DISTINCT(i.id)) FILTER (
-    WHERE i.category = 'supporting'
-    ) OVER identifier_history AS ids_given_agreeing,
-ids_given_agreeing / ids_given_count AS ids_given_agreeing_pct,
+)
 
--- Ai vision
-COUNT(DISTINCT(i.id)) FILTER (
-    WHERE i.vision = TRUE
-    ) OVER identifier_history AS ids_given_vision,
-ids_given_vision / ids_given_count AS ids_given_vision_pct,
+SELECT
+    o.observation_id,
+    o.user_id,
 
--- Taxonomic behaviour
-COUNT(DISTINCT(i.order)) FILTER (WHERE i.order IS NOT NULL) OVER taxon_history AS taxon_diversity_order,
-COUNT(DISTINCT(i.family)) FILTER (WHERE i.family IS NOT NULL) OVER taxon_history AS taxon_diversity_family,
-COUNT(DISTINCT(i.genus)) FILTER (WHERE i.genus IS NOT NULL) OVER taxon_history AS taxon_diversity_genus,
-COUNT(DISTINCT(i.species)) FILTER (WHERE i.species IS NOT NULL) OVER taxon_history AS taxon_diversity_species,
+    -- Sum up pre-aggregated counts from all prior observations
+    SUM(prev.total_identifiers)     AS identifiers_total,
+    SUM(prev.agreeing_identifiers)  AS identifiers_agreeing,
+    SUM(prev.improving_identifiers) AS identifiers_improving,
+    SUM(prev.maverick_identifiers)  AS identifiers_maverick,
+    SUM(prev.vision_identifiers)    AS identifiers_vision
 
-FROM staged.identifications i
-JOIN staged.users u ON u.user_id = i.user_id
-
-WINDOW
-    identifier_history AS (
-        PARTITION BY i.user_id
-        ORDER BY i.created_at
-        ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING
-    ),
-    taxon_history AS (
-    PARTITION BY i.taxon_id
-    ORDER BY i.created_at
-    ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING
-    )
+FROM base_obs o
+JOIN base_obs prev
+    ON  prev.user_id    = o.user_id
+    AND prev.created_at < o.created_at  -- prior observations only
+GROUP BY o.observation_id, o.user_id;

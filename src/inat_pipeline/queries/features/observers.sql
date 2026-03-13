@@ -19,7 +19,6 @@ WITH base_obs AS(
         t.taxon_rg_rate           AS expected_rg_rate,
         rg.n_identifiers_at_window,
         rg.n_identifiers_agree_at_window,
-
         -- Honest RG label from macro (no leakage)
         COALESCE(rg.is_rg, FALSE)           AS is_rg
 
@@ -29,6 +28,7 @@ WITH base_obs AS(
     JOIN features.taxon t
         ON t.observation_id = o.id
     -- Unbounded window = all identifications ever, for current-state scoring
+    JOIN staged.identifications i on o.observation_id = i.observation_id
     LEFT JOIN research_grade_windowed(INTERVAL '999 years') rg
         ON rg.observation_id = o.id
 ),

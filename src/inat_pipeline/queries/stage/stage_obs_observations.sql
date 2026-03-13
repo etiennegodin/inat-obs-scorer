@@ -110,4 +110,6 @@ WITH max_date AS(
 SELECT *
 FROM staged.observations
 CROSS JOIN max_date
-WHERE created_at <= max_date;
+WHERE created_at <= max_date
+ORDER BY user_id, created_at;
+;

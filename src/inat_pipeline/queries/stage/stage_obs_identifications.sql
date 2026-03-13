@@ -44,3 +44,7 @@ USING COALESCE(
     try_strptime(created_at, '%Y-%m-%d %H:%M:%S %Z'), -- Handles UTC
     try_cast(created_at AS TIMESTAMPTZ)               -- Fallback to default
 );
+
+CREATE OR REPLACE TABLE staged.identifications AS
+SELECT * FROM staged.identifications
+ORDER BY observation_id, created_at;
