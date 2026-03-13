@@ -17,6 +17,7 @@ WITH base_obs AS(
         u.created_at              AS user_created_at,
         u.orcid,
         t.taxon_rg_rate           AS expected_rg_rate,
+        rg.n_identifiers_at_window,
 
         -- Honest RG label from macro (no leakage)
         COALESCE(rg.is_rg, FALSE)           AS is_rg
@@ -66,6 +67,13 @@ aggregates AS(
         COUNT(DISTINCT(genus)) FILTER (WHERE genus IS NOT NULL) OVER observer_history AS taxon_diversity_genus,
         COALESCE(COUNT(DISTINCT(species)) FILTER (WHERE species IS NOT NULL) OVER observer_history,0) AS taxon_diversity_species,
 
+        -- Community interaction ?
+        -- logic, if lots of ides, observers is "popular" and it's observation might be reviewed faster than avg
+        -- rank
+        n_identifiers_at_window, -- raw value for this obs,
+        AVG(n_identifiers_at_window) OVER observer_history AS n_identifiers_mean,
+
+
         -- Documentation quality
         COALESCE(
             AVG(LENGTH(observation_photos)) OVER observer_history,0) AS avg_photo_count,
@@ -98,7 +106,19 @@ ranked AS (
         PERCENT_RANK() OVER (
             PARTITION BY DATE_TRUNC('month', created_at)
             ORDER BY observer_reputation_raw
-            ) AS observer_reputation_rank
+            ) AS observer_reputation_rank,
+
+        -- how much does this obs have more ids than others around same time
+        PERCENT_RANK() OVER (
+            PARTITION BY DATE_TRUNC('month', created_at)
+            ORDER BY n_identifiers_at_window
+            ) AS n_identifiers_rank,
+
+        PERCENT_RANK() OVER (
+            PARTITION BY DATE_TRUNC('month', created_at)
+            ORDER BY n_identifiers_mean
+            ) AS n_identifiers_mean_rank
+
     FROM aggregates
 )
 

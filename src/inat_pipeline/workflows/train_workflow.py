@@ -121,6 +121,7 @@ def execute(
 
         # Log best params and best CV score to the parent run
         mlflow.log_params({f"best_{k}": v for k, v in best_params.items()})
+        mlflow.log_dict(best_params, "best_params.json")
         mlflow.log_metric(f"cv/best_cv_{config.scoring_metric}", best_cv_score)
 
         # ── 4. Final model training ────────────────────────────────────────────

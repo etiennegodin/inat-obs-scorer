@@ -110,22 +110,22 @@ SEARCH_SPACES = {
         "classifier__num_leaves": {
             "type": "int",
             "low": 20,
-            "high": 200,
+            "high": 300,
             # rule of thumb: never exceed 2^(max_depth)
             # for depth=7 that's 128 — 200 is already generous
         },
         "classifier__min_child_samples": {
             "type": "int",
             "low": 5,
-            "high": 200,
+            "high": 300,
             # on imbalanced data (like iNat RG), push this higher
             # it prevents the model from memorizing rare patterns
         },
         # Secondary — worth including but narrow the range
         "classifier__n_estimators": {
             "type": "int",
-            "low": 100,
-            "high": 500,
+            "low": 400,
+            "high": 600,
             "step": 50,
             # prefer early stopping over a wide range here (see below)
         },
