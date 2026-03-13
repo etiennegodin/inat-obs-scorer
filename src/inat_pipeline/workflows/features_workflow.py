@@ -3,7 +3,7 @@ from dataclasses import asdict
 
 from ..app.container import Dependencies
 from ..db import DuckDBConnection, DuckDbSQL
-from ..db.params import TrainingSplitParams
+from ..queries.params import TrainingSplitParams
 
 logger = logging.getLogger(__name__)
 

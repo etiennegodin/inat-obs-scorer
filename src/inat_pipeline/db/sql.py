@@ -29,8 +29,9 @@ class SQLEngine(ABC):
         # Convert params to dict if passed as dataclass
         if is_dataclass(params):
             return asdict(params)
-        else:
-            return {}
+        elif params is None:
+            params = {}
+        return params
 
     def _identifiers(self, query: str, **identifiers) -> str:
         # Insert identifiers
@@ -73,7 +74,7 @@ class SQLEngine(ABC):
         )
 
     def fetch(
-        self, script_name: str, params: Any, **identifiers
+        self, script_name: str, params: Any = None, **identifiers
     ) -> list[dict[Any, Any]]:
         """Run a SELECT — returns rows as dicts."""
         query, params = self._load(script_name, params, **identifiers)
@@ -81,7 +82,9 @@ class SQLEngine(ABC):
         columns = [col[0] for col in result.description]
         return [dict(zip(columns, row)) for row in result.fetchall()]
 
-    def fetch_df(self, script_name: str, params: Any, **identifiers) -> pd.DataFrame:
+    def fetch_df(
+        self, script_name: str, params: Any = None, **identifiers
+    ) -> pd.DataFrame:
         """Fetch rows and convert to DataFrame — works with any PEP 249 driver."""
         query, params = self._load(script_name, params, **identifiers)
         result = self.con.execute(query, params)

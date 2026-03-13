@@ -25,7 +25,7 @@ def execute(deps: Dependencies, rate: int, ignore_not_found: bool) -> None:
         sql_api.execute("extract_species_list")
 
         # 1 Create table to receive api data
-        sql_api.execute("create_api_raw_table", params=(), table_name=TARGET_TABLE_NAME)
+        sql_api.execute("create_api_raw_table", table_name=TARGET_TABLE_NAME)
 
         # 2 Get missing items not collected
         df = sql_api.fetch_df(

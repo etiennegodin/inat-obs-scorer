@@ -24,7 +24,7 @@ def execute(deps: Dependencies, rate: int, ignore_not_found: bool) -> None:
         # 1 Create table to receive api data
 
         sql_api = DuckDbSQL(con, deps.SQL_API_PATH)
-        sql_api.execute("create_api_raw_table", params=(), table_name=TARGET_TABLE_NAME)
+        sql_api.execute("create_api_raw_table", table_name=TARGET_TABLE_NAME)
 
         df = sql_api.fetch_df(
             "fetch_missing_items",

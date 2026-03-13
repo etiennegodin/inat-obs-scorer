@@ -2,12 +2,12 @@ CREATE OR REPLACE TABLE tests.splits AS
 
 WITH params AS (
     SELECT
-        DATE '?'                     AS cutoff_date,
-        ?                          AS gap_days,
-        DATE '?'                     AS train_val_boundary,
-        DATE '?'                     AS val_test_boundary,
-        ?                          AS train_frac,
-        ?                          AS val_frac,
+        CAST(:cutoff_date AS DATE)                     AS cutoff_date,
+        :gap_days                        AS gap_days,
+        CAST(:train_val_boundary AS DATE)             AS train_val_boundary,
+        CAST(:val_test_boundary AS DATE)                     AS val_test_boundary,
+        :train_frac                        AS train_frac,
+        :val_frac                         AS val_frac,
         train_frac + val_frac      AS train_val_frac
 
 ),

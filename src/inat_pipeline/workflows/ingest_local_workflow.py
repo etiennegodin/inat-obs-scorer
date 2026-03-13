@@ -2,7 +2,7 @@ import logging
 
 from ..app.container import Dependencies
 from ..db import DuckDBConnection, DuckDbSQL
-from ..db.params import IngestCSVParams
+from ..queries.params import IngestCSVParams
 
 logger = logging.getLogger(__name__)
 
