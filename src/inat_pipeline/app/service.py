@@ -97,6 +97,7 @@ class ApplicationService:
                 n_trials=n_trials,
                 cv_folds=cv_folds,
                 random_seed=args.seed,
+                use_gpu=args.gpu,
             )
         except InatPipelineError as e:
             logger.error(f"Process_features failed {e}")

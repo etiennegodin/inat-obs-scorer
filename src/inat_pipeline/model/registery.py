@@ -117,7 +117,7 @@ SEARCH_SPACES = {
         "classifier__min_child_samples": {
             "type": "int",
             "low": 5,
-            "high": 100,
+            "high": 200,
             # on imbalanced data (like iNat RG), push this higher
             # it prevents the model from memorizing rare patterns
         },

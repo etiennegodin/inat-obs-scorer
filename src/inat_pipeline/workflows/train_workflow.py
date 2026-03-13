@@ -38,6 +38,7 @@ def execute(
     n_trials: int,
     cv_folds: int,
     random_seed: int,
+    use_gpu: bool,
 ):
     # Initialise pipeline configs
     config = model.PipelineConfig(
@@ -49,6 +50,7 @@ def execute(
         n_trials=n_trials,
         cv_folds=cv_folds,
         random_seed=random_seed,
+        use_gpu=use_gpu,
     )
 
     # ── 1. Data ───────────────────────────────────────────────────────────────

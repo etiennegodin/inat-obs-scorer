@@ -35,6 +35,11 @@ class PipelineConfig:
 
     # Flags
     ct_verbose_feature_names_out: bool = False
+    use_gpu: bool = False  # for lightgbm
+
+    def __post_init__(self):
+        if self.use_gpu and self.classifier != "lightgbm":
+            raise TypeError("use_gpu is only supported with lightgbm classifier")
 
     def set_features(self, df: pd.DataFrame) -> None:
         try:

@@ -42,6 +42,9 @@ def features_cmd(args: Namespace, app: ApplicationService):
 
 
 def train_cmd(args: Namespace, app: ApplicationService):
+    if args.gpu:
+        raise NotImplementedError("Not implemented")
+
     try:
         result = app.train(args)
     except InatPipelineError as e:
@@ -161,6 +164,9 @@ def create_parser() -> argparse.ArgumentParser:
 
     train_parser.add_argument(
         "--test", "-t", default=False, action="store_true", help="Run a quick test"
+    )
+    train_parser.add_argument(
+        "--gpu", default=False, action="store_true", help="Use gpu with lightgbm"
     )
     train_parser.set_defaults(func=train_cmd)
 
