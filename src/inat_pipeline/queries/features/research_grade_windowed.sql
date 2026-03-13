@@ -18,11 +18,6 @@ SELECT
         AND i.own_observation IS FALSE
     ) AS n_ids_at_window,
 
-    -- n ids agree
-
-
-
-
 
     COUNT(i.id) FILTER (
         WHERE i.created_at BETWEEN o.created_at AND o.created_at + eval_interval

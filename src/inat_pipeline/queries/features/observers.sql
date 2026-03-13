@@ -68,11 +68,9 @@ aggregates AS(
         COALESCE(COUNT(DISTINCT(species)) FILTER (WHERE species IS NOT NULL) OVER observer_history,0) AS taxon_diversity_species,
 
         -- Community interaction ?
-        -- logic, if lots of ides, observers is "popular" and it's observation might be reviewed faster than avg
-        -- rank
-        n_identifiers_at_window, -- raw value for this obs,
+        -- logic, if lots of ids observers observation is either
+        -- popular, easy,might be reviewed faster than avg
         AVG(n_identifiers_at_window) OVER observer_history AS n_identifiers_mean,
-
 
         -- Documentation quality
         COALESCE(
@@ -109,11 +107,6 @@ ranked AS (
             ) AS observer_reputation_rank,
 
         -- how much does this obs have more ids than others around same time
-        PERCENT_RANK() OVER (
-            PARTITION BY DATE_TRUNC('month', created_at)
-            ORDER BY n_identifiers_at_window
-            ) AS n_identifiers_rank,
-
         PERCENT_RANK() OVER (
             PARTITION BY DATE_TRUNC('month', created_at)
             ORDER BY n_identifiers_mean

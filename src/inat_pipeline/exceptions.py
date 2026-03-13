@@ -27,16 +27,53 @@ class InatPipelineError(Exception):
         return self.message
 
 
-# Infrastructure Layer Exceptions
-
-
+# Worflows
 class WorkflowError(InatPipelineError):
     """Errors related to workflow execution."""
 
     pass
 
 
-class SqlError(WorkflowError):
+## Ingest workflow
+class IngestWorkflowError(WorkflowError):
+    """Errors related to data ingestion workflow."""
+
+    pass
+
+
+class SourceReadError(IngestWorkflowError):
+    """Errors related to reading source data in ingestion."""
+
+    pass
+
+
+class ApiEnrichmentError(IngestWorkflowError):
+    """Errors related to api enrichment data in ingestion."""
+
+    pass
+
+
+## Model training
+class TrainModelError(WorkflowError):
+    """Errors related to model training workflow."""
+
+    pass
+
+
+class IncompatiblePipelineModules(TrainModelError):
+    """Errors related to incompatible pipeline settings."""
+
+    pass
+
+
+# Persistence layer
+class PersistenceError(InatPipelineError):
+    """Errors related to persistence layer ."""
+
+    pass
+
+
+class SqlError(PersistenceError):
     """Errors related to sql execution."""
 
     pass

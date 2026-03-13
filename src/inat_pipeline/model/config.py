@@ -3,6 +3,8 @@ from dataclasses import asdict, dataclass, field
 
 import pandas as pd
 
+from ..exceptions import IncompatiblePipelineModules
+
 logger = logging.getLogger(__name__)
 
 
@@ -39,7 +41,9 @@ class PipelineConfig:
 
     def __post_init__(self):
         if self.use_gpu and self.classifier != "lightgbm":
-            raise TypeError("use_gpu is only supported with lightgbm classifier")
+            raise IncompatiblePipelineModules(
+                "'use_gpu' is only supported with lightgbm classifier"
+            )
 
     def set_features(self, df: pd.DataFrame) -> None:
         try:
@@ -55,18 +59,19 @@ class PipelineConfig:
     def set_git_hash(self, git_hash: str):
         self.git_hash = git_hash
 
-    def change_feature_type(self, feature_name: str) -> None:
-        if feature_name in self.features:
-            try:
-                self.categorical_features.append(feature_name)
-                self.numeric_features.remove(feature_name)
-                logger.info(f"Changed '{feature_name}' to categorical type")
-            except ValueError:
-                self.numeric_features.append(feature_name)
-                self.categorical_features.remove(feature_name)
-                logger.info(f"Changed '{feature_name}' to numerical type")
-        else:
-            logger.warning(f"{feature_name} not found in features list")
+    def change_feature_type(self, *features) -> None:
+        for feature_name in features:
+            if feature_name in self.features:
+                try:
+                    self.categorical_features.append(feature_name)
+                    self.numeric_features.remove(feature_name)
+                    logger.info(f"Changed '{feature_name}' to categorical type")
+                except ValueError:
+                    self.numeric_features.append(feature_name)
+                    self.categorical_features.remove(feature_name)
+                    logger.info(f"Changed '{feature_name}' to numerical type")
+            else:
+                logger.warning(f"{feature_name} not found in features list")
 
     def to_dict(self) -> dict:
         """Serialize config for logging to MLflow."""
