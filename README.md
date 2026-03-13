@@ -51,6 +51,8 @@ From all observations records based on observers, using these metrics:
     - Time coverage. Oldest observation before 2020 and newest after 2024.
 
 ## Training data
+
+- out-of-time validation
 - Custom Train/Validation/Test splits accounting for non uniform distribution of observations.
     - Start/End of split accounting for label time
 
@@ -71,7 +73,7 @@ From all observations records based on observers, using these metrics:
 
 Used to ensure reproducibility
 Agnostic Sql db with protocols
-
+scope-agnostic (currently plantae in Qc only)
 
 ```bash
 pip install inat_pipeline

@@ -1,5 +1,5 @@
 import logging
-from dataclasses import asdict
+from datetime import date
 
 from ..app.container import Dependencies
 from ..db import DuckDBConnection, DuckDbSQL
@@ -11,10 +11,11 @@ logger = logging.getLogger(__name__)
 def execute(deps: Dependencies):
     with DuckDBConnection(deps.DB_PATH) as con:
         # Transform data and create features
-        sql = DuckDbSQL(con, deps.SQL_FEATURES_PATH)
-
+        sql_features = DuckDbSQL(con, deps.SQL_FEATURES_PATH)
+        sql_split = DuckDbSQL(con, deps.QUERY_FOLDER / "split")
+        sql_features
         """
-        sql.execute_many(
+        sql_features.execute_many(
             "community_taxon_windowed",
             "research_grade_windowed",
             "identifications",
@@ -29,11 +30,27 @@ def execute(deps: Dependencies):
             "taxa_confusion",
         )
         """
-        params = TrainingSplitParams()
 
-        sql.execute("split", params=asdict(params))
+        params = TrainingSplitParams(
+            cutoff_date=date(2023, 7, 1),
+            max_val_size=50000,
+            val_window_days=300,
+            max_test_size=90000,
+        )
+        sql_split.execute("split", params=params)
+        df_dist = sql_split.fetch_df("dist_year")
+        df_splits = sql_split.fetch_df("training_splits")
+        df_splits["perc"] = (
+            df_splits["n_obs"].div(df_splits["n_obs"].sum(axis=0), axis=0) * 100
+        )
+
+        true_total = df_dist["n"].sum()
+        split_total = df_splits["n_obs"].sum()
+        removed = true_total - split_total
+        print(split_total, " observations in splits")
+        print(f"Lost {removed}, {round((removed/true_total) * 100, 3)}%")
 
         # Build params for interactive sql
         # sql_features.execute_with_params("stratify", split_format)
 
-        sql.execute("training")
+        # sql.execute("training")

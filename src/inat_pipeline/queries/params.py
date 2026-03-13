@@ -1,5 +1,5 @@
-from dataclasses import dataclass
-from datetime import date
+from dataclasses import dataclass, field
+from datetime import date, timedelta
 
 
 @dataclass
@@ -21,15 +21,17 @@ class IngestCSVParams:
 
 @dataclass
 class TrainingSplitParams:
-    cutoff_date: int = date(2021, 1, 1)
+    cutoff_date: date
     gap_days: int = 90
-    train_val_boundary: date = date(2021, 1, 1)
-    val_test_boundary: date = date(2022, 6, 1)
-
-    train_frac: float = 0.70
-    val_frac: float = 0.15
+    val_window_days: int = 270
+    max_val_size: int = 50000
+    max_test_size: int = 80000
+    val_start: int = field(init=False)
+    val_end: int = field(init=False)
+    test_start: int = field(init=False)
 
     def __post_init__(self):
-        # Format values for sql
-        self.train_val_boundary = self.train_val_boundary.isoformat()
-        self.val_test_boundary = self.val_test_boundary.isoformat()
+        # Dynamic date cutoffs based on gap days and val_window_days
+        self.val_start = self.cutoff_date + timedelta(days=self.gap_days)
+        self.val_end = self.val_start + timedelta(days=self.val_window_days)
+        self.test_start = self.val_end + timedelta(days=self.gap_days)
