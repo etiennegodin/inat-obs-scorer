@@ -32,25 +32,32 @@ def execute(deps: Dependencies):
         """
 
         params = TrainingSplitParams(
-            cutoff_date=date(2023, 7, 1),
+            cutoff_date=date(2024, 1, 1),
             max_val_size=50000,
-            val_window_days=300,
+            val_window_days=250,
             max_test_size=90000,
         )
         sql_split.execute("split", params=params)
+
+        df_total_val = sql_split.fetch_df("total_val_avail", params=params)
+
+        # Fetch df from interpretability
         df_dist = sql_split.fetch_df("dist_year")
-        df_splits = sql_split.fetch_df("training_splits")
+        df_splits = sql_split.fetch_df("training_splits_eda")
         df_splits["perc"] = (
             df_splits["n_obs"].div(df_splits["n_obs"].sum(axis=0), axis=0) * 100
         )
 
         true_total = df_dist["n"].sum()
         split_total = df_splits["n_obs"].sum()
+        total_val_avail = df_total_val["total_val"].iloc[0]
         removed = true_total - split_total
-        print(split_total, " observations in splits")
-        print(f"Lost {removed}, {round((removed/true_total) * 100, 3)}%")
 
-        # Build params for interactive sql
-        # sql_features.execute_with_params("stratify", split_format)
+        print("\n", "-" * 50, "\n")
+        print(df_splits)
+        print(split_total, "observations in splits")
+        print(f"Lost {removed} observations ~{round((removed/true_total) * 100, 3)}%")
+        print(f"Total observation available in val split {total_val_avail}")
+        print("\n", "-" * 50, "\n")
 
-        # sql.execute("training")
+        sql_features.execute("training")

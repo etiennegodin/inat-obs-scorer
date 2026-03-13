@@ -1,4 +1,4 @@
-CREATE OR REPLACE TABLE tests.splits AS
+CREATE OR REPLACE TABLE features.splits AS
 
 WITH params AS (
     SELECT

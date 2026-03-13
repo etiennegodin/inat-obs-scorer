@@ -6,7 +6,7 @@ import pandas as pd
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 
-from ..db.connections import DuckDBConnection
+from ..db import DuckDBConnection
 from .config import PipelineConfig
 from .registery import (
     CATEGORICAL_IMPUTER_REGISTRY,
@@ -33,7 +33,7 @@ def load_and_split(
     dict,
 ]:
     with DuckDBConnection(db_path) as con:
-        df = con.execute("SELECT * FROM features.training").df()
+        df = con.execute("SELECT * FROM features.training", {}).df()
 
     # Fix timezone
     df["created_at"] = df["created_at"].dt.tz_convert("UTC").dt.tz_localize(None)

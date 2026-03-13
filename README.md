@@ -56,6 +56,8 @@ From all observations records based on observers, using these metrics:
 - Custom Train/Validation/Test splits accounting for non uniform distribution of observations.
     - Start/End of split accounting for label time
 
+- pos_rate drift (57% → 52%)
+    - val/test metrics will be slightly lower than train metrics for reasons unrelated to overfitting.
 ## Main Engineered Features
 
 | Group                     | Features                                                           |
