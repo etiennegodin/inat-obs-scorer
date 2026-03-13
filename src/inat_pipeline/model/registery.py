@@ -59,7 +59,11 @@ CLASSIFIER_REGISTRY = {
         "LogisticRegression",
         {"max_iter": 500},
     ),
-    "lightgbm": ("lightgbm", "LGBMClassifier", {"verbose": -1}),
+    "lightgbm": (
+        "lightgbm",
+        "LGBMClassifier",
+        {"scale_pos_weight": 0.7856690857471881, "verbose": -1},
+    ),
 }
 
 
@@ -97,7 +101,7 @@ SEARCH_SPACES = {
         # The three that matter most — search these hard
         "classifier__learning_rate": {
             "type": "float",
-            "low": 0.05,
+            "low": 0.01,
             "high": 0.2,
             "log": True,
             # log=True means Optuna samples 0.01, 0.012, 0.015...
@@ -112,17 +116,18 @@ SEARCH_SPACES = {
         },
         "classifier__min_child_samples": {
             "type": "int",
-            "low": 50,
-            "high": 200,
+            "low": 5,
+            "high": 100,
             # on imbalanced data (like iNat RG), push this higher
             # it prevents the model from memorizing rare patterns
         },
         # Secondary — worth including but narrow the range
         "classifier__n_estimators": {
             "type": "int",
-            "low": 10,
-            "high": 50,
-            "step": 10,
+            "low": 100,
+            "high": 500,
+            "step": 50,
+            # prefer early stopping over a wide range here (see below)
         },
         "classifier__reg_alpha": {
             "type": "float",

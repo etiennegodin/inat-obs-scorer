@@ -119,7 +119,7 @@ def create_parser() -> argparse.ArgumentParser:
     )
     train_parser.add_argument(
         "--scaler",
-        default="standard",
+        default="robust",
         choices=SCALER_REGISTRY,
         help="Numerical scaler choice",
     )
@@ -145,7 +145,7 @@ def create_parser() -> argparse.ArgumentParser:
     train_parser.add_argument(
         "--cv_folds",
         "-cv",
-        default=5,
+        default=4,
         type=min_cv_folds,
         help="Number of cross validation folds",
     )

@@ -36,8 +36,6 @@ def load_and_split(
     with DuckDBConnection(db_path) as con:
         df = con.execute("SELECT * FROM features.training").df()
 
-    df.drop(columns=["observation_id", "user_id"], inplace=True)
-
     train = df[df["split"] == "train"]
     val = df[df["split"] == "val"]
     test = df[df["split"] == "test"]
@@ -71,6 +69,7 @@ def load_and_split(
         "data/n_features_numeric": len(config.numeric_features),
         "data/n_features_cat": len(config.categorical_features),
         "data/target_positive_rate": float(df[config.target_column].mean()),
+        "data/scale_pos_weight": (y_train == 0).sum() / (y_train == 1).sum(),
     }
 
     return train, y_train, val, y_val, test, y_test, data_stats

@@ -105,6 +105,7 @@ def execute(
             n_trials=config.n_trials,
             show_progress_bar=False,
         )
+
         explainability.log_hyperparam_importance(study)
 
         best_params = study.best_params

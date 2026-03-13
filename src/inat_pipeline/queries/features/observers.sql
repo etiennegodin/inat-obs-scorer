@@ -44,7 +44,6 @@ aggregates AS(
         CASE WHEN observer_tenure > INTERVAL '730 days' THEN TRUE ELSE FALSE END AS is_veteran,
         orcid IS NOT NULL AS has_orcid,
 
-
         -- All-time observer history (excluding current observation)
         COALESCE(COUNT(*)           OVER observer_history, 0) AS observer_obs_count_at_t,
         COALESCE(SUM(is_rg::INT)    OVER observer_history, 0) AS observer_rg_count_at_t,
@@ -52,12 +51,6 @@ aggregates AS(
                 / NULLIF(observer_obs_count_at_t, 0), 0)          AS observer_rg_rate_at_t,
 
         observer_obs_count_at_t >= 20 AS rg_rate_is_reliable,
-
-        -- Rolling 12-month window
-        COALESCE(COUNT(*)           OVER observer_12m, 0) AS observer_obs_count_12m,
-        COALESCE(SUM(is_rg::INT)                OVER observer_12m, 0)       AS observer_rg_count_12m,
-        COALESCE(observer_rg_count_12m::FLOAT
-            / NULLIF(observer_obs_count_12m, 0),0)              AS observer_rg_rate_12m,
 
         -- Observer last
         created_at - LAG (created_at, 1, NULL ) OVER observer_history AS lag_since_last_obs,
@@ -72,7 +65,6 @@ aggregates AS(
         COUNT(DISTINCT(family)) FILTER (WHERE family IS NOT NULL) OVER observer_history AS taxon_diversity_family,
         COUNT(DISTINCT(genus)) FILTER (WHERE genus IS NOT NULL) OVER observer_history AS taxon_diversity_genus,
         COALESCE(COUNT(DISTINCT(species)) FILTER (WHERE species IS NOT NULL) OVER observer_history,0) AS taxon_diversity_species,
-
 
         -- Documentation quality
         COALESCE(
@@ -96,11 +88,6 @@ aggregates AS(
             PARTITION BY user_id
             ORDER BY created_at
             ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING
-        ),
-        observer_12m AS (
-            PARTITION BY user_id
-            ORDER BY created_at
-            RANGE BETWEEN INTERVAL 12 MONTHS PRECEDING AND INTERVAL 1 MICROSECOND PRECEDING
         )
 ),
 

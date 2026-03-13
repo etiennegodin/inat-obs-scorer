@@ -1,8 +1,6 @@
 CREATE OR REPLACE TABLE features.training AS
 SELECT
     -- Identity
-    o.observation_id,
-    o.user_id,
     s.split,
 
     -- Label
@@ -13,8 +11,8 @@ SELECT
     o.has_description,
     o.has_tags,
     o.tag_count,
-    o.has_license,
-    o.positional_accuracy_m,
+    --o.has_license,
+    --o.positional_accuracy_m,
     o.obscured,
     o.geoprivacy IS NOT NULL                AS geoprivacy_set,
     o.captive,                              -- should be FALSE for all training rows
@@ -23,7 +21,7 @@ SELECT
     -- Temporal features
     o.created_at,
     date_part('day',o.obs_to_submit_lag_days) AS obs_to_submit_lag_days,
-    o.observed_month,
+    --o.observed_month,
     o.observed_week,
     o.observed_hour,
     o.submitted_hour,
@@ -34,13 +32,10 @@ SELECT
     ob.is_veteran AS obv_is_veteran,
     ob.observer_obs_count_at_t AS obv_obs_count_total,
     ob.observer_rg_rate_at_t AS obv_rg_rate_lifetime,
-    ob.observer_rg_rate_12m AS obv_rg_rate_last_12m,
     date_part('day',ob.lag_since_last_obs) AS obv_lag_days_since_last_post,
     ob.observer_reputation_raw AS obv_reputation_score,
     ob.observer_reputation_rank AS obv_reputation_rank,
     ob.rg_rate_is_reliable AS obv_rg_rate_is_reliable,
-    ob.taxon_diversity_family AS obv_taxon_diversity_family,
-    ob.taxon_diversity_genus AS obv_taxon_diversity_genus,
     ob.taxon_diversity_species AS obv_taxon_diversity_species,
     oe.observer_species_entropy_norm AS obv_taxon_entropy,
     ob.avg_photo_count AS obv_avg_photo_count,
