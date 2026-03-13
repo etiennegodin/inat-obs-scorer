@@ -6,6 +6,7 @@ from pathlib import Path
 import mlflow
 import mlflow.models
 import optuna
+from mlflow.models.signature import infer_signature
 from sklearn.metrics import (
     accuracy_score,
     average_precision_score,
@@ -161,13 +162,13 @@ def execute(
         #   predictions = pipeline.predict(new_dataframe)
 
         # Cast to concrete dtypes so MLflow can read them
-        X_sample = X_train.head(3).copy()
+        X_sample = X_train.head(5).copy()
         for col in config.numeric_features:
             X_sample[col] = X_sample[col].astype(float)
         for col in config.categorical_features:
             X_sample[col] = X_sample[col].astype(str)
 
-        signature = mlflow.models.infer_signature(X_sample, y_train.head(3))
+        signature = infer_signature(X_sample, final_model.predict(X_sample))
         mlflow.sklearn.log_model(
             sk_model=final_model,
             name="model",

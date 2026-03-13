@@ -36,6 +36,10 @@ def load_and_split(
     with DuckDBConnection(db_path) as con:
         df = con.execute("SELECT * FROM features.training").df()
 
+    # Fix timezone
+    df["created_at"] = df["created_at"].dt.tz_convert("UTC").dt.tz_localize(None)
+
+    # Splits
     train = df[df["split"] == "train"]
     val = df[df["split"] == "val"]
     test = df[df["split"] == "test"]

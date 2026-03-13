@@ -1,16 +1,17 @@
 import logging
 
 import matplotlib
+import matplotlib.pyplot as plt
 import mlflow
 import numpy as np
 import optuna
 import optuna.visualization
 import pandas as pd
 import seaborn as sns
+import shap
 from optuna.importance import get_param_importances
 
 matplotlib.use("Agg")  # non-interactive backend — safe for logging, no window pops up
-import matplotlib.pyplot as plt
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 
@@ -24,7 +25,6 @@ logger = logging.getLogger(__name__)
 
 
 def log_feature_corr(features: pd.DataFrame):
-    features.shape[1]
     corr = features.corr(numeric_only=True)
     upper_tri = corr.where(np.triu(np.ones(corr.shape), k=1).astype(bool))
 
@@ -148,6 +148,91 @@ def log_pca_loadings(pipeline, config, top_n: int = 8, n_components: int = 8):
     logger.info("Logged pca_loadings.png + pca_loadings.csv")
 
 
+# ── 3. SHAP VALUES (model-agnostic, best explainability) ──────────────────────
+
+
+def log_shap_summary(pipeline, X_train: pd.DataFrame, config, max_rows: int = 200):
+    """
+    Logs a SHAP summary plot — the gold standard for model explainability.
+    """
+    logger.info("Computing SHAP values (this may take a minute)...")
+
+    # Transform data through all steps except the classifier
+    transformer = pipeline[:-1]
+    classifier = pipeline.named_steps["classifier"]
+
+    # SHAP on a sample — full dataset can be slow
+    X_sample = X_train.sample(min(max_rows, len(X_train)), random_state=42)
+    X_transformed = transformer.transform(X_sample)
+
+    # Recover feature names (lost after PCA, available otherwise)
+    if "reducer" not in pipeline.named_steps:
+        feature_names = list(
+            pipeline.named_steps["preprocessor"].get_feature_names_out()
+        )
+    else:
+        n_components = X_transformed.shape[1]
+        feature_names = [f"PC{i+1}" for i in range(n_components)]
+
+    X_transformed_df = pd.DataFrame(X_transformed, columns=feature_names)
+
+    # Choose the right SHAP explainer for the classifier type
+    classifier_type = type(classifier).__name__
+    tree_classifiers = {
+        "RandomForestClassifier",
+        "GradientBoostingClassifier",
+        "XGBClassifier",
+        "LGBMClassifier",
+    }
+
+    if classifier_type in tree_classifiers:
+        explainer = shap.TreeExplainer(classifier)
+    else:
+        # Model-agnostic fallback — slower but universal
+        explainer = shap.Explainer(classifier.predict_proba, X_transformed_df)
+
+    shap_values = explainer(X_transformed_df)
+
+    try:
+        # Summary plot (beeswarm) — shows distribution of SHAP values per feature
+        fig, ax = plt.subplots(figsize=(10, max(6, len(feature_names) * 0.4)))
+        shap.plots.beeswarm(
+            shap_values,
+            max_display=20,
+            group_remaining_features=True,
+            ax=ax,
+            plot_size=None,
+        )
+        plt.tight_layout()
+        mlflow.log_figure(plt.gcf(), "shap_summary.png")
+        plt.close("all")
+    except Exception:
+        pass
+
+    # Also log mean absolute SHAP as a clean bar chart
+    mean_shap = np.abs(
+        shap_values.values[..., 1]
+        if shap_values.values.ndim == 3
+        else shap_values.values
+    ).mean(axis=0)
+    shap_df = (
+        pd.DataFrame({"feature": feature_names, "mean_abs_shap": mean_shap})
+        .sort_values("mean_abs_shap", ascending=True)
+        .tail(20)
+    )
+    fig2, ax2 = plt.subplots(figsize=(9, max(5, len(shap_df) * 0.38)))
+    ax2.barh(
+        shap_df["feature"], shap_df["mean_abs_shap"], color="coral", edgecolor="white"
+    )
+    ax2.set_xlabel("Mean |SHAP value|")
+    ax2.set_title(f"Feature Impact — {config.classifier}")
+    fig2.tight_layout()
+    mlflow.log_figure(fig2, "shap_bar.png")
+    plt.close(fig2)
+
+    logger.info("Logged shap_summary.png + shap_bar.png")
+
+
 def log_feature_importance_report(
     pipeline: Pipeline, X_train: pd.DataFrame, config: PipelineConfig
 ) -> None:
@@ -159,7 +244,7 @@ def log_feature_importance_report(
         print("\nLogging explainability artifacts...")
         log_feature_importance(pipeline, config)
         log_pca_loadings(pipeline, config)
-        # log_shap_summary(pipeline, X_train, config)
+        log_shap_summary(pipeline, X_train, config)
     except Exception as e:
         logger.error(f"Error creating explainability report: {e}")
         return
