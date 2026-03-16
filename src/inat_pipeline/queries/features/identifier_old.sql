@@ -1,21 +1,10 @@
 CREATE OR REPLACE TABLE features.identifiers_score AS
 
-
-WITH base_id AS(
-
 SELECT
-    -- Keys
-    i.observation_id,
-    i.user_id,
-    u.identifier_only,
-    FROM staged.identifications i
-    JOIN staged.users u ON u.user_id = i.user_id
-    LEFT JOIN research_grade_windowed(INTERVAL '999 years') rg
-        ON rg.observation_id = o.id
-
-
-)
-
+-- Keys
+i.observation_id,
+i.user_id,
+u.identifier_only,
 
 -- Volume
 COUNT(*) OVER identifier_history AS total_id_count,
@@ -40,7 +29,8 @@ COUNT(DISTINCT(i.family)) FILTER (WHERE i.family IS NOT NULL) OVER taxon_history
 COUNT(DISTINCT(i.genus)) FILTER (WHERE i.genus IS NOT NULL) OVER taxon_history AS taxon_diversity_genus,
 COUNT(DISTINCT(i.species)) FILTER (WHERE i.species IS NOT NULL) OVER taxon_history AS taxon_diversity_species,
 
-
+FROM staged.identifications i
+JOIN staged.users u ON u.user_id = i.user_id
 
 WINDOW
     identifier_history AS (

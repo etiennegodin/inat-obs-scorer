@@ -14,7 +14,7 @@ def execute(deps: Dependencies):
         sql_features = DuckDbSQL(con, deps.SQL_FEATURES_PATH)
         sql_split = DuckDbSQL(con, deps.QUERY_FOLDER / "split")
         sql_features
-        """
+
         sql_features.execute_many(
             "community_taxon_windowed",
             "research_grade_windowed",
@@ -25,10 +25,11 @@ def execute(deps: Dependencies):
             "observations",
             "observers",
             "observers_entropy",
-            "taxa_assymetry",
-            "taxa_distance",
-            "taxa_confusion",
         )
+        """
+        sql_features.execute_many("taxa_assymetry",
+            "taxa_distance",
+            "taxa_confusion",)
         """
 
         params = TrainingSplitParams(

@@ -32,7 +32,7 @@ SELECT
         date_part('day',ob.lag_since_last_obs) AS obv_lag_days_since_last_post,
 
         -- Observations
-        ob.observer_obs_count_at_t AS obv_obs_count_total,
+        LOG(ob.observer_obs_count_at_t) AS obv_obs_count_log,
         ob.observer_rg_rate_at_t AS obv_rg_rate_lifetime,
         ob.observer_reputation_raw AS obv_reputation_score,
         ob.observer_reputation_rank AS obv_reputation_rank,
@@ -57,7 +57,7 @@ SELECT
         ob.has_orcid AS obv_has_orcid,
 
         --Identifiers counts from obs history
-        LOG(ir.identifiers_total),
+        LOG(ir.identifiers_total) AS obv_n_identifier_log,
         ir.identifiers_agreeing,
         ir.identifiers_improving,
         ir.identifiers_maverick,

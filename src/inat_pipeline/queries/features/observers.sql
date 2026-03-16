@@ -57,7 +57,7 @@ aggregates AS(
 
         -- This taxon's rg rate from this observer's history
         COALESCE(COUNT(*)           OVER observer_taxon_history, 0)  AS observer_taxon_obs_count_at_t,
-        COALESCE(SUM(is_rg::INT)    OVER observer_history, 0) AS observer_taxon_obs_rg_count_at_t,
+        COALESCE(SUM(is_rg::INT)    OVER observer_taxon_history, 0) AS observer_taxon_obs_rg_count_at_t,
         COALESCE(observer_taxon_obs_count_at_t::FLOAT
                 / NULLIF(observer_taxon_obs_rg_count_at_t, 0), 0)      AS observer_taxon_rg_rate_at_t,
 
