@@ -19,7 +19,7 @@ def execute(deps: Dependencies):
             "community_taxon_windowed",
             "research_grade_windowed",
             "identifications",
-            "identifiers",
+            "identifiers_counts",
             "taxon",
             "label",
             "observations",
@@ -61,4 +61,5 @@ def execute(deps: Dependencies):
         print(f"Total observation available in val split {total_val_avail}")
         print("\n", "-" * 50, "\n")
 
+        # Final merge
         sql_features.execute("training")

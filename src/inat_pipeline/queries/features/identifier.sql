@@ -24,6 +24,7 @@ WITH base_id AS(
         ON i.user_id = u.user_id
     LEFT JOIN research_grade_windowed(INTERVAL '999 years') rg
         ON rg.observation_id = i.observation_id
+    WHERE own_observation IS FALSE
 ),
 
 aggregates AS(
