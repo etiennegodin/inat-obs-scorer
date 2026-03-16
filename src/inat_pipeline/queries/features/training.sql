@@ -19,7 +19,7 @@ SELECT
     COALESCE(o.oauth_application_id,0)      AS oauth_application_id,
 
     -- Temporal features
-    --o.created_at,
+    o.created_at,
     date_part('day',o.obs_to_submit_lag_days) AS obs_to_submit_lag_days,
     --o.observed_month,
     o.observed_week,
