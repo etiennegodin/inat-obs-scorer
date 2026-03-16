@@ -6,7 +6,7 @@ import mlflow
 import numpy as np
 import optuna
 import pandas as pd
-from sklearn.model_selection import StratifiedKFold, cross_val_score
+from sklearn.model_selection import StratifiedKFold, TimeSeriesSplit, cross_val_score
 
 from .config import PipelineConfig
 from .core import build_pipeline
@@ -60,6 +60,12 @@ def make_objective(
         random_state=config.random_seed,
     )
 
+    cv
+
+    tscv = TimeSeriesSplit(
+        n_splits=config.cv_folds, gap=config.gap_days * 24 * 3600
+    )  # gap in seconds if using timestamps
+
     def objective(trial: optuna.Trial) -> float:
         # ── Step 1: Ask Optuna for hyperparameter suggestions ─────────────────
         # trial.suggest_* methods implement Bayesian optimization:
@@ -93,13 +99,13 @@ def make_objective(
         # ── Step 3: Cross-validate ────────────────────────────────────────────
 
         start = time.time()
-        logger.debug("Start cv")
+        logger.debug("Start tscv")
 
         scores = cross_val_score(
             pipeline,
             X_train,
             y_train,
-            cv=cv,
+            cv=tscv,
             scoring=config.scoring_metric,
             n_jobs=-1,  # use all CPU cores
             error_score="raise",

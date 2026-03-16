@@ -102,21 +102,21 @@ SEARCH_SPACES = {
         "classifier__learning_rate": {
             "type": "float",
             "low": 0.01,
-            "high": 0.2,
+            "high": 0.1,
             "log": True,
             # log=True means Optuna samples 0.01, 0.012, 0.015...
             # rather than 0.01, 0.11, 0.21 — much smarter for rates
         },
         "classifier__num_leaves": {
             "type": "int",
-            "low": 20,
-            "high": 300,
+            "low": 31,
+            "high": 127,
             # rule of thumb: never exceed 2^(max_depth)
             # for depth=7 that's 128 — 200 is already generous
         },
         "classifier__min_child_samples": {
             "type": "int",
-            "low": 5,
+            "low": 50,
             "high": 300,
             # on imbalanced data (like iNat RG), push this higher
             # it prevents the model from memorizing rare patterns
@@ -131,8 +131,14 @@ SEARCH_SPACES = {
         },
         "classifier__reg_alpha": {
             "type": "float",
-            "low": 1e-8,
-            "high": 1.0,
+            "low": 1e-3,
+            "high": 10.0,
+            "log": True,
+        },
+        "classifier__reg_lambda": {
+            "type": "float",
+            "low": 1e-3,
+            "high": 10.0,
             "log": True,
         },
     },

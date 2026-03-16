@@ -39,6 +39,7 @@ class PipelineConfig:
     # Flags
     ct_verbose_feature_names_out: bool = False
     use_gpu: bool = False  # for lightgbm
+    gap_days: int = 90
 
     def __post_init__(self):
         if self.use_gpu and self.classifier != "lightgbm":
