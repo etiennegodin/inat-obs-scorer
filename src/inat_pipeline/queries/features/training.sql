@@ -77,6 +77,8 @@ SELECT
     -- Fixed Taxon confusion stats
     IFNULL(c.has_similar_species, FALSE)    AS has_similar_species,
     COALESCE(c.neighborhood_difficulty,0)   AS neighborhood_difficulty,
+    c.rg_percentile_in_neighborhood,
+    c.magnet_score,
     c.rg_rate_vs_neighbors,
 
 FROM features.observations o

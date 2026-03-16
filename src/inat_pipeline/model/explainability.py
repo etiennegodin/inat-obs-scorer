@@ -220,6 +220,7 @@ def log_shap_summary(pipeline, X_train: pd.DataFrame, config, max_rows: int = 20
         .sort_values("mean_abs_shap", ascending=True)
         .tail(20)
     )
+
     fig2, ax2 = plt.subplots(figsize=(9, max(5, len(shap_df) * 0.38)))
     ax2.barh(
         shap_df["feature"], shap_df["mean_abs_shap"], color="coral", edgecolor="white"
