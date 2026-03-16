@@ -28,7 +28,7 @@ WITH base_obs AS(
     JOIN features.taxon t
         ON t.observation_id = o.id
     -- Unbounded window = all identifications ever, for current-state scoring
-    JOIN staged.identifications i on o.observation_id = i.observation_id
+    JOIN staged.identifications i on o.id = i.observation_id
     LEFT JOIN research_grade_windowed(INTERVAL '999 years') rg
         ON rg.observation_id = o.id
 ),
@@ -50,16 +50,26 @@ aggregates AS(
         COALESCE(COUNT(*)           OVER observer_history, 0) AS observer_obs_count_at_t,
         COALESCE(SUM(is_rg::INT)    OVER observer_history, 0) AS observer_rg_count_at_t,
         COALESCE(observer_rg_count_at_t::FLOAT
-                / NULLIF(observer_obs_count_at_t, 0), 0)          AS observer_rg_rate_at_t,
-
+                / NULLIF(observer_obs_count_at_t, 0), 0)      AS observer_rg_rate_at_t,
+        expected_rg_rate,
+        COALESCE(observer_rg_rate_at_t /  NULLIF(expected_rg_rate, 0),0) AS observer_reputation_raw,
         observer_obs_count_at_t >= 20 AS rg_rate_is_reliable,
+
+        -- This taxon's rg rate from this observer's history
+        COALESCE(COUNT(*)           OVER observer_taxon_history, 0)  AS observer_taxon_obs_count_at_t,
+        COALESCE(SUM(is_rg::INT)    OVER observer_history, 0) AS observer_taxon_obs_rg_count_at_t,
+        COALESCE(observer_taxon_obs_count_at_t::FLOAT
+                / NULLIF(observer_taxon_obs_rg_count_at_t, 0), 0)      AS observer_taxon_rg_rate_at_t,
+
+        observer_taxon_obs_count_at_t::FLOAT
+            / NULLIF(observer_obs_count_at_t, 0) AS observer_taxon_focus_rate,
+
 
         -- Observer last
         created_at - LAG (created_at, 1, NULL ) OVER observer_history AS lag_since_last_obs,
 
         -- Observer reputation score (v0.2 definition)
-        expected_rg_rate,
-        COALESCE(observer_rg_rate_at_t /  NULLIF(expected_rg_rate, 0),0) AS observer_reputation_raw,
+
         -- (observer_reputation_raw - MIN(observer_reputation_raw) OVER ()) * 1.0 / NULLIF(MAX(observer_reputation_raw) OVER() - MIN(observer_reputation_raw) OVER (),0 ) AS observer_reputation_score,
 
         -- Taxonomic behaviour
@@ -94,6 +104,11 @@ aggregates AS(
     WINDOW
         observer_history AS (
             PARTITION BY user_id
+            ORDER BY created_at
+            ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING
+        ),
+        observer_taxon_history AS (
+            PARTITION BY user_id, taxon_id
             ORDER BY created_at
             ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING
         )

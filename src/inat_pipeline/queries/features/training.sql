@@ -11,7 +11,7 @@ SELECT
     o.has_description,
     o.has_tags,
     o.tag_count,
-    o.has_license,
+    --o.has_license,
     o.positional_accuracy_m,
     o.geoprivacy IS NOT NULL                AS geoprivacy_set,
     COALESCE(o.oauth_application_id,0)      AS oauth_application_id,
@@ -45,6 +45,9 @@ SELECT
          --Taxonomic
         ob.taxon_diversity_species AS obv_taxon_diversity_species,
         oe.observer_species_entropy_norm AS obv_taxon_entropy,
+        ob.observer_taxon_rg_rate_at_t AS obv_taxon_rg_rate_at_t,
+        ob.observer_taxon_focus_rate AS obv_taxon_focus_rate,
+
 
          --Metadata
         ob.avg_photo_count AS obv_avg_photo_count,
@@ -53,14 +56,16 @@ SELECT
         ob.pct_obs_from_mobile AS obv_pct_obs_from_mobile,
         ob.has_orcid AS obv_has_orcid,
 
-         --Identifications history
-
-        --Identifiers
-        ir.identifiers_total,
+        --Identifiers counts from obs history
+        LOG(ir.identifiers_total),
         ir.identifiers_agreeing,
         ir.identifiers_improving,
         ir.identifiers_maverick,
         ir.identifiers_vision,
+
+        -- Observer as identifiers score
+        u.observer_only,
+
 
      --Taxon features (fixed lookup)
     t.taxon_rg_rate,
@@ -90,6 +95,7 @@ SELECT
 
 
 
+
 FROM features.observations o
 JOIN features.splits                     s  ON o.observation_id = s.observation_id
 LEFT JOIN features.observers             ob ON o.observation_id = ob.observation_id
@@ -99,4 +105,6 @@ LEFT JOIN features.identifications       i  ON o.observation_id = i.observation_
 LEFT JOIN features.identifiers           ir ON o.observation_id = ir.observation_id
 LEFT JOIN features.taxon                 t  ON o.observation_id = t.observation_id
 LEFT JOIN features.taxa_confusion        c  ON o.taxon_id = c.taxon_id
+LEFT JOIN staged.users                   u  ON o.user_id = u.user_id
+
 WHERE o.label IS NOT NULL
