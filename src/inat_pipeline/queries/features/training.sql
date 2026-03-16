@@ -108,3 +108,4 @@ LEFT JOIN features.taxa_confusion        c  ON o.taxon_id = c.taxon_id
 LEFT JOIN staged.users                   u  ON o.user_id = u.user_id
 
 WHERE o.label IS NOT NULL
+ORDER BY o.created_at

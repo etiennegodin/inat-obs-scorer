@@ -6,10 +6,10 @@ import mlflow
 import numpy as np
 import optuna
 import pandas as pd
-from sklearn.model_selection import StratifiedKFold, TimeSeriesSplit, cross_val_score
+from sklearn.model_selection import cross_val_score
 
 from .config import PipelineConfig
-from .core import build_pipeline
+from .core import CustomCvSplit, build_pipeline
 from .registery import SEARCH_SPACES
 
 # Suppress noisy warnings during hyperparameter search
@@ -54,17 +54,8 @@ def make_objective(
          Final:  mean(score_1, ..., score_5)
     """
     search_space = SEARCH_SPACES.get(config.classifier, {})
-    cv = StratifiedKFold(
-        n_splits=config.cv_folds,
-        shuffle=True,
-        random_state=config.random_seed,
-    )
 
-    cv
-
-    tscv = TimeSeriesSplit(
-        n_splits=config.cv_folds, gap=config.gap_days * 24 * 3600
-    )  # gap in seconds if using timestamps
+    custom_cv = CustomCvSplit(n_splits=config.cv_folds)
 
     def objective(trial: optuna.Trial) -> float:
         # ── Step 1: Ask Optuna for hyperparameter suggestions ─────────────────
@@ -105,7 +96,7 @@ def make_objective(
             pipeline,
             X_train,
             y_train,
-            cv=tscv,
+            cv=custom_cv,
             scoring=config.scoring_metric,
             n_jobs=-1,  # use all CPU cores
             error_score="raise",

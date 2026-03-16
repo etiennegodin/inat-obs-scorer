@@ -2,8 +2,10 @@ import logging
 from pathlib import Path
 from typing import Optional
 
+import numpy as np
 import pandas as pd
 from sklearn.compose import ColumnTransformer
+from sklearn.model_selection import BaseCrossValidator
 from sklearn.pipeline import Pipeline
 
 from ..db import DuckDBConnection
@@ -19,6 +21,28 @@ from .registery import (
 from .utils import _instantiate
 
 logger = logging.getLogger(__name__)
+
+
+class CustomCvSplit(BaseCrossValidator):
+    def __init__(self, n_splits=3):
+        self.n_splits = n_splits
+
+    def split(self, X, y=None, groups=None):
+        n_samples = len(X)
+        indices = np.arange(n_samples)
+        chunks = np.array_split(indices, self.n_splits)
+        for i in range(self.n_splits - 1):
+            # In a basic time-series CV,
+            # you train on the past and test on the next block
+            # For 3 equal sets:
+            # Iter 1: Train on Set 1, Test on Set 2
+            # Iter 2: Train on Set 1+2, Test on Set 3
+            train_idx = np.concatenate(chunks[: i + 1])
+            test_idx = chunks[i + 1]
+            yield train_idx, test_idx
+
+    def get_n_splits(self, X=None, y=None, groups=None):
+        return 1
 
 
 def load_and_split(
@@ -62,7 +86,7 @@ def load_and_split(
     # Override features type
     # config.change_feature_type("oauth_application_id")
 
-    # ── Log basic data stats (will be passed to MLflow by experiment.py) ──────
+    # ── Log basic data stats ──────
     data_stats = {
         "data/n_rows_total": len(df),
         "data/n_features_numeric": len(config.numeric_features),

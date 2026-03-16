@@ -4,6 +4,7 @@ from datetime import date
 from ..app.container import Dependencies
 from ..db import DuckDBConnection, DuckDbSQL
 from ..queries.params import TrainingSplitParams
+from ..utils.splits import splits_report
 
 logger = logging.getLogger(__name__)
 
@@ -26,12 +27,14 @@ def execute(deps: Dependencies):
             "observers",
             "observers_entropy",
         )
+
         """
         sql_features.execute_many("taxa_assymetry",
             "taxa_distance",
             "taxa_confusion",)
         """
 
+        # Train/Val/Test splits
         params = TrainingSplitParams(
             cutoff_date=date(2024, 1, 1),
             max_val_size=50000,
@@ -39,27 +42,7 @@ def execute(deps: Dependencies):
             max_test_size=90000,
         )
         sql_split.execute("split", params=params)
-
-        df_total_val = sql_split.fetch_df("total_val_avail", params=params)
-
-        # Fetch df from interpretability
-        df_dist = sql_split.fetch_df("dist_year")
-        df_splits = sql_split.fetch_df("training_splits_eda")
-        df_splits["perc"] = (
-            df_splits["n_obs"].div(df_splits["n_obs"].sum(axis=0), axis=0) * 100
-        )
-
-        true_total = df_dist["n"].sum()
-        split_total = df_splits["n_obs"].sum()
-        total_val_avail = df_total_val["total_val"].iloc[0]
-        removed = true_total - split_total
-
-        print("\n", "-" * 50, "\n")
-        print(df_splits)
-        print(split_total, "observations in splits")
-        print(f"Lost {removed} observations ~{round((removed/true_total) * 100, 3)}%")
-        print(f"Total observation available in val split {total_val_avail}")
-        print("\n", "-" * 50, "\n")
+        splits_report(sql_split, params)
 
         # Final merge
         sql_features.execute("training")
