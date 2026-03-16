@@ -62,7 +62,7 @@ CLASSIFIER_REGISTRY = {
     "lightgbm": (
         "lightgbm",
         "LGBMClassifier",
-        {"scale_pos_weight": 0.8172429174339209, "verbose": -1},
+        {"verbose": -1},
     ),
 }
 

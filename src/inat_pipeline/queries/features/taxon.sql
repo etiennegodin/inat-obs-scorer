@@ -104,6 +104,9 @@ rates AS(
     END AS source_obs_count,
 
     LOG(source_obs_count + 1) AS taxon_popularity_rank,
+    LOG(genus_obs_count + 1) AS genus_popularity_rank,
+    LOG(family_obs_count + 1) AS family_popularity_rank,
+    LOG(order_obs_count + 1) AS order_popularity_rank,
 
     FROM aggregates
 

@@ -16,7 +16,7 @@ SELECT
     --o.obscured,
     --o.geoprivacy IS NOT NULL                AS geoprivacy_set,
     --o.captive,                              -- should be FALSE for all training rows
-    COALESCE(o.oauth_application_id,0)      AS oauth_application_id,
+    --COALESCE(o.oauth_application_id,0)      AS oauth_application_id,
 
     -- Temporal features
     o.created_at,
@@ -73,6 +73,15 @@ SELECT
     --t.taxon_cold_start,
     --t.is_difficult_group,
     --t.iconic_taxon_name,
+    t.genus_popularity_rank,
+    t.family_popularity_rank,
+    t.order_popularity_rank,
+    t.genus_rg_rate,
+    t.family_rg_rate,
+    t.order_rg_rate,
+
+
+
 
     -- Fixed Taxon confusion stats
     --IFNULL(c.has_similar_species, FALSE)    AS has_similar_species,
@@ -80,6 +89,13 @@ SELECT
     c.rg_percentile_in_neighborhood,
     --c.magnet_score,
     c.rg_rate_vs_neighbors,
+    c.neighbor_genus_diversity,
+    c.nbor_dist_mean,
+    c.nbor_rg_rate_std,
+
+
+
+
 
 FROM features.observations o
 JOIN features.splits                     s  ON o.observation_id = s.observation_id
