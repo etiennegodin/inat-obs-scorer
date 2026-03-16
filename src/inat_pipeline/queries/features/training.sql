@@ -19,10 +19,13 @@ SELECT
      --Temporal features
     o.created_at,
     date_part('day',o.obs_to_submit_lag_days) AS obs_to_submit_lag_days,
-    o.observed_month,
     o.observed_week,
-    o.observed_hour,
+    o.observed_day,
+    o.observed_year,
+
     o.submitted_hour,
+    o.submitted_day,
+    o.submitted_week,
     o.submitted_year,
 
      --Observer features (from observer_features, computed at observation time)
@@ -76,7 +79,6 @@ SELECT
     t.taxon_cold_start,
     t.genus_popularity_rank,
     t.family_popularity_rank,
-    t.order_popularity_rank,
     t.genus_rg_rate,
     t.family_rg_rate,
 

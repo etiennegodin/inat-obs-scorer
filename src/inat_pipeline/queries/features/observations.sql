@@ -1,8 +1,8 @@
 CREATE SCHEMA IF NOT EXISTS features;
 
-CREATE OR REPLACE TABLE features.observations AS 
+CREATE OR REPLACE TABLE features.observations AS
 
-SELECT 
+SELECT
 
 -- Primary keys & joins
 o.id AS observation_id,
@@ -17,10 +17,17 @@ l.label,
 o.observed_on,
 o.created_at,
 o.created_at - o.observed_on AS obs_to_submit_lag_days,
-MONTH(o.observed_on) AS observed_month,
+
+YEAR(o.observed_on) AS observed_year,
+--MONTH(o.observed_on) AS observed_month,
 WEEK(o.observed_on) AS observed_week,
+DAY(o.observed_on) AS observed_day,
 COALESCE(HOUR(observed_on_string),0) AS observed_hour,
+
 HOUR(o.created_at) AS submitted_hour,
+DAY(o.created_at) AS submitted_day,
+--MONTH(o.created_at) AS submitted_month,
+WEEK(o.created_at) AS submitted_week,
 YEAR(o.created_at) AS submitted_year,
 
 -- Documentation quality (submission-time)
@@ -37,11 +44,11 @@ CASE
     WHEN o.tag_list is not NULL THEN LENGTH(tag_list)
     ELSE FALSE
 END AS tag_count,
-CASE 
+CASE
     WHEN o.license IS NOT NULL THEN license
     ELSE NULL
 END AS license_code,
-CASE 
+CASE
     WHEN o.license IS NOT NULL THEN TRUE
     ELSE FALSE
 END AS has_license,

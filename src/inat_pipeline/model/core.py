@@ -84,7 +84,7 @@ def load_and_split(
     config.set_features(test)
 
     # Override features type
-    # config.change_feature_type("oauth_application_id")
+    config.change_feature_type("oauth_application_id")
 
     # ── Log basic data stats ──────
     data_stats = {
