@@ -110,7 +110,7 @@ def create_parser() -> argparse.ArgumentParser:
     train_parser = subparsers.add_parser("train", help="Train model")
     train_parser.add_argument(
         "--classifier",
-        default="logistic",
+        default="lightgbm",
         choices=CLASSIFIER_REGISTRY,
         help="Classifier algorithm",
     )
