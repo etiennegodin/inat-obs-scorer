@@ -2,6 +2,8 @@ CREATE OR REPLACE TABLE graph.observer_id_events AS
 
 WITH raw_events AS (
     SELECT
+        i.id AS identification_id,
+        i.observation_id,
         o.user_id        AS observer_id,
         i.user_id        AS identifier_id,
         i.created_at,
@@ -19,6 +21,8 @@ WITH raw_events AS (
 )
 
 SELECT
+    observation_id,
+    id,
     observer_id,
     identifier_id,
     created_at,
@@ -32,6 +36,8 @@ FROM raw_events;
 
 CREATE OR REPLACE TABLE graph.observer_timeline AS
 SELECT
+    observation_id,
+    id,
     observer_id,
     identifier_id,
     created_at,
