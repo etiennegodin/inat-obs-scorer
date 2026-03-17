@@ -74,6 +74,7 @@ SELECT
         u.observer_only,
 
         -- Roles stats from this observers
+        /*
         COALESCE(r.prior_ids_received,0),
         COALESCE(r.prior_identifier_diversity,0),
         COALESCE(r.prior_taxa_received_on,0),
@@ -82,15 +83,18 @@ SELECT
         COALESCE(r.prior_ids_received_maverick,0),
         COALESCE(r.prior_ids_received_supporting,0),
         COALESCE(r.prior_ids_received_vision,0),
-        COALESCE(r.prior_ids_given,0),
-        COALESCE(r.prior_observers_helped,0),
-        COALESCE(r.prior_taxa_identified,0),
+        */
+        COALESCE(r.prior_ids_given,0) AS prior_ids_given,
+        COALESCE(r.prior_observers_helped,0) AS prior_obseververs_helped,
+        COALESCE(r.prior_taxa_identified,0) AS prior_taxa_identified,
+        /*
         COALESCE(r.prior_ids_given_improving,0),
         COALESCE(r.prior_ids_given_leading,0),
         COALESCE(r.prior_ids_given_maverick,0),
         COALESCE(r.prior_ids_given_supporting,0),
         COALESCE(r.prior_ids_given_vision,0),
-        COALESCE(r.reciprocity_ratio, 0),
+        */
+        COALESCE(r.reciprocity_ratio, 0) AS reciprocity_ratio,
      --Taxon features (fixed lookup)
     t.taxon_rg_rate,
     t.rank_level,

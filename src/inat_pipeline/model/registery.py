@@ -39,7 +39,7 @@ REDUCER_REGISTRY = {
         "PCA",
         {"n_components": 0.99},
     ),  # keep 95% variance
-    "svd": ("sklearn.decomposition", "TruncatedSVD", {"n_components": 20}),
+    "svd": ("sklearn.decomposition", "TruncatedSVD", {"n_components": 40}),
     "none": None,  # skip reduction entirely
 }
 
