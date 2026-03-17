@@ -5,6 +5,8 @@ WITH raw_events AS (
         o.user_id        AS observer_id,
         i.user_id        AS identifier_id,
         i.created_at,
+        i.category,
+        i.vision,
         -- rank each (observer, identifier) pair occurrence chronologically
         ROW_NUMBER() OVER (
             PARTITION BY o.user_id, i.user_id
@@ -20,6 +22,8 @@ SELECT
     observer_id,
     identifier_id,
     created_at,
+    vision,
+    category,
     1                                                     AS n_ids,
     CASE WHEN pair_occurrence_rank = 1 THEN 1 ELSE 0 END AS is_new_identifier
     -- is_new_identifier = 1 only on the FIRST time this person ever IDed for this observer
@@ -31,17 +35,18 @@ SELECT
     observer_id,
     identifier_id,
     created_at,
-    SUM(n_ids) OVER (
-        PARTITION BY observer_id
-        ORDER BY created_at
-        ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
-    ) AS cumulative_ids_received,
+    SUM(n_ids) OVER observer_history AS cumulative_ids_received,
+    SUM(is_new_identifier) OVER observer_history AS cumulative_distinct_identifiers,
 
-    SUM(is_new_identifier) OVER (
-        PARTITION BY observer_id
-        ORDER BY created_at
-        ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
-    ) AS cumulative_distinct_identifiers,
+    SUM(n_ids) FILTER (WHERE category = 'supporting') OVER observer_history AS cumulative_ids_supporting,
+    SUM(n_ids) FILTER (WHERE category = 'improving') OVER observer_history AS cumulative_ids_improving,
+    SUM(n_ids) FILTER (WHERE category = 'leading') OVER observer_history AS cumulative_ids_leading,
+    SUM(n_ids) FILTER (WHERE category = 'maverick') OVER observer_history AS cumulative_ids_maverick,
+    SUM(n_ids) FILTER (WHERE vision IS TRUE) OVER observer_history AS cumulative_ids_vision,
+
+
+
+
 
     SUM(n_ids) OVER (
         PARTITION BY observer_id, identifier_id
@@ -50,6 +55,12 @@ SELECT
     ) AS running_pair_weight
 
 FROM graph.observer_id_events
+
+    WINDOW observer_history AS (
+            PARTITION BY observer_id
+            ORDER BY created_at
+            ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+        )
 ORDER BY observer_id, created_at ASC;
 
 

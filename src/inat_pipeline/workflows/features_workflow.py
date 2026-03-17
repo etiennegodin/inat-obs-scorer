@@ -22,7 +22,6 @@ def execute(deps: Dependencies):
             "identifications_timeline",
             "cumulative_id_stats",
             "identifications",
-            "identifiers_counts",
             "taxon",
             "label",
             "observations",

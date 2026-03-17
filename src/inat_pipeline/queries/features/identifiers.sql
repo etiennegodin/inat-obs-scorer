@@ -4,6 +4,7 @@ WITH base_id AS(
     SELECT
         i.id                      AS identification_id,
         i.user_id,
+        o.id,
         i.taxon_id,
         i.created_at,
         i.category,
@@ -20,6 +21,7 @@ WITH base_id AS(
         rg.is_rg,
 
     FROM staged.identifications i
+    JOIN staged.observations o ON o.id = i.observation_id
     JOIN staged.users u
         ON i.user_id = u.user_id
     LEFT JOIN research_grade_windowed(INTERVAL '999 years') rg
