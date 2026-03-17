@@ -74,8 +74,23 @@ SELECT
         u.observer_only,
 
         -- Roles stats from this observers
-        --r.*EXCLUDE(observation_id),
-
+        COALESCE(r.prior_ids_received,0),
+        COALESCE(r.prior_identifier_diversity,0),
+        COALESCE(r.prior_taxa_received_on,0),
+        COALESCE(r.prior_ids_received_improving,0),
+        COALESCE(r.prior_ids_received_leading,0),
+        COALESCE(r.prior_ids_received_maverick,0),
+        COALESCE(r.prior_ids_received_supporting,0),
+        COALESCE(r.prior_ids_received_vision,0),
+        COALESCE(r.prior_ids_given,0),
+        COALESCE(r.prior_observers_helped,0),
+        COALESCE(r.prior_taxa_identified,0),
+        COALESCE(r.prior_ids_given_improving,0),
+        COALESCE(r.prior_ids_given_leading,0),
+        COALESCE(r.prior_ids_given_maverick,0),
+        COALESCE(r.prior_ids_given_supporting,0),
+        COALESCE(r.prior_ids_given_vision,0),
+        COALESCE(r.reciprocity_ratio, 0),
      --Taxon features (fixed lookup)
     t.taxon_rg_rate,
     t.rank_level,
@@ -107,7 +122,7 @@ LEFT JOIN features.observers_entropy     oe ON o.observation_id = oe.observation
 
 --LEFT JOIN features.identifications       i  ON o.observation_id = i.observation_id
 --LEFT JOIN features.identifiers           ir ON o.observation_id = ir.observation_id
---JOIN features.user_roles                 r  ON o.observation_id = r.observation_id
+JOIN features.user_roles                 r  ON o.observation_id = r.observation_id
 LEFT JOIN features.taxon                 t  ON o.observation_id = t.observation_id
 LEFT JOIN features.taxa_confusion        c  ON o.taxon_id = c.taxon_id
 LEFT JOIN staged.users                   u  ON o.user_id = u.user_id
