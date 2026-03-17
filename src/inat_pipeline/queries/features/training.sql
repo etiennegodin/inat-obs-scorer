@@ -61,14 +61,20 @@ SELECT
 
         --Identifiers counts from obs history
         --LOG(ir.identifiers_total + 1) AS obv_n_identifier_log,
+        /*
         ir.identifiers_agreeing,
         ir.identifiers_improving,
         ir.identifiers_maverick,
         ir.identifiers_vision,
+        */
+
+
 
         -- Observer as identifiers score
         u.observer_only,
 
+        -- Roles stats from this observers
+        r.*EXCLUDE(observation_id),
 
      --Taxon features (fixed lookup)
     t.taxon_rg_rate,
@@ -103,8 +109,9 @@ JOIN features.splits                     s  ON o.observation_id = s.observation_
 LEFT JOIN features.observers             ob ON o.observation_id = ob.observation_id
 LEFT JOIN features.observers_entropy     oe ON o.observation_id = oe.observation_id
 
-LEFT JOIN features.identifications       i  ON o.observation_id = i.observation_id
-LEFT JOIN features.identifiers           ir ON o.observation_id = ir.observation_id
+--LEFT JOIN features.identifications       i  ON o.observation_id = i.observation_id
+--LEFT JOIN features.identifiers           ir ON o.observation_id = ir.observation_id
+LEFT JOIN features.user_roles            r ON o.observation_id = r.observation_id
 LEFT JOIN features.taxon                 t  ON o.observation_id = t.observation_id
 LEFT JOIN features.taxa_confusion        c  ON o.taxon_id = c.taxon_id
 LEFT JOIN staged.users                   u  ON o.user_id = u.user_id

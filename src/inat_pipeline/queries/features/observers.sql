@@ -137,4 +137,4 @@ ranked AS (
         FROM aggregates
 )
 
-SELECT * FROM ranked;
+SELECT * FROM ranked
