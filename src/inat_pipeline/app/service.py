@@ -82,7 +82,7 @@ class ApplicationService:
         if args.test:
             logger.info("Test mode, limited to 3 trials and 2 cv_folds")
             n_trials = 3
-            cv_folds = 2
+            cv_folds = 3
         else:
             n_trials = args.n_trials
             cv_folds = args.cv_folds

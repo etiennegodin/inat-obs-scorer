@@ -21,7 +21,7 @@ def execute(deps: Dependencies):
             "research_grade_windowed",
             "identifications_timeline",
             "cumulative_id_stats",
-            "identifications",
+            "identifiers",
             "taxon",
             "label",
             "observations",
@@ -30,9 +30,8 @@ def execute(deps: Dependencies):
         )
 
         """
-        sql_features.execute_many("taxa_assymetry",
-            "taxa_distance",
-            "taxa_confusion",)
+        sql_features.execute(
+            "taxa_confusion")
         """
 
         # Train/Val/Test splits

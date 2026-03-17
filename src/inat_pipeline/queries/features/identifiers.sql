@@ -1,10 +1,11 @@
-CREATE OR REPLACE TABLE features.identifiers_score AS
+CREATE OR REPLACE TABLE features.identifiers AS
 
 WITH base_id AS(
     SELECT
         i.id                      AS identification_id,
-        i.user_id,
-        o.id,
+        i.user_id AS identifier_id,
+        o.id as observation_id,
+        o.user_id AS observer_id,
         i.taxon_id,
         i.created_at,
         i.category,
@@ -33,7 +34,9 @@ aggregates AS(
     SELECT
         -- Keys
         identification_id,
-        user_id,
+        observation_id,
+        identifier_id,
+        observer_id,
         taxon_id,
         created_at,
 
@@ -78,12 +81,12 @@ aggregates AS(
 
     WINDOW
         identifier_history AS (
-            PARTITION BY user_id
+            PARTITION BY identifier_id
             ORDER BY created_at
             ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING
         ),
         identifier_taxon_history AS (
-            PARTITION BY user_id, taxon_id
+            PARTITION BY identifier_id, taxon_id
             ORDER BY created_at
             ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING
         )
