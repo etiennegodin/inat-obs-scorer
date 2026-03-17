@@ -66,7 +66,7 @@ aggregates AS(
 
     FROM staged.similar_species s
     JOIN similar_species_agg n ON s.similar_taxon_id = n.similar_taxon_id
-    JOIN features.taxa_distance d ON d.taxon_id = s.taxon_id
+    JOIN staged.taxa_distance d ON d.taxon_id = s.taxon_id
     JOIN staged.observations o ON s.taxon_id = o.taxon_id
     GROUP BY s.taxon_id
 
@@ -122,6 +122,6 @@ SELECT a.*,
 
 FROM aggregates a
 JOIN nbor_taxa_diversity n ON n.taxon_id = a.taxon_id
-JOIN features.taxa_assymetry s ON a.taxon_id = s.taxon_id
+JOIN staged.taxa_assymetry s ON a.taxon_id = s.taxon_id
 JOIN ranked r ON a.taxon_id = r.focal_taxon_id
 WHERE r.is_focal = TRUE

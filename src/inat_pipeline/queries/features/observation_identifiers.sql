@@ -1,4 +1,4 @@
-CREATE OR REPLACE TABLE staged.identifiers_summary AS
+CREATE OR REPLACE TABLE staged.observation_identifiers AS
     SELECT
         observation_id,
         COUNT(DISTINCT(user_id))                        AS total_identifiers,

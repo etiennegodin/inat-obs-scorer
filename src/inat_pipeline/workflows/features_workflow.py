@@ -19,6 +19,8 @@ def execute(deps: Dependencies):
         sql_features.execute_many(
             "community_taxon_windowed",
             "research_grade_windowed",
+            "identifications_timeline",
+            "cumulative_id_stats",
             "identifications",
             "identifiers_counts",
             "taxon",

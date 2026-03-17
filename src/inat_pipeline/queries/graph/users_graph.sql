@@ -1,8 +1,7 @@
 CREATE SCHEMA IF NOT EXISTS graph;
-
+-- static
 
 CREATE OR REPLACE TABLE graph.observer_identifier_edges AS
-
 
 WITH base AS(
 
@@ -35,7 +34,7 @@ FROM base b
 JOIN identifier_totals it USING (identifier_id);
 
 
-CREATE OR REPLACE TABLE graph.nodes AS
+CREATE OR REPLACE TABLE graph.user_nodes AS
 SELECT user_id, 'observer'   AS role FROM staged.observations
 UNION
 SELECT user_id, 'identifier' AS role FROM staged.identifications WHERE own_observation IS FALSE

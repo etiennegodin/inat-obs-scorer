@@ -1,4 +1,4 @@
-CREATE OR REPLACE TABLE features.identifiers_network AS
+CREATE OR REPLACE TABLE graph.identifiers_network AS
 
 SELECT
     observer_id,
