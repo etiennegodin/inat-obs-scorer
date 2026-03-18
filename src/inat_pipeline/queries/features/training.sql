@@ -74,27 +74,25 @@ SELECT
         u.observer_only,
 
         -- Roles stats from this observers
-        /*
-        COALESCE(i.prior_ids_received,0),
-        COALESCE(i.prior_identifier_diversity,0),
-        COALESCE(i.prior_taxa_received_on,0),
-        COALESCE(i.prior_ids_received_improving,0),
-        COALESCE(i.prior_ids_received_leading,0),
-        COALESCE(i.prior_ids_received_maverick,0),
-        COALESCE(i.prior_ids_received_supporting,0),
-        COALESCE(i.prior_ids_received_vision,0),
-        */
-        COALESCE(i.prior_ids_given,0) AS prior_ids_given,
-        COALESCE(i.prior_observers_helped,0) AS prior_obseververs_helped,
-        COALESCE(i.prior_taxa_identified,0) AS prior_taxa_identified,
-        /*
-        COALESCE(i.prior_ids_given_improving,0),
-        COALESCE(i.prior_ids_given_leading,0),
-        COALESCE(i.prior_ids_given_maverick,0),
-        COALESCE(i.prior_ids_given_supporting,0),
-        COALESCE(i.prior_ids_given_vision,0),
-        */
+
+        COALESCE(i.prior_ids_received,0) AS prior_ids_received,
+        COALESCE(i.prior_identifier_diversity,0) AS prior_identifier_diversity,
+        COALESCE(i.prior_taxa_received_on,0) AS prior_taxa_received_on,
+        COALESCE(i.prior_observer_rg_rate,0) AS prior_observer_rg_rate,
+        COALESCE(i.prior_ids_received_agree_rate, 0) AS prior_ids_received_agree_rate,
+        COALESCE(i.prior_ids_received_disagree_rate, 0) AS prior_ids_received_disagree_rate,
+,
+
+        COALESCE(i.prior_ids_given, 0) AS prior_ids_given,
+        COALESCE(i.prior_observers_helped, 0) AS prior_observers_helped,
+        COALESCE(i.prior_taxa_identified, 0) AS prior_taxa_identified,
+        COALESCE(i.prior_ids_given_improving_rate, 0) AS prior_ids_given_improving_rate,
+        COALESCE(i.prior_ids_given_agree_rate, 0) AS prior_ids_given_agree_rate,
+        COALESCE(i.prior_ids_given_disagree_rate, 0) AS prior_ids_given_disagree_rate,
+        COALESCE(i.prior_ids_vision_rate, 0) AS prior_ids_vision_rate,
+
         COALESCE(i.reciprocity_ratio, 0) AS reciprocity_ratio,
+
      --Taxon features (fixed lookup)
     t.taxon_rg_rate,
     t.rank_level,
