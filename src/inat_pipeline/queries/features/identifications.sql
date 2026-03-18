@@ -1,4 +1,4 @@
-CREATE OR REPLACE TABLE features.user_roles AS
+CREATE OR REPLACE TABLE features.identifications AS
 
 -- Observer features: history of IDs RECEIVED by this observation's author
 WITH observer_features AS(
@@ -48,7 +48,6 @@ SELECT
     id_role.*EXCLUDE(observation_id, user_id),
 
     --| `prior_rg_rate_of_ids_given` | How often do their IDs help close observations |
-
 
     -- derived: reciprocity ratio
     COALESCE(id_role.prior_ids_given, 0)::FLOAT

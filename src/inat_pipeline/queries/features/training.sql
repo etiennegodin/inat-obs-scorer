@@ -4,29 +4,29 @@ SELECT
     s.split,
 
     --Label
-    o.label,
+    l.label,
 
      --Documentation features (submission-time safe)
-    o.photo_count,
-    o.has_description,
-    o.has_tags,
-    o.tag_count,
-    --o.has_license,
-    o.positional_accuracy_m,
-    o.geoprivacy IS NOT NULL                AS geoprivacy_set,
-    COALESCE(o.oauth_application_id,0)      AS oauth_application_id,
+    m.photo_count,
+    m.has_description,
+    m.has_tags,
+    m.tag_count,
+    --m.has_license,
+    m.positional_accuracy_m,
+    m.geoprivacy IS NOT NULL                AS geoprivacy_set,
+    COALESCE(m.oauth_application_id,0)      AS oauth_application_id,
 
      --Temporal features
-    o.created_at,
-    date_part('day',o.obs_to_submit_lag_days) AS obs_to_submit_lag_days,
-    o.observed_week,
-    o.observed_day,
-    o.observed_year,
+    m.created_at,
+    date_part('day',m.obs_to_submit_lag_days) AS obs_to_submit_lag_days,
+    m.observed_week,
+    m.observed_day,
+    m.observed_year,
 
-    o.submitted_hour,
-    o.submitted_day,
-    o.submitted_week,
-    o.submitted_year,
+    m.submitted_hour,
+    m.submitted_day,
+    m.submitted_week,
+    m.submitted_year,
 
      --Observer features (from observer_features, computed at observation time)
          --Temporal
@@ -60,12 +60,12 @@ SELECT
         ob.has_orcid AS obv_has_orcid,
 
         --Identifiers counts from obs history
-        --LOG(ir.identifiers_total + 1) AS obv_n_identifier_log,
+        --LOG(ii.identifiers_total + 1) AS obv_n_identifier_log,
         /*
-        ir.identifiers_agreeing,
-        ir.identifiers_improving,
-        ir.identifiers_maverick,
-        ir.identifiers_vision,
+        ii.identifiers_agreeing,
+        ii.identifiers_improving,
+        ii.identifiers_maverick,
+        ii.identifiers_vision,
         */
 
 
@@ -75,26 +75,26 @@ SELECT
 
         -- Roles stats from this observers
         /*
-        COALESCE(r.prior_ids_received,0),
-        COALESCE(r.prior_identifier_diversity,0),
-        COALESCE(r.prior_taxa_received_on,0),
-        COALESCE(r.prior_ids_received_improving,0),
-        COALESCE(r.prior_ids_received_leading,0),
-        COALESCE(r.prior_ids_received_maverick,0),
-        COALESCE(r.prior_ids_received_supporting,0),
-        COALESCE(r.prior_ids_received_vision,0),
+        COALESCE(i.prior_ids_received,0),
+        COALESCE(i.prior_identifier_diversity,0),
+        COALESCE(i.prior_taxa_received_on,0),
+        COALESCE(i.prior_ids_received_improving,0),
+        COALESCE(i.prior_ids_received_leading,0),
+        COALESCE(i.prior_ids_received_maverick,0),
+        COALESCE(i.prior_ids_received_supporting,0),
+        COALESCE(i.prior_ids_received_vision,0),
         */
-        COALESCE(r.prior_ids_given,0) AS prior_ids_given,
-        COALESCE(r.prior_observers_helped,0) AS prior_obseververs_helped,
-        COALESCE(r.prior_taxa_identified,0) AS prior_taxa_identified,
+        COALESCE(i.prior_ids_given,0) AS prior_ids_given,
+        COALESCE(i.prior_observers_helped,0) AS prior_obseververs_helped,
+        COALESCE(i.prior_taxa_identified,0) AS prior_taxa_identified,
         /*
-        COALESCE(r.prior_ids_given_improving,0),
-        COALESCE(r.prior_ids_given_leading,0),
-        COALESCE(r.prior_ids_given_maverick,0),
-        COALESCE(r.prior_ids_given_supporting,0),
-        COALESCE(r.prior_ids_given_vision,0),
+        COALESCE(i.prior_ids_given_improving,0),
+        COALESCE(i.prior_ids_given_leading,0),
+        COALESCE(i.prior_ids_given_maverick,0),
+        COALESCE(i.prior_ids_given_supporting,0),
+        COALESCE(i.prior_ids_given_vision,0),
         */
-        COALESCE(r.reciprocity_ratio, 0) AS reciprocity_ratio,
+        COALESCE(i.reciprocity_ratio, 0) AS reciprocity_ratio,
      --Taxon features (fixed lookup)
     t.taxon_rg_rate,
     t.rank_level,
@@ -119,17 +119,18 @@ SELECT
     c.nbor_rg_rate_std,
 
 
-FROM features.observations o
-JOIN features.splits                     s  ON o.observation_id = s.observation_id
-LEFT JOIN features.observers             ob ON o.observation_id = ob.observation_id
-LEFT JOIN features.observers_entropy     oe ON o.observation_id = oe.observation_id
+FROM features.metadata m
+JOIN features.splits                     s  ON m.observation_id = s.observation_id
+LEFT JOIN features.observers             ob ON m.observation_id = ob.observation_id
+LEFT JOIN features.observers_entropy     oe ON m.observation_id = oe.observation_id
+LEFT JOIN features.label                 l  ON m.observation_id = l.observation_id
 
---LEFT JOIN features.identifications       i  ON o.observation_id = i.observation_id
---LEFT JOIN features.identifiers           ir ON o.observation_id = ir.observation_id
-JOIN features.user_roles                 r  ON o.observation_id = r.observation_id
-LEFT JOIN features.taxon                 t  ON o.observation_id = t.observation_id
-LEFT JOIN features.taxa_confusion        c  ON o.taxon_id = c.taxon_id
-LEFT JOIN staged.users                   u  ON o.user_id = u.user_id
+--LEFT JOIN features.identifications       i  ON m.observation_id = i.observation_id
+--LEFT JOIN features.identifiers           ir ON m.observation_id = ii.observation_id
+JOIN features.identifications            i  ON m.observation_id = i.observation_id
+LEFT JOIN features.taxon                 t  ON m.observation_id = t.observation_id
+LEFT JOIN features.taxa_confusion        c  ON m.taxon_id = c.taxon_id
+LEFT JOIN staged.users                   u  ON m.user_id = u.user_id
 
-WHERE o.label IS NOT NULL
-ORDER BY o.created_at
+WHERE m.label IS NOT NULL
+ORDER BY m.created_at

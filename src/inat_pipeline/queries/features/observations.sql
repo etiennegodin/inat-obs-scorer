@@ -1,90 +1,143 @@
-CREATE SCHEMA IF NOT EXISTS features;
-
 CREATE OR REPLACE TABLE features.observations AS
 
-SELECT
+WITH base_obs AS(
+    SELECT
+        o.id                      AS observation_id,
+        o.user_id,
+        o.taxon_id,
+        o.created_at,
+        o.description,
+        o.license,
+        o.oauth_application_id,
+        o.observation_photos,
+        o."order",
+        o.family,
+        o.genus,
+        o.species,
+        u.created_at              AS user_created_at,
+        u.orcid,
+        t.taxon_rg_rate           AS expected_rg_rate,
+        rg.n_identifiers_at_window,
+        rg.n_identifiers_agree_at_window,
+        -- Honest RG label from macro (no leakage)
+        COALESCE(rg.is_rg, FALSE)           AS is_rg
 
--- Primary keys & joins
-o.id AS observation_id,
-o.uuid,
-o.user.id AS user_id,
+    FROM staged.observations o
+    JOIN staged.users u
+        ON o.user_id = u.user_id
+    JOIN features.taxon t
+        ON t.observation_id = o.id
+    -- Unbounded window = all identifications ever, for current-state scoring
+    LEFT JOIN research_grade_windowed(INTERVAL '999 years') rg
+        ON rg.observation_id = o.id
+),
 
--- Label
-l.label,
---o.quality_grade AS final_grade,
+aggregates AS(
+    SELECT
+        -- Keys
+        observation_id,
+        user_id,
+        taxon_id,
+        created_at,
 
--- Temporal (submission-time signals)
-o.observed_on,
-o.created_at,
-o.created_at - o.observed_on AS obs_to_submit_lag_days,
+        -- ── Static observer attributes ──────────────────────────────
+        created_at - user_created_at     AS observer_tenure,
+        CASE WHEN observer_tenure > INTERVAL '730 days' THEN TRUE ELSE FALSE END AS is_veteran,
+        orcid IS NOT NULL AS has_orcid,
 
-YEAR(o.observed_on) AS observed_year,
---MONTH(o.observed_on) AS observed_month,
-WEEK(o.observed_on) AS observed_week,
-DAY(o.observed_on) AS observed_day,
-COALESCE(HOUR(observed_on_string),0) AS observed_hour,
+        -- ── Own-observation history ──────────────────────────────────
+        COALESCE(COUNT(*)           OVER observer_history, 0) AS observer_obs_count_at_t,
+        COALESCE(SUM(is_rg::INT)    OVER observer_history, 0) AS observer_rg_count_at_t,
 
-HOUR(o.created_at) AS submitted_hour,
-DAY(o.created_at) AS submitted_day,
---MONTH(o.created_at) AS submitted_month,
-WEEK(o.created_at) AS submitted_week,
-YEAR(o.created_at) AS submitted_year,
+        -- Bayesian-shrunk RG rate (α=10, matches taxon shrinkage convention)
+        (COALESCE(SUM(is_rg::INT) OVER obs_hist, 0) + 10 * expected_rg_rate)
+            / NULLIF(COALESCE(COUNT(*) OVER obs_hist, 0) + 10, 0)
+                                                                AS observer_rg_rate_at_t,
 
--- Documentation quality (submission-time)
-LENGTH(o.observation_photos) AS photo_count,
-CASE
-    WHEN o.description is not NULL THEN TRUE
-    ELSE FALSE
-END AS has_description,
-CASE
-    WHEN o.tag_list is not NULL THEN TRUE
-    ELSE FALSE
-END AS has_tags,
-CASE
-    WHEN o.tag_list is not NULL THEN LENGTH(tag_list)
-    ELSE FALSE
-END AS tag_count,
-CASE
-    WHEN o.license IS NOT NULL THEN license
-    ELSE NULL
-END AS license_code,
-CASE
-    WHEN o.license IS NOT NULL THEN TRUE
-    ELSE FALSE
-END AS has_license,
-o.positional_accuracy AS positional_accuracy_m,
-CASE WHEN o.coordinates_obscured is not Null THEN TRUE ELSE FALSE END AS obscured,
-o.geoprivacy,
-o.taxon_geoprivacy,
-COALESCE(
-    o.captive_cultivated IS NOT NULL,
-    o.captive_cultivated
-) AS captive,
-o.oauth_application_id,
-CASE WHEN o.user.orcid IS NOT NULL THEN TRUE ELSE FALSE END AS has_orcid,
-o.owners_identification_from_vision AS owners_id_from_vision,
+        COALESCE(COUNT(*) OVER obs_hist, 0) >= 20              AS rg_rate_is_reliable,
 
 
--- Community engagement (post-submission signals — use carefully, see notes)
---identifications_count,
---comments_count,
---faves_count,
---LENGTH(reviewed_by) AS reviewed_by_count,
---LENGTH(identifications) AS id_count_total,
---CASE WHEN outlinks is not NULL THEN TRUE ELSE FALSE END AS had_outlink,
+        -- Raw ratio for reputation (unshrunk, used for rank)
+        COALESCE(observer_rg_rate_at_t /  NULLIF(expected_rg_rate, 0),0) AS observer_reputation_raw,
+        observer_obs_count_at_t >= 20 AS rg_rate_is_reliable,
+
+        COALESCE(COUNT(*)           OVER observer_taxon_history, 0)  AS observer_taxon_obs_count_at_t,
+        COALESCE(SUM(is_rg::INT)    OVER observer_taxon_history, 0) AS observer_taxon_obs_rg_count_at_t,
+        COALESCE(observer_taxon_obs_count_at_t::FLOAT
+                / NULLIF(observer_taxon_obs_rg_count_at_t, 0), 0)      AS observer_taxon_rg_rate_at_t,
+
+        observer_taxon_obs_count_at_t::FLOAT
+            / NULLIF(observer_obs_count_at_t, 0) AS observer_taxon_focus_rate,
 
 
--- Location (for geo features join)
-o.latitude,
-o.longitude,
-o.place_guess,
+        -- ── Observation cadence ──────────────────────────────────────
+        created_at - LAG (created_at, 1, NULL ) OVER observer_history AS lag_since_last_obs,
 
--- Taxon (for taxon features join)
-o.taxon_id,
+        -- Observer reputation score (v0.2 definition)
 
--- Metadata
-a.scraped_at,
+        -- (observer_reputation_raw - MIN(observer_reputation_raw) OVER ()) * 1.0 / NULLIF(MAX(observer_reputation_raw) OVER() - MIN(observer_reputation_raw) OVER (),0 ) AS observer_reputation_score,
 
-FROM staged.observations o
-LEFT JOIN features.label l ON o.id = l.observation_id
-LEFT JOIN raw.inat_api a ON o.uuid = a.raw_id
+        -- Taxonomic behaviour
+        COUNT(DISTINCT("order")) FILTER (WHERE "order" IS NOT NULL) OVER observer_history AS taxon_diversity_order,
+        COUNT(DISTINCT(family)) FILTER (WHERE family IS NOT NULL) OVER observer_history AS taxon_diversity_family,
+        COUNT(DISTINCT(genus)) FILTER (WHERE genus IS NOT NULL) OVER observer_history AS taxon_diversity_genus,
+        COALESCE(COUNT(DISTINCT(species)) FILTER (WHERE species IS NOT NULL) OVER observer_history,0) AS taxon_diversity_species,
+
+        -- ── Community engagement received ────────────────────────────
+        AVG(n_identifiers_at_window) OVER observer_history AS n_identifiers_mean,
+        AVG(n_identifiers_agree_at_window) OVER observer_history AS n_identifiers_agree_mean,
+
+        -- Documentation quality
+        COALESCE(
+            AVG(LENGTH(observation_photos)) OVER observer_history,0) AS avg_photo_count,
+        COALESCE(COUNT(DISTINCT(observation_id)) FILTER (
+            WHERE description IS NOT NULL
+            ) OVER observer_history / NULLIF(observer_obs_count_at_t,0),0) AS pct_obs_with_description,
+        COALESCE(COUNT(DISTINCT(observation_id)) FILTER (
+            WHERE license IS NOT NULL
+            ) OVER observer_history / NULLIF(observer_obs_count_at_t,0),0)  AS pct_obs_with_license,
+        COALESCE(COUNT(DISTINCT(observation_id)) FILTER (
+            WHERE oauth_application_id = 3
+            OR oauth_application_id = 4
+            ) OVER observer_history / NULLIF(observer_obs_count_at_t,0),0)   AS pct_obs_from_mobile,
+
+
+    FROM base_obs
+
+    WINDOW
+        observer_history AS (
+            PARTITION BY user_id
+            ORDER BY created_at
+            ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING
+        ),
+        observer_taxon_history AS (
+            PARTITION BY user_id, taxon_id
+            ORDER BY created_at
+            ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING
+        )
+),
+
+ranked AS (
+    SELECT
+        *,
+        -- leaky but approximation point-in-time rank among observers active in same period
+        PERCENT_RANK() OVER (
+            PARTITION BY DATE_TRUNC('month', created_at)
+            ORDER BY observer_reputation_raw
+            ) AS observer_reputation_rank,
+
+        -- how much does this obs have more ids than others around same time
+        PERCENT_RANK() OVER (
+            PARTITION BY DATE_TRUNC('month', created_at)
+            ORDER BY n_identifiers_mean
+            ) AS n_identifiers_mean_rank,
+
+        PERCENT_RANK() OVER (
+            PARTITION BY DATE_TRUNC('month', created_at)
+                ORDER BY n_identifiers_agree_mean
+                ) AS n_identifiers_agree_mean_rank,
+
+        FROM aggregates
+)
+
+SELECT * FROM ranked
