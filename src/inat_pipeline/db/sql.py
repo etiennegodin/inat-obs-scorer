@@ -8,6 +8,7 @@ from typing import Any
 import pandas as pd
 import sqlparams
 
+from .adapters import DuckDBAdapter
 from .protocols import DBConnection
 
 # ALLOWED_TABLES = ["raw.downloads", "raw.taxa", "raw.places"]
@@ -67,7 +68,8 @@ class SQLEngine(ABC):
         query, values = self._load(script_name, params, **identifiers)
         logger.debug("Executing SQL: %s", script_name)
         start = time.monotonic()
-        self.con.execute(query, values)
+        self.con.execute(query, values, script=script_name)
+
         logger.info(
             f"Executed {script_name}.sql, "
             f"took {round((time.monotonic() - start), 3)}s"
@@ -78,7 +80,7 @@ class SQLEngine(ABC):
     ) -> list[dict[Any, Any]]:
         """Run a SELECT — returns rows as dicts."""
         query, params = self._load(script_name, params, **identifiers)
-        result = self.con.execute(query, params)
+        result = self.con.execute(query, params, script=script_name)
         columns = [col[0] for col in result.description]
         return [dict(zip(columns, row)) for row in result.fetchall()]
 
@@ -87,7 +89,7 @@ class SQLEngine(ABC):
     ) -> pd.DataFrame:
         """Fetch rows and convert to DataFrame — works with any PEP 249 driver."""
         query, params = self._load(script_name, params, **identifiers)
-        result = self.con.execute(query, params)
+        result = self.con.execute(query, params, script=script_name)
         columns = [col[0] for col in result.description]
         return pd.DataFrame(result.fetchall(), columns=columns)
 
@@ -100,8 +102,12 @@ class SQLEngine(ABC):
 
 
 class DuckDbSQL(SQLEngine):
-    def __init__(self, con: DBConnection, sql_dir: Path):
-        self.con = con
+    def __init__(
+        self,
+        adapter: DuckDBAdapter,
+        sql_dir: Path,
+    ):
+        self.con = adapter
         self.sql_dir = Path(sql_dir)
 
     def _parametrise_query(self, query: str, params: dict) -> tuple[str, list]:

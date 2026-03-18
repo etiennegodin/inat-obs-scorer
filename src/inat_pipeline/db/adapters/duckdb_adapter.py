@@ -3,10 +3,12 @@ from typing import Any
 
 import duckdb
 
+from ...exceptions import DBError
+
 logger = logging.getLogger(__name__)
 
 
-class DuckDBConnection:
+class DuckDBAdapter:
     def __init__(self, db_path: str):
         self.db_path = db_path
         self._con: duckdb.DuckDBPyConnection | None = None
@@ -24,8 +26,16 @@ class DuckDBConnection:
             logger.debug("DuckDB connection closed")
         return False
 
-    def execute(self, query: str, params: Any):
-        return self._con.execute(query, params)
+    def execute(self, query: str, params: Any, script: str | None = None):
+        print(script)
+        try:
+            return self._con.execute(query, params)
+        except duckdb.CatalogException as e:
+            raise DBError(str(e), script=script) from e
+        except duckdb.BinderException as e:
+            raise DBError(str(e), script=script) from e
+        except duckdb.Error as e:
+            raise DBError(str(e), script=script) from e
 
     def executemany(self, query: str, params: list[tuple]):
         return self._con.executemany(query, params)

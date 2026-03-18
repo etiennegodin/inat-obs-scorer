@@ -16,7 +16,7 @@ base AS(
         observation_id,
         created_at,
         submitted_year
-    FROM features.observations,
+    FROM features.base,
 ),
 -- Everything before cutoff is train.
 train_obs AS (

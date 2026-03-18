@@ -2,7 +2,7 @@ import logging
 from datetime import date
 
 from ..app.container import Dependencies
-from ..db import DuckDBConnection, DuckDbSQL
+from ..db import DuckDBAdapter, DuckDbSQL
 from ..queries.params import TrainingSplitParams
 from ..utils.splits import splits_report
 
@@ -10,25 +10,29 @@ logger = logging.getLogger(__name__)
 
 
 def execute(deps: Dependencies):
-    with DuckDBConnection(deps.DB_PATH) as con:
+    with DuckDBAdapter(deps.DB_PATH) as con:
         # Transform data and create features
         sql_features = DuckDbSQL(con, deps.SQL_FEATURES_PATH)
         sql_split = DuckDbSQL(con, deps.QUERY_FOLDER / "split")
-        sql_features
+        sql_graph = DuckDbSQL(con, deps.QUERY_FOLDER / "graph")
 
+        sql_graph.execute_many(
+            "network_events",
+            "user_role_timeline",
+        )
+
+        """
         sql_features.execute_many(
             "community_taxon_windowed",
             "research_grade_windowed",
-            "network_events",
-            "user_role_timeline",
+            "base",
             "taxon",
             "label",
             "observations",
             "identifications",
-            "observers",
             "observers_entropy",
         )
-
+        """
         """
         sql_features.execute(
             "taxa_confusion")

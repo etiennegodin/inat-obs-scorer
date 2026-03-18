@@ -2,7 +2,7 @@ import asyncio
 import logging
 
 from ..app.container import Dependencies
-from ..db import DuckDBConnection, DuckDbSQL
+from ..db import DuckDBAdapter, DuckDbSQL
 from ..inat_client import (
     DuckDbWriter,
     EndpointConfig,
@@ -20,7 +20,7 @@ def execute(deps: Dependencies, rate: int, ignore_not_found: bool) -> None:
     SOURCE_KEY = "uuid"
     CHUNK_SIZE = 200
 
-    with DuckDBConnection(deps.DB_PATH) as con:
+    with DuckDBAdapter(deps.DB_PATH) as con:
         # 1 Create table to receive api data
 
         sql_api = DuckDbSQL(con, deps.SQL_API_PATH)

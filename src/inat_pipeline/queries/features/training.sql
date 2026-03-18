@@ -7,26 +7,26 @@ SELECT
     l.label,
 
      --Documentation features (submission-time safe)
-    m.photo_count,
-    m.has_description,
-    m.has_tags,
-    m.tag_count,
-    --m.has_license,
-    m.positional_accuracy_m,
-    m.geoprivacy IS NOT NULL                AS geoprivacy_set,
-    COALESCE(m.oauth_application_id,0)      AS oauth_application_id,
+    b.photo_count,
+    b.has_description,
+    b.has_tags,
+    b.tag_count,
+    --b.has_license,
+    b.positional_accuracy_m,
+    b.geoprivacy IS NOT NULL                AS geoprivacy_set,
+    COALESCE(b.oauth_application_id,0)      AS oauth_application_id,
 
      --Temporal features
-    m.created_at,
-    date_part('day',m.obs_to_submit_lag_days) AS obs_to_submit_lag_days,
-    m.observed_week,
-    m.observed_day,
-    m.observed_year,
+    b.created_at,
+    date_part('day',b.obs_to_submit_lag_days) AS obs_to_submit_lag_days,
+    b.observed_week,
+    b.observed_day,
+    b.observed_year,
 
-    m.submitted_hour,
-    m.submitted_day,
-    m.submitted_week,
-    m.submitted_year,
+    b.submitted_hour,
+    b.submitted_day,
+    b.submitted_week,
+    b.submitted_year,
 
      --Observer features (from observer_features, computed at observation time)
          --Temporal
@@ -117,18 +117,18 @@ SELECT
     c.nbor_rg_rate_std,
 
 
-FROM features.metadata m
-JOIN features.splits                     s  ON m.observation_id = s.observation_id
-LEFT JOIN features.observers             ob ON m.observation_id = ob.observation_id
-LEFT JOIN features.observers_entropy     oe ON m.observation_id = oe.observation_id
-LEFT JOIN features.label                 l  ON m.observation_id = l.observation_id
+FROM features.base b
+JOIN features.splits                     s  ON b.observation_id = s.observation_id
+LEFT JOIN features.observers             ob ON b.observation_id = ob.observation_id
+LEFT JOIN features.observers_entropy     oe ON b.observation_id = oe.observation_id
+LEFT JOIN features.label                 l  ON b.observation_id = l.observation_id
 
---LEFT JOIN features.identifications       i  ON m.observation_id = i.observation_id
---LEFT JOIN features.identifiers           ir ON m.observation_id = ii.observation_id
-JOIN features.identifications            i  ON m.observation_id = i.observation_id
-LEFT JOIN features.taxon                 t  ON m.observation_id = t.observation_id
-LEFT JOIN features.taxa_confusion        c  ON m.taxon_id = c.taxon_id
-LEFT JOIN staged.users                   u  ON m.user_id = u.user_id
+--LEFT JOIN features.identifications       i  ON b.observation_id = i.observation_id
+--LEFT JOIN features.identifiers           ir ON b.observation_id = ii.observation_id
+JOIN features.identifications            i  ON b.observation_id = i.observation_id
+LEFT JOIN features.taxon                 t  ON b.observation_id = t.observation_id
+LEFT JOIN features.taxa_confusion        c  ON b.taxon_id = c.taxon_id
+LEFT JOIN staged.users                   u  ON b.user_id = u.user_id
 
-WHERE m.label IS NOT NULL
-ORDER BY m.created_at
+WHERE b.label IS NOT NULL
+ORDER BY b.created_at

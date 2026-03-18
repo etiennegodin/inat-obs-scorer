@@ -1,14 +1,14 @@
 import logging
 
 from ..app.container import Dependencies
-from ..db import DuckDBConnection, DuckDbSQL
+from ..db import DuckDBAdapter, DuckDbSQL
 from ..queries.params import IngestCSVParams
 
 logger = logging.getLogger(__name__)
 
 
 def execute(deps: Dependencies):
-    with DuckDBConnection(deps.DB_PATH) as con:
+    with DuckDBAdapter(deps.DB_PATH) as con:
         data_dir = deps._RAW_DATA_FOLDER
 
         # con.execute("CREATE SCHEMA IF NOT EXISTS raw")

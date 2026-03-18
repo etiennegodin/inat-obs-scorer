@@ -10,7 +10,7 @@ This is the entry point for all use cases. It handles:
 
 import logging
 
-from ..exceptions import InatPipelineError, WorkflowError
+from ..exceptions import DBError, InatPipelineError, WorkflowError
 from ..workflows import (
     features_workflow,
     ingest_api_workflow,
@@ -68,9 +68,13 @@ class ApplicationService:
         logger.info("Starting features workflow")
         try:
             features_workflow.execute(self.deps)
+        except DBError as e:
+            # Specific handling — you know it's a SQL problem
+            logger.error("SQL failure in script '%s': %s", e.script, e)
+            raise  # re-raise to propagate up, or handle + continue
         except InatPipelineError as e:
             logger.error(f"Process_features failed {e}")
-            raise WorkflowError(f"Process_features failed {e}") from e
+            raise
         except Exception as e:
             logger.exception("Unexpected error during install")
             raise WorkflowError(f"Install failed: {e}") from e

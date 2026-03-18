@@ -2,7 +2,7 @@ import asyncio
 import logging
 
 from ..app.container import Dependencies
-from ..db import DuckDBConnection, DuckDbSQL
+from ..db import DuckDBAdapter, DuckDbSQL
 from ..inat_client import (
     DuckDbWriter,
     EndpointConfig,
@@ -18,7 +18,7 @@ def execute(deps: Dependencies, rate: int, ignore_not_found: bool) -> None:
     TARGET_TABLE_NAME = "raw.api_similar_species"
     SOURCE_KEY = "taxon_id"
 
-    with DuckDBConnection(deps.DB_PATH) as con:
+    with DuckDBAdapter(deps.DB_PATH) as con:
         # Extract species list to feed in taxa api module
         sql_api = DuckDbSQL(con, deps.SQL_API_PATH)
         logger.info("Listing species from observations to request taxa confusion data")

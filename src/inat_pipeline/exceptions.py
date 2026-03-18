@@ -27,6 +27,29 @@ class InatPipelineError(Exception):
         return self.message
 
 
+# Persistence layer
+class PersistenceError(InatPipelineError):
+    """Errors related to persistence layer ."""
+
+    pass
+
+
+class DBError(PersistenceError):
+    """Errors related to db execution."""
+
+    def __init__(
+        self, message: str, script: str | None = None, details: dict | None = None
+    ):
+        merged = {"script": script} if script else {}
+        if details:
+            merged.update(details)
+        super().__init__(message, details=merged)
+
+    @property
+    def script(self) -> str | None:
+        return self.details.get("script")
+
+
 # Worflows
 class WorkflowError(InatPipelineError):
     """Errors related to workflow execution."""
@@ -53,6 +76,9 @@ class ApiEnrichmentError(IngestWorkflowError):
     pass
 
 
+# Features workflow
+
+
 ## Model training
 class TrainModelError(WorkflowError):
     """Errors related to model training workflow."""
@@ -66,21 +92,8 @@ class IncompatiblePipelineModules(TrainModelError):
     pass
 
 
-# Persistence layer
-class PersistenceError(InatPipelineError):
-    """Errors related to persistence layer ."""
-
-    pass
-
-
-class SqlError(PersistenceError):
-    """Errors related to sql execution."""
-
-    pass
-
-
 __all__ = [
     "InatPipelineError",
     "WorkflowError",
-    "SqlError",
+    "DBError",
 ]

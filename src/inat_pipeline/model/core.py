@@ -8,7 +8,7 @@ from sklearn.compose import ColumnTransformer
 from sklearn.model_selection import BaseCrossValidator
 from sklearn.pipeline import Pipeline
 
-from ..db import DuckDBConnection
+from ..db import DuckDBAdapter
 from .config import PipelineConfig
 from .registery import (
     CATEGORICAL_IMPUTER_REGISTRY,
@@ -56,7 +56,7 @@ def load_and_split(
     pd.DataFrame,
     dict,
 ]:
-    with DuckDBConnection(db_path) as con:
+    with DuckDBAdapter(db_path) as con:
         df = con.execute("SELECT * FROM features.training", {}).df()
 
     # Fix timezone

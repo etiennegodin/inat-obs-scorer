@@ -1,6 +1,6 @@
 CREATE SCHEMA IF NOT EXISTS features;
 
-CREATE OR REPLACE TABLE features.metadata AS
+CREATE OR REPLACE TABLE features.base AS
 
 SELECT
 
