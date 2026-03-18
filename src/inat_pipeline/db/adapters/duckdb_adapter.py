@@ -20,7 +20,14 @@ class DuckDBAdapter:
         except duckdb.IOException as e:
             raise DBConnectionError(str(e), file=self.db_path)
 
-        self._load_spatial_extension()  # or whatever extensions you need
+        # Spatial extension
+        self._con.execute("INSTALL spatial;")
+        self._con.execute("LOAD spatial;")
+
+        # Graph
+        self._con.install_extension("duckpgq", repository="community")
+        self._con.load_extension("duckpgq")
+
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
@@ -41,11 +48,3 @@ class DuckDBAdapter:
 
     def executemany(self, query: str, params: list[tuple]):
         return self._con.executemany(query, params)
-
-    def _load_spatial_extension(self) -> None:
-        try:
-            self._con.execute("INSTALL spatial;")
-            self._con.execute("LOAD spatial;")
-        except Exception as e:
-            logger.error(f"Error loading spatial extension : {e}")
-            raise e

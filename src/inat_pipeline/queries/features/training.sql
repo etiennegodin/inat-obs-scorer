@@ -43,7 +43,7 @@ SELECT
 
          --Identifiers interactions
         ob.n_identifiers_agree_mean_rank AS obv_n_identifiers_agree_mean_rank,
-
+        ob.n_identifiers_mean_rank AS obv_n_identifiers_mean_rank,
          --Taxonomic
         ob.taxon_diversity_species AS obv_taxon_diversity_species,
         oe.observer_species_entropy_norm AS obv_taxon_entropy,

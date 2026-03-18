@@ -18,6 +18,7 @@ class PipelineConfig:
 
     # ── Column groups ─────────────────────────────────────────────────────────
     # List columns explicitly so the pipeline is transparent about what it uses.
+    features: list = field(default_factory=list)
     numeric_features: list = field(default_factory=list)
     categorical_features: list = field(default_factory=list)
     features_types: list = field(default_factory=lambda: ["numeric", "categorical"])

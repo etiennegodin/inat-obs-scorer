@@ -18,6 +18,7 @@ class Dependencies:
     package_root: Path
     log_path: Path
     version: str
+    git_branch: str
 
     def __post_init__(self):
         self._DATA_FOLDER = self.project_root / "data"

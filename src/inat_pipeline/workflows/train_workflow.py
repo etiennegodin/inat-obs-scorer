@@ -52,6 +52,7 @@ def execute(
         random_seed=random_seed,
         use_gpu=use_gpu,
         version=deps.version,
+        # experiment_name= deps.git_branch
     )
 
     # ── 1. Data ───────────────────────────────────────────────────────────────
@@ -63,6 +64,11 @@ def execute(
     # ── 2. MLflow setup ───────────────────────────────────────────────────────
 
     mlflow.set_experiment(config.experiment_name)
+
+    features_diff = model.utils.get_feature_diff(
+        config.features,
+        config.experiment_name,
+    )
 
     with mlflow.start_run(run_name=f"{config.classifier}_optuna") as parent_run:
         parent_run_id = parent_run.info.run_id
@@ -76,6 +82,9 @@ def execute(
         # Log full config so this run is 100% reproducible
         mlflow.log_params(config.to_dict())
 
+        # Log features diff
+        mlflow.log_dict(features_diff)
+
         # Log data statistics
         mlflow.log_metrics(data_stats)
 
@@ -84,7 +93,7 @@ def execute(
 
         # Log pipeline structure as a JSON artifact
         sample_pipeline = model.build_pipeline(config)
-        pipeline_desc = model.utils.describe_pipeline(sample_pipeline)
+        pipeline_desc = model.helpers.describe_pipeline(sample_pipeline)
         with open("pipeline_description.json", "w") as f:
             json.dump(pipeline_desc, f, indent=2, default=str)
         mlflow.log_artifact("pipeline_description.json")

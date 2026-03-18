@@ -1,6 +1,29 @@
 import subprocess
 
 
+def get_git_branch():
+    """
+    Retrieves the current Git commit hash using subprocess.
+
+    Args:
+        short (bool): If True, returns the shortened 7-character hash.
+
+    Returns:
+        str: The Git commit hash.
+    """
+    command = ["git", "rev-parse", "--abbrev-ref", "HEAD"]
+    try:
+        # Use check_output for simple command execution and error checking
+        result = subprocess.check_output(command, stderr=subprocess.PIPE, text=True)
+        return result.strip()
+    except subprocess.CalledProcessError as e:
+        print(f"Error getting git hash: {e.stderr}")
+        return "UNKNOWN"
+    except FileNotFoundError:
+        print("Git executable not found. Make sure Git is installed and in your PATH.")
+        return "UNKNOWN"
+
+
 def get_git_hash(short=False):
     """
     Retrieves the current Git commit hash using subprocess.
