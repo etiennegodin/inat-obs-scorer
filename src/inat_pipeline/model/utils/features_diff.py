@@ -1,9 +1,12 @@
 import ast
 import json
+import logging
 from typing import Sequence
 
 import mlflow
 from mlflow.tracking import MlflowClient
+
+logger = logging.getLogger(__name__)
 
 
 def get_feature_diff(
@@ -38,7 +41,11 @@ def get_feature_diff(
         param_name=param_name,
         n_runs=n_runs,
     )
+
+    if prev_features is None:
+        return None
     prev = set(prev_features)
+
     added = sorted(current - prev)
     removed = sorted(prev - current)
     common = sorted(current & prev)
@@ -88,8 +95,8 @@ def _fetch_previous_features(
 
     runs = client.search_runs(
         experiment_ids=[experiment.experiment_id],
-        filter_string=f"params.{param_name} != ''",
-        order_by=["start_time DESC"],
+        # filter_string=f"params.{param_name} != ''",
+        order_by=["start_time ASC"],
         max_results=n_runs + 10,  # small buffer in case some runs lack the param
     )
 
@@ -101,5 +108,4 @@ def _fetch_previous_features(
     raw = target.data.params.get(param_name)
     if raw is None:
         return None, None
-
     return _parse_feature_param(raw), target.info.run_id

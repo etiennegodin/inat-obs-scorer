@@ -198,6 +198,7 @@ def main():
         print(f"[red]Configuration error: {e}[/red]")
         sys.exit(1)
 
+    logger.debug(deps.to_dict())
     # Create application service
     app = ApplicationService(deps)
 

@@ -1,5 +1,5 @@
 import logging
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from pathlib import Path
 
 
@@ -31,3 +31,7 @@ class Dependencies:
         self.SQL_API_PATH = self.QUERY_FOLDER / "api"
         self.SQL_STAGE_PATH = self.QUERY_FOLDER / "stage"
         self.SQL_FEATURES_PATH = self.QUERY_FOLDER / "features"
+
+    def to_dict(self) -> dict:
+        """Serialize config for logging to MLflow."""
+        return asdict(self)

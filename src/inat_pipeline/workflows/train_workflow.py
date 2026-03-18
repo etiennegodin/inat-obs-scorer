@@ -69,6 +69,7 @@ def execute(
         config.features,
         config.experiment_name,
     )
+    logger.info(features_diff)
 
     with mlflow.start_run(run_name=f"{config.classifier}_optuna") as parent_run:
         parent_run_id = parent_run.info.run_id
@@ -83,7 +84,8 @@ def execute(
         mlflow.log_params(config.to_dict())
 
         # Log features diff
-        mlflow.log_dict(features_diff)
+        if features_diff is not None:
+            mlflow.log_dict(features_diff, "features_diff.json")
 
         # Log data statistics
         mlflow.log_metrics(data_stats)
