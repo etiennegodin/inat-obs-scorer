@@ -112,17 +112,42 @@ SELECT
      --Fixed Taxon confusion stats
     IFNULL(c.has_similar_species, FALSE)    AS has_similar_species,
     COALESCE(c.neighborhood_difficulty,0)   AS neighborhood_difficulty,
-    c.rg_percentile_in_neighborhood,
-    c.magnet_score,
+    COALESCE(c.neighborhood_difficulty_inv_dist, 0) AS neighborhood_difficulty_inv_dist
+
+    c.similar_species_count
+
+    c.nbor_obs_count_sum,
+    c.nbor_obs_count_mean,
+    c.nbor_obs_count_std,
+    c.nbor_obs_count_max,
+
+    c.nbor_rg_rate_mean,
+    c.nbor_rg_rate_std,
+    c.nbor_rg_rate_min
+
+    c.weighted_mean_neighbor_rg_rate
+    c.nbor_rg_rate_inv_dist_weighted
+    c.neighborhood_difficulty_dist_weighted
+
+    c.nbor_dist_max
+    c.nbor_dist_mean,
+
     c.rg_rate_vs_neighbors,
+
+    c.nbor_count_same_genus,
+    c.nbor_count_cross_genus,
+    c.nbor_count_cross_family,
+
+    c.cross_genus_confusion_rate
+    c.max_confusion_boundary_crossed,
+
+    c.rg_percentile_in_neighborhood,
+    c.rg_percentile_dist_weighted,
+
     c.neighbor_genus_diversity,
     c.neighbor_rank_min,
-    c.nbor_dist_mean,
-    c.nbor_rg_rate_std,
-    c.nbor_rg_rate_inv_dist_weighted,
-    c.neighborhood_difficulty_dist_weighted,
-    c.cross_genus_confusion_rate,
-    c.deemax_confusion_boundary_crossed,
+
+    c.magnet_score,
 
 
 FROM features.base b
