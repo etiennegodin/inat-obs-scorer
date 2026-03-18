@@ -16,11 +16,7 @@ def execute(deps: Dependencies):
         sql_split = DuckDbSQL(con, deps.QUERY_FOLDER / "split")
         sql_graph = DuckDbSQL(con, deps.QUERY_FOLDER / "graph", ignore_params=True)
 
-        """
-        sql_graph.execute_many(
-            "taxa_confusion"
-        )
-        """
+        sql_graph.execute_many("taxa_confusion")
 
         sql_graph.execute("confusion_graph")
         # sql_graph.execute("confusion_graph_metrics")

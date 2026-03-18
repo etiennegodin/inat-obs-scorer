@@ -34,7 +34,7 @@ similar_species_agg AS(
     LEFT JOIN obs_stats o          ON o.taxon_id  = s.similar_taxon_id
     JOIN  staged.taxa tf           ON tf.taxon_id = s.taxon_id
     JOIN  staged.taxa ts           ON ts.taxon_id = s.similar_taxon_id
-    JOIN  features.taxa_distance d ON d.taxon_id  = s.taxon_id
+    JOIN  staged.taxa_distance d ON d.taxon_id  = s.taxon_id
                                    AND d.similar_taxon_id = s.similar_taxon_id
 
 ),
@@ -85,8 +85,8 @@ aggregates AS(
 
 
         ROUND(
-            (1 - AVG(n.similar_species_rg_rate * d.taxonomic_distance))
-            * LOG(a.similar_species_count + 1),
+            (1 - AVG(n.similar_species_rg_rate * n.taxonomic_distance))
+            * LOG(similar_species_count + 1),
         4) AS neighborhood_difficulty_dist_weighted,
 
         -- Taxonomic distance aggregates
@@ -183,6 +183,6 @@ SELECT a.*,
 
 FROM aggregates a
 JOIN nbor_taxa_diversity     n ON n.taxon_id = a.taxon_id
-JOIN features.taxa_assymetry s ON s.taxon_id = a.taxon_id
+JOIN staged.taxa_assymetry s ON s.taxon_id = a.taxon_id
 JOIN ranked                  r ON r.focal_taxon_id = a.taxon_id
 WHERE r.is_focal = TRUE
