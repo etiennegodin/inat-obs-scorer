@@ -79,10 +79,10 @@ aggregates AS(
         -- (observer_reputation_raw - MIN(observer_reputation_raw) OVER ()) * 1.0 / NULLIF(MAX(observer_reputation_raw) OVER() - MIN(observer_reputation_raw) OVER (),0 ) AS observer_reputation_score,
 
         -- Taxonomic behaviour
-        COUNT(DISTINCT("order")) FILTER (WHERE "order" IS NOT NULL) OVER observer_history AS taxon_diversity_order,
-        COUNT(DISTINCT(family)) FILTER (WHERE family IS NOT NULL) OVER observer_history AS taxon_diversity_family,
-        COUNT(DISTINCT(genus)) FILTER (WHERE genus IS NOT NULL) OVER observer_history AS taxon_diversity_genus,
-        COALESCE(COUNT(DISTINCT(species)) FILTER (WHERE species IS NOT NULL) OVER observer_history,0) AS taxon_diversity_species,
+        COUNT(DISTINCT("order")) OVER observer_history AS taxon_diversity_order,
+        COUNT(DISTINCT(family)) OVER observer_history AS taxon_diversity_family,
+        COUNT(DISTINCT(genus))  OVER observer_history AS taxon_diversity_genus,
+        COALESCE(COUNT(DISTINCT(species)) OVER observer_history,0) AS taxon_diversity_species,
 
         -- ── Community engagement received ────────────────────────────
         AVG(n_identifiers_at_window) OVER observer_history AS n_identifiers_mean,

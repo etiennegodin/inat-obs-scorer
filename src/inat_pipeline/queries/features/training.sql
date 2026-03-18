@@ -43,9 +43,14 @@ SELECT
 
          --Identifiers interactions
         ob.n_identifiers_agree_mean_rank AS obv_n_identifiers_agree_mean_rank,
-        ob.n_identifiers_mean_rank AS obv_n_identifiers_mean_rank,
+        --ob.n_identifiers_mean_rank AS obv_n_identifiers_mean_rank,
          --Taxonomic
-        ob.taxon_diversity_species AS obv_taxon_diversity_species,
+        --ob.taxon_diversity_species AS obv_taxon_diversity_species,
+        ob.taxon_diversity_species AS obv_taxon_diversity_genus,
+        --ob.taxon_diversity_species AS obv_taxon_diversity_family,
+        --ob.taxon_diversity_species AS obv_taxon_diversity_order,
+
+
         oe.observer_species_entropy_norm AS obv_taxon_entropy,
         ob.observer_taxon_rg_rate_at_t AS obv_taxon_rg_rate_at_t,
         ob.observer_taxon_focus_rate AS obv_taxon_focus_rate,
@@ -75,15 +80,15 @@ SELECT
         -- Roles stats from this observers
 
         COALESCE(i.prior_ids_received,0) AS prior_ids_received,
-        COALESCE(i.prior_identifier_diversity,0) AS prior_identifier_diversity,
-        COALESCE(i.prior_taxa_received_on,0) AS prior_taxa_received_on,
+        --COALESCE(i.prior_identifier_diversity,0) AS prior_identifier_diversity,
+        --COALESCE(i.prior_taxa_received_on,0) AS prior_taxa_received_on,
         COALESCE(i.prior_observer_rg_rate,0) AS prior_observer_rg_rate,
         COALESCE(i.prior_ids_received_agree_rate, 0) AS prior_ids_received_agree_rate,
         COALESCE(i.prior_ids_received_disagree_rate, 0) AS prior_ids_received_disagree_rate,
 
-        --COALESCE(i.prior_ids_given, 0) AS prior_ids_given,
-        --COALESCE(i.prior_observers_helped, 0) AS prior_observers_helped,
-        COALESCE(i.prior_taxa_identified, 0) AS prior_taxa_identified,
+        COALESCE(i.prior_ids_given, 0) AS prior_ids_given,
+        COALESCE(i.prior_observers_helped, 0) AS prior_observers_helped,
+        --COALESCE(i.prior_taxa_identified, 0) AS prior_taxa_identified,
         COALESCE(i.prior_ids_given_improving_rate, 0) AS prior_ids_given_improving_rate,
         COALESCE(i.prior_ids_given_agree_rate, 0) AS prior_ids_given_agree_rate,
         COALESCE(i.prior_ids_given_disagree_rate, 0) AS prior_ids_given_disagree_rate,
@@ -111,8 +116,13 @@ SELECT
     c.magnet_score,
     c.rg_rate_vs_neighbors,
     c.neighbor_genus_diversity,
+    c.neighbor_rank_min,
     c.nbor_dist_mean,
     c.nbor_rg_rate_std,
+    c.nbor_rg_rate_inv_dist_weighted,
+    c.neighborhood_difficulty_dist_weighted,
+    c.cross_genus_confusion_rate,
+    c.deemax_confusion_boundary_crossed,
 
 
 FROM features.base b

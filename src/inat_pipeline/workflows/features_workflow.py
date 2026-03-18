@@ -14,16 +14,23 @@ def execute(deps: Dependencies):
         # Transform data and create features
         sql_features = DuckDbSQL(con, deps.SQL_FEATURES_PATH)
         sql_split = DuckDbSQL(con, deps.QUERY_FOLDER / "split")
-        sql_graph = DuckDbSQL(con, deps.QUERY_FOLDER / "graph")
+        sql_graph = DuckDbSQL(con, deps.QUERY_FOLDER / "graph", ignore_params=True)
 
+        """
         sql_graph.execute_many(
-            "network_events",
-            "user_role_timeline",
+            "taxa_confusion"
         )
+        """
 
+        sql_graph.execute("confusion_graph")
+        # sql_graph.execute("confusion_graph_metrics")
+
+        """
         sql_features.execute_many(
             "community_taxon_windowed",
             "research_grade_windowed",
+            "network_events",
+            "user_role_timeline",
             "base",
             "taxon",
             "label",
@@ -33,10 +40,6 @@ def execute(deps: Dependencies):
         )
 
         """
-        sql_features.execute(
-            "taxa_confusion")
-        """
-
         # Train/Val/Test splits
         params = TrainingSplitParams(
             cutoff_date=date(2024, 1, 1),

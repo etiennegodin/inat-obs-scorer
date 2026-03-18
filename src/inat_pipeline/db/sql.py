@@ -17,9 +17,10 @@ logger = logging.getLogger(__name__)
 
 
 class SQLEngine(ABC):
-    def __init__(self, con: DBConnection, sql_dir: Path):
+    def __init__(self, con: DBConnection, sql_dir: Path, ignore_params: bool = False):
         self.con = con
         self.sql_dir = Path(sql_dir)
+        self.ignore_params = ignore_params
 
     @abstractmethod
     def _parametrise_query(self, query: str, params: dict) -> tuple[str, list]:
@@ -56,7 +57,10 @@ class SQLEngine(ABC):
         params = self._prep_params(params)
 
         # Parametrisation by subclass
-        query, values = self._parametrise_query(query, params)
+        if self.ignore_params:
+            values = {}
+        else:
+            query, values = self._parametrise_query(query, params)
         # Inject identitifers
         identified = self._identifiers(query, **identifiers)
         # logger.debug(identified)
@@ -103,15 +107,16 @@ class SQLEngine(ABC):
 
 class DuckDbSQL(SQLEngine):
     def __init__(
-        self,
-        adapter: DuckDBAdapter,
-        sql_dir: Path,
+        self, adapter: DuckDBAdapter, sql_dir: Path, ignore_params: bool = False
     ):
         self.con = adapter
         self.sql_dir = Path(sql_dir)
+        self.ignore_params = ignore_params
 
     def _parametrise_query(self, query: str, params: dict) -> tuple[str, list]:
         """Change for sql flavor"""
+        logger.debug(query)
+        logger.debug(params)
         query_tool = sqlparams.SQLParams("named", "qmark")
         sql, values = query_tool.format(query, params)
         return sql, values
