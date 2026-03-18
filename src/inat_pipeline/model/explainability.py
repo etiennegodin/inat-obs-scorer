@@ -151,7 +151,9 @@ def log_pca_loadings(pipeline, config, top_n: int = 8, n_components: int = 8):
 # ── 3. SHAP VALUES (model-agnostic, best explainability) ──────────────────────
 
 
-def log_shap_summary(pipeline, X_train: pd.DataFrame, config, max_rows: int = 200):
+def log_shap_summary(
+    pipeline, X_train: pd.DataFrame, config, max_rows: int = 200, top_n: int = 30
+):
     """
     Logs a SHAP summary plot — the gold standard for model explainability.
     """
@@ -198,7 +200,7 @@ def log_shap_summary(pipeline, X_train: pd.DataFrame, config, max_rows: int = 20
         fig, ax = plt.subplots(figsize=(10, max(6, len(feature_names) * 0.4)))
         shap.plots.beeswarm(
             shap_values,
-            max_display=20,
+            max_display=top_n,
             group_remaining_features=True,
             ax=ax,
             plot_size=None,
@@ -218,7 +220,7 @@ def log_shap_summary(pipeline, X_train: pd.DataFrame, config, max_rows: int = 20
     shap_df = (
         pd.DataFrame({"feature": feature_names, "mean_abs_shap": mean_shap})
         .sort_values("mean_abs_shap", ascending=True)
-        .tail(20)
+        .tail(top_n)
     )
 
     fig2, ax2 = plt.subplots(figsize=(9, max(5, len(shap_df) * 0.38)))

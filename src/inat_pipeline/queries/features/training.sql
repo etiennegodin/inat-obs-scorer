@@ -42,7 +42,6 @@ SELECT
         ob.rg_rate_is_reliable AS obv_rg_rate_is_reliable,
 
          --Identifiers interactions
-        ob.n_identifiers_mean_rank AS obv_n_identifiers_mean_rank,
         ob.n_identifiers_agree_mean_rank AS obv_n_identifiers_agree_mean_rank,
 
          --Taxonomic
@@ -82,8 +81,8 @@ SELECT
         COALESCE(i.prior_ids_received_agree_rate, 0) AS prior_ids_received_agree_rate,
         COALESCE(i.prior_ids_received_disagree_rate, 0) AS prior_ids_received_disagree_rate,
 
-        COALESCE(i.prior_ids_given, 0) AS prior_ids_given,
-        COALESCE(i.prior_observers_helped, 0) AS prior_observers_helped,
+        --COALESCE(i.prior_ids_given, 0) AS prior_ids_given,
+        --COALESCE(i.prior_observers_helped, 0) AS prior_observers_helped,
         COALESCE(i.prior_taxa_identified, 0) AS prior_taxa_identified,
         COALESCE(i.prior_ids_given_improving_rate, 0) AS prior_ids_given_improving_rate,
         COALESCE(i.prior_ids_given_agree_rate, 0) AS prior_ids_given_agree_rate,
