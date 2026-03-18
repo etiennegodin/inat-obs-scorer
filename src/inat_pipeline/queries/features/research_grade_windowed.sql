@@ -30,16 +30,21 @@ SELECT
         AND i.category = 'supporting'
     ) AS n_ids_agree_at_window,
 
+    -- verifiable label
+    CASE
+        WHEN o.created_at IS NULL                  THEN TRUE
+        WHEN o.latitude IS NULL                    THEN TRUE
+        WHEN LENGTH(o.observation_photos) = 0      THEN TRUE
+        WHEN o.captive_cultivated IS TRUE          THEN TRUE
+        -- Community taxon doesn't match submitted taxon
+        WHEN t.community_taxon != o.taxon_id       THEN TRUE
+        ELSE TRUE
+
+    END AS verifiable,
+
     -- research grade label
     CASE
-        WHEN o.created_at IS NULL                  THEN 'ineligible'
-        WHEN o.latitude IS NULL                    THEN 'ineligible'
-        WHEN LENGTH(o.observation_photos) = 0      THEN 'ineligible'
-        WHEN o.captive_cultivated IS TRUE          THEN 'ineligible'
-
-        -- Community taxon doesn't match submitted taxon
-        WHEN t.community_taxon != o.taxon_id       THEN 'ineligible'
-
+        WHEN verifiable IS FALSE                  THEN 'ineligible'
         -- Eligible but consensus didn't reach species level
         WHEN t.consensus_level_rg IS FALSE         THEN 'not_rg'
         -- Eligible, species consensus, but no confirming identifiers

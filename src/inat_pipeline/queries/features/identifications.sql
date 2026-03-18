@@ -3,7 +3,7 @@ CREATE OR REPLACE TABLE features.identifications AS
 -- Observer features: history of IDs RECEIVED by this observation's author
 WITH observer_features AS(
     SELECT
-        obs.id AS observation_id,
+        obs.observation_id,
         obs.user_id,
         t.cumulative_events                 AS prior_ids_received,
         t.cumulative_distinct_counterparts  AS prior_identifier_diversity,
@@ -13,7 +13,13 @@ WITH observer_features AS(
         t.cumulative_maverick AS prior_ids_received_maverick,
         t.cumulative_supporting AS prior_ids_received_supporting,
         t.cumulative_vision AS prior_ids_received_vision,
-    FROM staged.observations obs
+
+
+        -- Bayesian-shrunk RG rate as observer (how often do their obs reach RG)
+        (t.cumulative_settled_rg + 10 * obs.expected_rg_rate)
+            / NULLIF(t.cumulative_settled_events + 10, 0)
+                                            AS prior_observer_rg_rate
+    FROM features.observations obs
     ASOF JOIN graph.user_role_timeline t
         ON  t.user_id     = obs.user_id
         AND t.role        = 'observer'
@@ -22,7 +28,7 @@ WITH observer_features AS(
 
 identifier_features AS(
     SELECT
-        obs.id AS observation_id,
+        obs.observation_id,
         obs.user_id,
         t.cumulative_events                 AS prior_ids_given,
         t.cumulative_distinct_counterparts  AS prior_observers_helped,
@@ -32,13 +38,34 @@ identifier_features AS(
         t.cumulative_maverick AS prior_ids_given_maverick,
         t.cumulative_supporting AS prior_ids_given_supporting,
         t.cumulative_vision AS prior_ids_given_vision,
-    FROM staged.observations obs
+
+        -- Bayesian-shrunk RG rate as observer (how often do their obs reach RG)
+        -- Shrunk RG success rate as an identifier
+        (COALESCE(t.cumulative_settled_rg, 0) + 10 * obs.expected_rg_rate)
+            / NULLIF(COALESCE(t.cumulative_settled_events, 0) + 10, 0)
+                                                                    AS prior_identifier_rg_rate,
+    FROM features.observations obs
     ASOF JOIN graph.user_role_timeline t
         ON  t.user_id     = obs.user_id
         AND t.role        = 'identifier'
         AND t.created_at <= obs.created_at
 )
 
+
+
+/*
+## What the Two RG Rates Mean
+
+
+| Feature | Interpretation |
+|---|---|
+| `prior_observer_rg_rate` | How reliably does this person's observations close? Quality / completeness signal |
+| `prior_identifier_rg_rate` | How often do this person's IDs push observations to RG? Expertise / correctness signal |
+| `prior_observer_rg_rate` (via identifier role join) | When identifying for others, what's the RG rate of obs they chose to engage with? Selectivity signal |
+
+That last one is s
+
+*/
 
 SELECT
     obs.id AS observation_id,

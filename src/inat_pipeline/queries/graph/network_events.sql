@@ -10,10 +10,16 @@ SELECT
     i.observation_id,
     i.vision,
     i.category,
+    l.label AS is_rg,
+    -- outcome is only "known" if the obs was old enough when the ID was left
+    CASE WHEN i.created_at - o.created_at > INTERVAL '90 days'
+         THEN 1 ELSE 0 END  AS outcome_settled
 
 FROM staged.identifications i
 JOIN staged.observations o
     ON o.id = i.observation_id
+JOIN features.label l
+    ON l.observation_id = i.observation_id
 WHERE i.user_id != o.user_id
 
 UNION ALL
@@ -28,10 +34,16 @@ SELECT
     i.observation_id,
     i.vision,
     i.category,
+    l.label AS is_rg,
+    -- outcome is only "known" if the obs was old enough when the ID was left
+    CASE WHEN i.created_at - o.created_at > INTERVAL '90 days'
+         THEN 1 ELSE 0 END  AS outcome_settled
 
 FROM staged.identifications i
 JOIN staged.observations o
     ON o.id = i.observation_id
+JOIN features.label l
+    ON l.observation_id = i.observation_id
 WHERE i.user_id != o.user_id;
 
 

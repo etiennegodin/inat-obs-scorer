@@ -21,6 +21,14 @@ SELECT
     COALESCE(SUM(1) FILTER (WHERE vision IS TRUE ) OVER w,0) AS cumulative_vision,
 
 
+    -- RG accumulators: only over settled outcomes
+    SUM(outcome_settled) OVER w                 AS cumulative_settled_events,
+    SUM(is_rg::INT * outcome_settled) OVER w         AS cumulative_settled_rg,
+
+    -- running RG rate: settled RG obs / all settled obs
+    -- can't divide inline in window frame, carry numerator+denominator forward
+    -- and derive rate at join time (see Step 3)
+
     -- per-pair running edge weight (how many times has this pair interacted)
     SUM(1) OVER (
         PARTITION BY user_id, role, counterpart_id

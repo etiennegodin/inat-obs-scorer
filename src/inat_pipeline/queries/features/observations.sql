@@ -50,11 +50,12 @@ aggregates AS(
         COALESCE(SUM(is_rg::INT)    OVER observer_history, 0) AS observer_rg_count_at_t,
 
         -- Bayesian-shrunk RG rate (α=10, matches taxon shrinkage convention)
-        (COALESCE(SUM(is_rg::INT) OVER obs_hist, 0) + 10 * expected_rg_rate)
-            / NULLIF(COALESCE(COUNT(*) OVER obs_hist, 0) + 10, 0)
+        expected_rg_rate,
+        (COALESCE(SUM(is_rg::INT) OVER observer_history, 0) + 10 * expected_rg_rate)
+            / NULLIF(COALESCE(COUNT(*) OVER observer_history, 0) + 10, 0)
                                                                 AS observer_rg_rate_at_t,
 
-        COALESCE(COUNT(*) OVER obs_hist, 0) >= 20              AS rg_rate_is_reliable,
+        COALESCE(COUNT(*) OVER observer_history, 0) >= 20              AS rg_rate_is_reliable,
 
 
         -- Raw ratio for reputation (unshrunk, used for rank)

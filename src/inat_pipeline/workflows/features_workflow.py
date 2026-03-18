@@ -19,12 +19,12 @@ def execute(deps: Dependencies):
         sql_features.execute_many(
             "community_taxon_windowed",
             "research_grade_windowed",
-            "identifications_timeline",
-            "cumulative_id_stats",
-            "identifiers",
+            "network_events",
+            "user_role_timeline",
             "taxon",
             "label",
             "observations",
+            "identifications",
             "observers",
             "observers_entropy",
         )
