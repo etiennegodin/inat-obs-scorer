@@ -81,7 +81,6 @@ SELECT
         COALESCE(i.prior_observer_rg_rate,0) AS prior_observer_rg_rate,
         COALESCE(i.prior_ids_received_agree_rate, 0) AS prior_ids_received_agree_rate,
         COALESCE(i.prior_ids_received_disagree_rate, 0) AS prior_ids_received_disagree_rate,
-,
 
         COALESCE(i.prior_ids_given, 0) AS prior_ids_given,
         COALESCE(i.prior_observers_helped, 0) AS prior_observers_helped,
@@ -119,7 +118,7 @@ SELECT
 
 FROM features.base b
 JOIN features.splits                     s  ON b.observation_id = s.observation_id
-LEFT JOIN features.observers             ob ON b.observation_id = ob.observation_id
+LEFT JOIN features.observations          ob ON b.observation_id = ob.observation_id
 LEFT JOIN features.observers_entropy     oe ON b.observation_id = oe.observation_id
 LEFT JOIN features.label                 l  ON b.observation_id = l.observation_id
 
@@ -130,5 +129,5 @@ LEFT JOIN features.taxon                 t  ON b.observation_id = t.observation_
 LEFT JOIN features.taxa_confusion        c  ON b.taxon_id = c.taxon_id
 LEFT JOIN staged.users                   u  ON b.user_id = u.user_id
 
-WHERE b.label IS NOT NULL
+WHERE l.label IS NOT NULL
 ORDER BY b.created_at

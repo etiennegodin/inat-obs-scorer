@@ -34,6 +34,22 @@ class PersistenceError(InatPipelineError):
     pass
 
 
+class DBConnectionError(PersistenceError):
+    """Errors related to db connection."""
+
+    def __init__(
+        self, message: str, file: str | None = None, details: dict | None = None
+    ):
+        merged = {"file": file} if file else {}
+        if details:
+            merged.update(details)
+        super().__init__(message, details=merged)
+
+    @property
+    def file(self) -> str | None:
+        return self.details.get("file")
+
+
 class DBError(PersistenceError):
     """Errors related to db execution."""
 

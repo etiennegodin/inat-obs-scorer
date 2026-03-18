@@ -59,8 +59,8 @@ class SQLEngine(ABC):
         query, values = self._parametrise_query(query, params)
         # Inject identitifers
         identified = self._identifiers(query, **identifiers)
-        logger.debug(identified)
-        logger.debug(str(values))
+        # logger.debug(identified)
+        # logger.debug(str(values))
         return identified, values
 
     def execute(self, script_name: str, params: Any = None, **identifiers) -> None:

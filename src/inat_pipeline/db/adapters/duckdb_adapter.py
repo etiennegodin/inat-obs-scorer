@@ -3,7 +3,7 @@ from typing import Any
 
 import duckdb
 
-from ...exceptions import DBError
+from ...exceptions import DBConnectionError, DBError
 
 logger = logging.getLogger(__name__)
 
@@ -15,7 +15,10 @@ class DuckDBAdapter:
 
     def __enter__(self):
         logger.debug("Opening DuckDB connection: %s", self.db_path)
-        self._con = duckdb.connect(self.db_path)
+        try:
+            self._con = duckdb.connect(self.db_path)
+        except duckdb.IOException as e:
+            raise DBConnectionError(str(e), file=self.db_path)
 
         self._load_spatial_extension()  # or whatever extensions you need
         return self

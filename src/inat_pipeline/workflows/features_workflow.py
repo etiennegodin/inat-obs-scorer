@@ -21,7 +21,6 @@ def execute(deps: Dependencies):
             "user_role_timeline",
         )
 
-        """
         sql_features.execute_many(
             "community_taxon_windowed",
             "research_grade_windowed",
@@ -32,7 +31,7 @@ def execute(deps: Dependencies):
             "identifications",
             "observers_entropy",
         )
-        """
+
         """
         sql_features.execute(
             "taxa_confusion")
