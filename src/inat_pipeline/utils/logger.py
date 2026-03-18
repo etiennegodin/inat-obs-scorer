@@ -3,6 +3,14 @@ import sys
 from pathlib import Path
 
 
+class MaxLevelFilter(logging.Filter):
+    def __init__(self, max_level: int):
+        self.max_level = max_level
+
+    def filter(self, record: logging.LogRecord) -> bool:
+        return record.levelno <= self.max_level
+
+
 def init_logger(log_file: Path, level: int = logging.DEBUG) -> logging.Logger:
     """Configure application-wide logging."""
 
@@ -21,6 +29,7 @@ def init_logger(log_file: Path, level: int = logging.DEBUG) -> logging.Logger:
     # Console handler
     console_handler = logging.StreamHandler(sys.stdout)
     console_handler.setLevel(logging.INFO)
+    console_handler.addFilter(MaxLevelFilter(logging.WARNING))  # INFO and WARNING only
     console_handler.setFormatter(console_formatter)
 
     # Root logger
@@ -28,5 +37,6 @@ def init_logger(log_file: Path, level: int = logging.DEBUG) -> logging.Logger:
     rootlogger.setLevel(logging.DEBUG)
     rootlogger.addHandler(file_handler)
     rootlogger.addHandler(console_handler)
+    rootlogger.propagate = False  # don't bubble up to the root logger's StreamHandler
 
     return rootlogger

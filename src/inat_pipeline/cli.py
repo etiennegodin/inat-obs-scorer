@@ -39,6 +39,9 @@ def features_cmd(args: Namespace, app: ApplicationService):
     except InatPipelineError as e:
         print(f"[red]✗ {e}[/red]")
         return 1
+    except Exception as e:
+        print(f"[red]✗ Unexpected error: {e}[/red]")
+        return 1
 
 
 def train_cmd(args: Namespace, app: ApplicationService):

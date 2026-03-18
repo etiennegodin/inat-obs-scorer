@@ -73,11 +73,11 @@ class ApplicationService:
             logger.error("SQL failure in script '%s': %s", e.script, e)
             raise  # re-raise to propagate up, or handle + continue
         except InatPipelineError as e:
-            logger.error(f"Process_features failed {e}")
+            logger.error("Features workflow failed: %s", e)
             raise
         except Exception as e:
-            logger.exception("Unexpected error during install")
-            raise WorkflowError(f"Install failed: {e}") from e
+            logger.exception("Unexpected error during features workflow")
+            raise WorkflowError("Features workflow failed") from e
 
     def train(self, args):
         logger.info("Starting training workflow")
