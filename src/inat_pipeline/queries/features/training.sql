@@ -111,14 +111,14 @@ SELECT
 
      --Fixed Taxon confusion stats
     IFNULL(c.has_similar_species, FALSE)    AS has_similar_species,
-    COALESCE(c.neighborhood_difficulty_dist_weighted,0)   AS neighborhood_difficulty,
+    COALESCE(c.neighborhood_difficulty_dist_weighted,0)   AS neighborhood_difficulty_dist_weighted,
     COALESCE(c.neighborhood_difficulty_inv_dist, 0) AS neighborhood_difficulty_inv_dist,
 
     c.similar_species_count,
 
     --c.nbor_obs_count_sum,
     c.nbor_obs_count_mean,
-    --c.nbor_obs_count_std,
+    c.nbor_obs_count_std,
     --c.nbor_obs_count_max,
 
     c.nbor_rg_rate_mean,
