@@ -23,7 +23,6 @@ This project builds a **binary classifier** that scores each open "Needs ID" obs
 Observer quality      → How reliable is this observer's documentation?
 Identifier quality    → How knowledgeable are the identifiers involved?
 Taxon difficulty      → How much community attention does this species require?
-Geographic activity   → How active is the local identifier community?
 Community consensus   → What has the community already signalled?
                                         ↓
                            P(Research Grade) score
