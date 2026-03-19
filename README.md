@@ -1,194 +1,298 @@
-# inat-obs-scorer v0.2
+# inat-obs-scorer
 
-> Expert Review Prioritization Engine for inaturalist
+> **Expert Review Prioritization Engine for iNaturalist**
+> *Which "Needs ID" observations are most likely to reach Research Grade — and should be reviewed first?*
 
-Which “Needs ID” observations are most likely to reach Research Grade if reviewed soon?
+[![Python 3.11+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/)
+[![LightGBM](https://img.shields.io/badge/model-LightGBM-brightgreen)](https://lightgbm.readthedocs.io/)
+[![MLflow](https://img.shields.io/badge/tracking-MLflow-orange)](https://mlflow.org/)
+[![DuckDB](https://img.shields.io/badge/storage-DuckDB-yellow)](https://duckdb.org/)
+[![ROC-AUC](https://img.shields.io/badge/ROC--AUC-0.88-success)]()
 
-## Project modules
+---
 
-- Data Pipeline orchestrator from terminal*
+## Overview
 
-## Domain Model
+iNaturalist accumulates millions of wildlife observations submitted by citizen scientists. A subset of these earn **Research Grade (RG)** status — a quality threshold that makes observations useful for biodiversity science. Getting there requires community agreement from knowledgeable identifiers, but expert attention is a scarce resource.
+
+This project builds a **binary classifier** that scores each open "Needs ID" observation on its probability of reaching Research Grade, enabling triage of expert review queues. It is scoped to the plant kingdom (*Plantae*) in Québec and is designed as a production-style ML system, not a notebook.
+
+### Problem framing
+
 ```
-Observer quality     → Observation documentation quality
-Identifier quality   → Identifier knowlege of the species
-Taxon difficulty     → Community attention required
-Geographic activity  → Speed of community response
-Community consensus  →
-                              ↓
-                    Research Grade (outcome)
+Observer quality      → How reliable is this observer's documentation?
+Identifier quality    → How knowledgeable are the identifiers involved?
+Taxon difficulty      → How much community attention does this species require?
+Geographic activity   → How active is the local identifier community?
+Community consensus   → What has the community already signalled?
+                                        ↓
+                           P(Research Grade) score
 ```
 
-## Engineered Features
+The core modelling challenge is **temporal**: all features must be reconstructed at the exact moment of each observation, and the label itself must be derived from a point-in-time simulation of iNaturalist's identification algorithm — not the current scraped state.
 
-#### Observations features
-- Identifications history per observation
-- [Community taxon](https://help.inaturalist.org/en/support/solutions/articles/151000173076-what-are-the-community-taxon-and-the-observation-taxon) from identifications
-    - Taxonomic tree traversal
-- [Research grade](https://help.inaturalist.org/en/support/solutions/articles/151000169936-what-is-the-data-quality-assessment-and-how-do-observations-qualify-to-become-research-grade-) using community taxon and other quality requirements (main-label)
-#### Observer features
-- Observations history
-- Research grade rate
-- Taxon diversity
-- Documentation habits summary
-#### Taxonomic features
-- Taxon research grade rate point in time
-    - account for evolving behaviours
-    - Taxonomic fallback for taxon with low observations using Bayesian Shrinkage*
+---
 
-- Species confusion graph
-    - Taxonomic distance
-    - Focus species rank *
-    - Assymetry - sink species flag*
+## Architecture
 
+```
+[Raw Source]
+    iNaturalist open data export (CSV) + targeted API scraping
+          ↓
+[Ingestion Layer]
+    Async API client — rate-limited, fault-tolerant, Protocol-based
+    DuckDB as single source of truth
+          ↓
+[Feature Engineering Layer]
+    SQL-heavy transforms in DuckDB
+    Point-in-time windowed features — no temporal leakage
+          ↓
+[Label Engineering]
+    Community taxon re-derived via DuckDB table macro
+    Research Grade label computed from windowed identification history
+          ↓
+[Training Dataset]
+    Hard temporal split with gap buffers (train / val / test)
+    Closed-window binary label: RG status at obs_date + 90 days
+          ↓
+[Model Training]
+    Modular scikit-learn Pipeline with registry-pattern components
+    LightGBM + Optuna hyperparameter search + MLflow tracking
+          ↓
+[Explainability]
+    SHAP value analysis logged as MLflow artifacts
+          ↓
+[Serving Layer]  ← (v0.3)
+    FastAPI  POST /score → { observation_id, rg_probability, rank }
+```
 
-### Challenges
-Main challenge is to avoid temporal leakage and reconstruct features at point in time per observation
+---
 
-##  Sampling strategy
-From all observations records based on observers, using these metrics:
-    - At least 20 observations
-    - Time coverage. Oldest observation before 2020 and newest after 2024.
+## Key Engineering Decisions
 
-## Training data
+### 1. Temporal leakage has three distinct risk vectors
 
-- out-of-time validation
-- Custom Train/Validation/Test splits accounting for non uniform distribution of observations.
-    - Start/End of split accounting for label time
+Most ML pipelines guard against one form of leakage. This project explicitly addresses three:
 
-- pos_rate drift (57% → 52%)
-    - val/test metrics will be slightly lower than train metrics for reasons unrelated to overfitting.
-## Main Engineered Features
+| Vector | Risk | Mitigation |
+|---|---|---|
+| **Label leakage** | Using scraped `quality_grade` reflects current state, not state at prediction time | Re-derive RG label from windowed identification history |
+| **Feature leakage** | Aggregating observer/taxon stats across the full dataset contaminates the past with the future | All window functions are bounded to `obs_created_at` |
+| **Split leakage** | Shuffling records within temporal partitions destroys gap buffer integrity | Hard date-range boundaries; val/test rows sorted by `created_at`, never shuffled |
 
-| Group                     | Features                                                           |
-| ------------------------- | ------------------------------------------------------------------ |
-| Observer history          | historical RG rate, total obs count, tenure days, taxa diversity   |
-| Identifiers history*       | historical RG rate, total id count, tenure days, taxa diversity    |
-| Observation documentation | photo count, has notes, coordinate uncertainty                     |
-| Taxon context             | taxon rank, taxon-level RG rate,                           |
-| Temporal                  | day of year, time since submission, hour of day                    |
-| Community signals*         | number of IDs already received, ID agreement rate so far           |
-| Geographic context*      | regional iNat activity density, distance to nearest urban center |
+### 2. Community taxon re-derived from first principles
 
+iNaturalist's Research Grade algorithm is non-trivial: it involves a taxonomic tree traversal that scores cumulative agreement at each node. Rather than trusting the scraped `quality_grade` column, this project implements the actual algorithm as a **DuckDB table macro** (`community_taxon_windowed(eval_interval)`) — parameterized by an evaluation timestamp to enable fully point-in-time label computation.
 
-## Data pipeline orchestrator
+```sql
+-- Threshold: cumulative_agreement / (agreements + disagreements + ancestor_disagreements) ≥ 2/3
+-- Minimum count: 2 identifications required
+-- research_grade_windowed() wraps this and surfaces is_rg as the external label
+```
 
-Used to ensure reproducibility
-Agnostic Sql db with protocols
-scope-agnostic (currently plantae in Qc only)
+### 3. Taxon difficulty with Bayesian shrinkage and hierarchical fallback
+
+Rare taxa have too few observations to compute a reliable RG rate. A naive approach either drops them or overfits to small samples. This project uses:
+
+- **Bayesian shrinkage** (α = 10) to blend the taxon-specific rate toward the global prior
+- **Hierarchical fallback**: species → genus → family → order → global mean, applied when the shrunk estimate is still unreliable
+- All rates computed **point-in-time** on the training partition only, then applied to val/test — never recomputed on the full dataset
+
+### 4. Species confusion graph features
+
+Taxonomically similar species compete for identifier attention and create systematic misidentification patterns. The confusion graph encodes:
+
+- **Neighborhood difficulty**: how hard is the local species cluster to disambiguate?
+- **Asymmetric sink flag**: is this taxon disproportionately the *recipient* of misidentifications from similar species?
+- **Focal taxon rank within neighborhood**: where does this species sit in terms of identifier confidence?
+
+### 5. Protocol-based async API client
+
+The enrichment layer uses a fully async client designed around Python `Protocol` interfaces rather than inheritance, keeping fetchers and writers decoupled and independently testable.
+
+```
+BatchEndpointClient      — fixed-set ID requests, bulk pagination
+ParametrizedEndpointClient — flexible endpoint/param formatting per call
+
+asyncio.Queue            — bridges fetch workers and the write thread
+ThreadPoolExecutor(max_workers=1) — serializes DuckDB writes from async context
+Exponential backoff + jitter — handles iNaturalist rate limiting gracefully
+_resolve_id cascade      — flexible ID field mapping across endpoint shapes
+```
+
+### 6. Modular scikit-learn pipeline with registry pattern
+
+Each pipeline stage (imputer, encoder, scaler, reducer, classifier) is registered by name and resolved at runtime from CLI arguments, enabling clean experiment configuration without code changes:
 
 ```bash
-pip install inat_pipeline
+inat_pipe train \
+  --classifier lightgbm \
+  --imputer median \
+  --encoder onehot \
+  --scaler robust \
+  --reducer none \
+  --n_trials 50 \
+  --cv_folds 5
 ```
 
-### Commands
+---
 
-#### Ingest
+## Feature Groups
+
+| Group | Features |
+|---|---|
+| **Observer history** | Historical RG rate (actual vs. expected), total obs count, account tenure, taxon diversity |
+| **Observation documentation** | Photo count, presence of notes, coordinate uncertainty |
+| **Taxon context** | Taxon rank, RG rate with Bayesian shrinkage, hierarchical fallback chain |
+| **Identification dynamics** | Number of IDs received, agreement rate |
+| **Confusion graph** | Neighborhood difficulty, sink-species flag, focal taxon rank in cluster |
+| **Temporal** | Day of year, hour of submission, time elapsed since submission |
+---
+
+## ML Stack
+
+| Concern | Tool |
+|---|---|
+| Storage & transforms | DuckDB (SQL-first, no ORM) |
+| Pipeline composition | scikit-learn `Pipeline` |
+| Model | LightGBM |
+| Hyperparameter search | Optuna (fANOVA importance logged to MLflow) |
+| Experiment tracking | MLflow (params, metrics, artifacts, model registry) |
+| Explainability | SHAP (feature importance, beeswarm plots) |
+| Validation  *(v0.3)* | Pydantic models for config and schema enforcement |
+| Serving *(v0.3)* | FastAPI |
+
+**Current performance**: ROC-AUC **~0.88** on out-of-time test set.
+
+---
+
+## Data Pipeline CLI
+
 ```bash
-# Ingests data sources
-inat_pipe ingest
+pip install -e .
+```
 
-# Ingest local data sources in /data/raw
+### Ingest
+
+```bash
+# Ingest from local export files
 inat_pipe ingest local
 
-# Ingest data from inaturalist's api
+# Enrich via iNaturalist API (async, rate-limited)
 inat_pipe ingest api --rate 15 --ignore_not_found
 ```
 
-#### Features
+### Feature engineering
+
 ```bash
-# Creates features suite
 inat_pipe features
 ```
 
-#### Train
-```bash
-#  Train
-inat_pipe train
-
-inat_pipe train -h
-
-  -h, --help            show this help message and exit
-  --classifier {random_forest,gradient_boost,logistic,lightgbm}
-  --reducer {pca,svd,none}
-  --scaler {standard,minmax,robust,none}
-  --encoder {onehot,ordinal}
-  --imputer {median,mean,knn,constant}
-  --n_trials N_TRIALS, -n N_TRIALS
-  --cv_folds CV_FOLDS
-  --test, -t            Run a quick test
-```
-
-#### Inference
+### Train
 
 ```bash
-# Run inference on observations
-inat_pipe inference*
+inat_pipe train \
+  --classifier lightgbm \
+  --imputer median \
+  --encoder onehot \
+  --scaler robust \
+  --n_trials 50 \
+  --cv_folds 5
 ```
 
-### Architecture
+### Inference *(v0.3)*
 
-```markdown
-[Raw Source]
-    iNaturalist observations exports
-          ↓
-[Additionnal Source]
-    Batched & rate limited request on inaturalist's api
-          ↓
-[Storage Layer]
-    Local: DuckDB database
-          ↓
-[Feature Engineering Layer]
-    Python features module running sql queries
-    All transforms are reproducible and testable
-          ↓
-[Training Dataset]
-    Snapshot at time T, label = RG status at T+90 days
-          ↓
-[Model Registry]
-    MLflow tracking (params, metrics, artifacts)
-    Optuna studies to run Cv
-    Explainability module*
-          ↓
-[Serving Layer]*
-    FastAPI endpoint: POST /score → returns {observation_id, rg_probability, rank}
-
+```bash
+inat_pipe inference --obs_id <id>
 ```
 
+---
 
-## Api client
+## Sampling Strategy
 
-context manager
-protocols for fetchers, writers
-variable endpoint formatting and params required
+Observers are included if they meet both criteria:
 
+- **Minimum activity**: ≥ 20 observations
+- **Time coverage**: oldest observation before 2020, newest after 2024
 
+This ensures every observer in the training set has a meaningful historical footprint and spans the label window cleanly.
+
+---
+
+## Split Strategy
+
+Splits use hard date-range boundaries derived from a `SplitConfig` dataclass anchored on a single `cutoff_date`. Gap buffers between partitions prevent label-time contamination. Val and test sets are downsampled by `ORDER BY created_at` to preserve temporal ordering.
+
+```
+[──── Train ────][gap][── Val ──][gap][─── Test ───]
+  ~60%                  ~16%            ~24%
+```
+
+A natural positive-rate drift (57% → 52%) from train to test is expected and is not a sign of overfitting — it reflects the evolving composition of the iNaturalist community over time.
+
+---
+
+## Project Structure
+
+```
+inat_pipeline/
+├── ingest/
+│   ├── local.py          # CSV ingestion
+│   └── api/
+│       ├── client.py     # Async Protocol-based API client
+│       ├── fetchers.py   # BatchEndpointClient, ParametrizedEndpointClient
+│       └── writers.py    # ThreadPoolExecutor-backed DuckDB writer
+├── features/
+│   ├── observer.py
+│   ├── taxon.py          # Bayesian shrinkage + hierarchical fallback
+│   ├── confusion_graph.py
+│   └── sql/              # All transforms as .sql files, injected via params CTE
+├── labels/
+│   └── community_taxon.sql  # Windowed RG label derivation
+├── training/
+│   ├── pipeline.py       # Registry-pattern component resolution
+│   ├── cv.py             # Custom CV loop with LightGBM eval_set support
+│   ├── optuna_study.py
+│   └── mlflow_logging.py
+└── cli.py                # Entrypoints: ingest / features / train / inference
+```
+
+---
 
 ## Roadmap
 
-### v0.1 - Data pipeline and baseline model
-- ELT data pipeline
+### ✅ v0.1 — Data pipeline and baseline
+- ELT pipeline, DuckDB storage layer
 - Basic feature engineering
-- Simple logistic regression model on subset of features as baseline
+- Logistic regression baseline
 
-### v0.2 - Extended user features, real model, evaluation strategy
-- sklearn Pipeline
-- mlFlow and Optuna setup
-- LightGBM model
-- SHAP analysis
-- Bayesian shrinkage for taxon
+### ✅ v0.2 — Extended features and real model
+- scikit-learn Pipeline with registry pattern
+- LightGBM + Optuna + MLflow
+- SHAP explainability
+- Bayesian shrinkage for taxon RG rates
+- Windowed community taxon and RG label re-derivation
+- DVC for data versioning
 
-### v0.3 - System design
 
-- Model wrapped in FastApi
+### 🔲 v0.3 — System design and serving
+- FastAPI inference endpoint (`POST /score`)
+- Cold-start fallback paths via precomputed inference cache
+- Run manifest and pipeline lineage table (idempotent retries)
+- Schema drift assertions + lightweight feature versioning tied to MLflow runs
 
-### v0.4 - Ranking and expert routing, additionnal features
-
+### 🔲 v0.4 — Advanced features and routing
+- ID velocity features (time-to-first-ID, burst patterns)
 - Survival model (time-to-RG)
-- Identifiers features
-- ID velocity features (time-to-first-ID, ID burst patterns)
-- Specific rare species to expert
-- Similar species
-- Annotations
+- Rare species → expert routing
+- AWS S3 ingestion source migration
 
-*Not Implemented
+---
+
+## Scope & Limitations
+
+- Currently scoped to **Plantae** observations in **Québec**
+
+---
+
+*Built as a portfolio project modeled on a production ML team working within the iNaturalist ecosystem.*
