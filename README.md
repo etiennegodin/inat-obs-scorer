@@ -7,7 +7,7 @@
 [![LightGBM](https://img.shields.io/badge/model-LightGBM-brightgreen)](https://lightgbm.readthedocs.io/)
 [![MLflow](https://img.shields.io/badge/tracking-MLflow-orange)](https://mlflow.org/)
 [![DuckDB](https://img.shields.io/badge/storage-DuckDB-yellow)](https://duckdb.org/)
-[![ROC-AUC](https://img.shields.io/badge/ROC--AUC-0.88-success)]()
+[![ROC-AUC](https://img.shields.io/badge/ROC--AUC-0.8879-success)]()
 
 ---
 

@@ -45,7 +45,7 @@ class CustomCvSplit(BaseCrossValidator):
 
 
 def load_and_split(
-    features_path: Path, config: PipelineConfig
+    features_path: Path,
 ) -> tuple[
     pd.DataFrame,
     pd.DataFrame,
@@ -78,22 +78,7 @@ def load_and_split(
     y_test = test["label"]
     test.pop("label")
 
-    # Store features from dataframe
-    config.set_features(test)
-
-    # Override features type
-    config.change_feature_type("oauth_application_id")
-
-    # ── Log basic data stats ──────
-    data_stats = {
-        "data/n_rows_total": len(df),
-        "data/n_features_numeric": len(config.numeric_features),
-        "data/n_features_cat": len(config.categorical_features),
-        "data/target_positive_rate": float(df[config.target_column].mean()),
-        "data/scale_pos_weight": (y_train == 0).sum() / (y_train == 1).sum(),
-    }
-
-    return train, y_train, val, y_val, test, y_test, data_stats
+    return train, y_train, val, y_val, test, y_test
 
 
 def _build_categorical_transformer(config: PipelineConfig) -> Pipeline:

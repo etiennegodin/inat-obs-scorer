@@ -15,6 +15,7 @@ from ..workflows import (
     features_workflow,
     ingest_api_workflow,
     ingest_local_workflow,
+    test_workflow,
     train_workflow,
 )
 from .container import Dependencies
@@ -108,8 +109,20 @@ class ApplicationService:
                 use_gpu=args.gpu,
             )
         except InatPipelineError as e:
-            logger.error(f"Process_features failed {e}")
-            raise WorkflowError(f"Process_features failed {e}") from e
+            logger.error("Train workflow failed: %s", e)
+            raise
         except Exception as e:
-            logger.exception("Unexpected error during install")
-            raise WorkflowError(f"Install failed: {e}") from e
+            logger.exception("Unexpected error during train workflow")
+            raise WorkflowError("Train workflow failed") from e
+
+    def test(self, args):
+        logger.info("Starting testing workflow")
+        try:
+            test_workflow.execute(self.deps)
+
+        except InatPipelineError as e:
+            logger.error("Test workflow failed: %s", e)
+            raise
+        except Exception as e:
+            logger.exception("Unexpected error during test workflow")
+            raise WorkflowError("Test workflow failed") from e

@@ -52,6 +52,16 @@ def train_cmd(args: Namespace, app: ApplicationService):
         return 1
 
     print("\n✓ Model run passed!")
+    print(f"  Val ROC-AUC: {result['test_metrics']['test/test_roc_auc']:.4f}")
+
+
+def test_cmd(args: Namespace, app: ApplicationService):
+    try:
+        result = app.test(args)
+    except InatPipelineError as e:
+        print(f"[red]✗ {e}[/red]")
+        return 1
+
     print(f"  Test ROC-AUC: {result['test_metrics']['test/test_roc_auc']:.4f}")
 
 
@@ -169,6 +179,10 @@ def create_parser() -> argparse.ArgumentParser:
         "--gpu", "-g", default=False, action="store_true", help="Use gpu with lightgbm"
     )
     train_parser.set_defaults(func=train_cmd)
+
+    # Features command
+    test_parser = subparsers.add_parser("test", help="Run test on held out split")
+    test_parser.set_defaults(func=test_cmd)
 
     return parser
 

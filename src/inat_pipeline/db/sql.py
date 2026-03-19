@@ -127,8 +127,8 @@ class DuckDbSQL(SQLEngine):
 
     def _parametrise_query(self, query: str, params: dict) -> tuple[str, list]:
         """Change for sql flavor"""
-        logger.debug(query)
-        logger.debug(params)
+        # logger.debug(query)
+        # logger.debug(params)
         query_tool = sqlparams.SQLParams("named", "qmark")
         sql, values = query_tool.format(query, params)
         return sql, values

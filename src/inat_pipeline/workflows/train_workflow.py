@@ -39,7 +39,7 @@ def execute(
     cv_folds: int,
     random_seed: int,
     use_gpu: bool,
-):
+) -> dict:
     # Initialise pipeline configs
     config = model.PipelineConfig(
         classifier=classifier,
@@ -55,19 +55,28 @@ def execute(
         # experiment_name= deps.git_branch
     )
 
-    # ── 1. Data ───────────────────────────────────────────────────────────────
+    # ── 1. Data & Config setup ─────────────────────────────────────────────────
 
-    X_train, y_train, X_val, y_val, X_test, y_test, data_stats = model.load_and_split(
-        deps._DATA_FOLDER / "features.parquet", config
+    X_train, y_train, X_val, y_val, X_test, y_test = model.load_and_split(
+        deps._DATA_FOLDER / "features.parquet"
+    )
+
+    # Store features from dataframe
+    config.set_features(X_train)
+    # Override features type
+    config.change_feature_type("oauth_application_id")
+
+    # Get features set stats
+    features_stats = model.utils.get_features_stats(X_train, y_train, config)
+
+    # Get features diff from previous run
+    features_diff = model.utils.get_feature_diff(
+        config,
     )
 
     # ── 2. MLflow setup ───────────────────────────────────────────────────────
 
     mlflow.set_experiment(config.experiment_name)
-
-    features_diff = model.utils.get_feature_diff(
-        config,
-    )
 
     with mlflow.start_run(run_name=config.run_name) as parent_run:
         parent_run_id = parent_run.info.run_id
@@ -86,7 +95,7 @@ def execute(
             mlflow.log_dict(features_diff, "features_diff.json")
 
         # Log data statistics
-        mlflow.log_metrics(data_stats)
+        mlflow.log_metrics(features_stats)
 
         # Log plot of feature correlation
         explainability.log_feature_corr(X_train)

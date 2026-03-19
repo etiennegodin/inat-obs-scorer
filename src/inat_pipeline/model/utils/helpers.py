@@ -1,7 +1,25 @@
 import importlib
 from typing import Optional
 
+import pandas as pd
 from sklearn.pipeline import Pipeline
+
+from ..config import PipelineConfig
+
+
+def get_features_stats(
+    X_train: pd.DataFrame,
+    y_train: pd.Series,
+    config: PipelineConfig,
+) -> dict:
+    # ── Log basic data stats ──────
+    return {
+        "data/n_rows_total": len(X_train),
+        "data/n_features_numeric": len(config.numeric_features),
+        "data/n_features_cat": len(config.categorical_features),
+        "data/target_positive_rate": float(y_train.mean()),
+        "data/scale_pos_weight": (y_train == 0).sum() / (y_train == 1).sum(),
+    }
 
 
 def describe_pipeline(pipeline: Pipeline) -> dict:
