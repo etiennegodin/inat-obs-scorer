@@ -62,7 +62,7 @@ CLASSIFIER_REGISTRY = {
     "lightgbm": (
         "lightgbm",
         "LGBMClassifier",
-        {"verbose": 1},
+        {"verbose": -1},
     ),
 }
 

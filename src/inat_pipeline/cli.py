@@ -166,7 +166,7 @@ def create_parser() -> argparse.ArgumentParser:
         "--test", "-t", default=False, action="store_true", help="Run a quick test"
     )
     train_parser.add_argument(
-        "--gpu", default=False, action="store_true", help="Use gpu with lightgbm"
+        "--gpu", "-g", default=False, action="store_true", help="Use gpu with lightgbm"
     )
     train_parser.set_defaults(func=train_cmd)
 
