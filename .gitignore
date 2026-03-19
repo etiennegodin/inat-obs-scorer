@@ -22,14 +22,18 @@ htmlcov/
 # Project
 .env
 *.md
+*.duckdb
 !README.md
 obsidian/
 notebooks/*
-data/*
-!data/features.parquet
-
 *.log
 *.sh
+*.parquet
+
+# Data
+data/*
+!data/*.dvc
+!data/.gitignore
 
 # Ml Flow
 mlruns/*
