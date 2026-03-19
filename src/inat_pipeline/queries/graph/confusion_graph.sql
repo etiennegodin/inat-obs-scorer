@@ -1,8 +1,4 @@
-FORCE INSTALL duckpgq FROM community;
-LOAD duckpgq;
-
 DROP PROPERTY GRAPH IF EXISTS confusion_graph;
-
 SET search_path = 'staged,main';
 
 -- Redefine graph using these aliases

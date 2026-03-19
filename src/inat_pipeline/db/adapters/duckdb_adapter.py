@@ -27,7 +27,8 @@ class DuckDBAdapter:
         self._con.execute("LOAD spatial;")
 
         # duckpgq extension
-        # self._load_duckpgq_extension()
+        self._con.install_extension("duckpgq", repository="community")
+        self._con.load_extension("duckpgq")
 
         return self
 
@@ -37,7 +38,7 @@ class DuckDBAdapter:
             logger.debug("DuckDB connection closed")
         return False
 
-    def execute(self, query: str, params: Any, script: str | None = None):
+    def execute(self, query: str, params: Any | None = None, script: str | None = None):
         try:
             return self._con.execute(query, params)
         except duckdb.CatalogException as e:
@@ -49,14 +50,3 @@ class DuckDBAdapter:
 
     def executemany(self, query: str, params: list[tuple]):
         return self._con.executemany(query, params)
-
-    def _load_duckpgq_extension2(self):
-        self._con.execute(
-            "SET custom_extension_repository = 'http://duckpgq.s3.eu-north-1.amazonaws.com';"
-        )
-        self._con.execute("FORCE INSTALL 'duckpgq';")
-        self._con.execute("LOAD 'duckpgq';")
-
-    def _load_duckpgq_extension(self):
-        self._con.execute("INSTALL duckpgq FROM community;;")
-        self._con.execute("LOAD 'duckpgq';")

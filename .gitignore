@@ -26,6 +26,8 @@ htmlcov/
 obsidian/
 notebooks/*
 data/*
+!data/features.parquet
+
 *.log
 *.sh
 

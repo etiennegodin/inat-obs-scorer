@@ -1,4 +1,5 @@
 import logging
+import re
 import time
 from abc import ABC, abstractmethod
 from dataclasses import asdict, is_dataclass
@@ -46,6 +47,15 @@ class SQLEngine(ABC):
         """
         return query.format(**identifiers) if identifiers else query
 
+    def _strip_comments(self, sql: str) -> str:
+        """Remove single-line (--) and block (/* */) SQL comments for DuckPGQ parser."""
+
+        # Block comments first
+        sql = re.sub(r"/\*.*?\*/", "", sql, flags=re.DOTALL)
+        # Single-line comments
+        sql = re.sub(r"--[^\n]*", "", sql)
+        return sql.strip()
+
     def _load(self, script_name: str, params: Any, **identifiers) -> tuple[str, Any]:
         """Shared file loading + params & identifier injection."""
         path = self.sql_dir / f"{script_name}.sql"
@@ -63,9 +73,11 @@ class SQLEngine(ABC):
             query, values = self._parametrise_query(query, params)
         # Inject identitifers
         identified = self._identifiers(query, **identifiers)
-        # logger.debug(identified)
-        # logger.debug(str(values))
-        return identified, values
+
+        # Strip comments for sensitive parsers
+        stripped = self._strip_comments(identified)
+
+        return stripped, values
 
     def execute(self, script_name: str, params: Any = None, **identifiers) -> None:
         """Run a mutation — CREATE, INSERT, UPDATE. Returns nothing."""

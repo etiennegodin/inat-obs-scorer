@@ -110,44 +110,57 @@ SELECT
 
 
      --Fixed Taxon confusion stats
-    IFNULL(c.has_similar_species, FALSE)    AS has_similar_species,
-    COALESCE(c.neighborhood_difficulty_dist_weighted,0)   AS neighborhood_difficulty_dist_weighted,
-    COALESCE(c.neighborhood_difficulty_inv_dist, 0) AS neighborhood_difficulty_inv_dist,
+        IFNULL(c.has_similar_species, FALSE)    AS has_similar_species,
+        COALESCE(c.neighborhood_difficulty_dist_weighted,0)   AS neighborhood_difficulty_dist_weighted,
+        COALESCE(c.neighborhood_difficulty_inv_dist, 0) AS neighborhood_difficulty_inv_dist,
 
-    c.similar_species_count,
+        c.similar_species_count,
 
-    --c.nbor_obs_count_sum,
-    c.nbor_obs_count_mean,
-    c.nbor_obs_count_std,
-    --c.nbor_obs_count_max,
+        --c.nbor_obs_count_sum,
+        c.nbor_obs_count_mean,
+        c.nbor_obs_count_std,
+        --c.nbor_obs_count_max,
 
-    c.nbor_rg_rate_mean,
-    c.nbor_rg_rate_std,
-    c.nbor_rg_rate_min,
+        c.nbor_rg_rate_mean,
+        c.nbor_rg_rate_std,
+        c.nbor_rg_rate_min,
 
-    c.weighted_mean_neighbor_rg_rate,
-    c.nbor_rg_rate_inv_dist_weighted,
+        c.weighted_mean_neighbor_rg_rate,
+        c.nbor_rg_rate_inv_dist_weighted,
 
 
-    --c.nbor_dist_max,
-    c.nbor_dist_mean,
+        --c.nbor_dist_max,
+        c.nbor_dist_mean,
 
-    c.rg_rate_vs_neighbors,
+        c.rg_rate_vs_neighbors,
 
-    c.nbor_count_same_genus,
-    c.nbor_count_cross_genus,
-    c.nbor_count_cross_family,
+        c.nbor_count_same_genus,
+        c.nbor_count_cross_genus,
+        c.nbor_count_cross_family,
 
-    c.cross_genus_confusion_rate,
-    c.max_confusion_boundary_crossed,
+        c.cross_genus_confusion_rate,
+        c.max_confusion_boundary_crossed,
 
-    c.rg_percentile_in_neighborhood,
-    c.rg_percentile_dist_weighted,
+        c.rg_percentile_in_neighborhood,
+        c.rg_percentile_dist_weighted,
 
-    c.neighbor_genus_diversity,
-    --c.neighbor_rank_min,
+        c.neighbor_genus_diversity,
+        --c.neighbor_rank_min,
 
-    c.magnet_score,
+        c.magnet_score,
+
+    -- Taxa confusion graph
+        cc.clustering_coefficient,
+
+        dh.double_hop_nbrhd_size,
+        dh.double_hop_nbrhd_genus,
+        dh.double_hop_nbrhd_family,
+        dh.genus_crossover_count,
+        dh.family_crossover_count,
+
+
+
+
 
 
 FROM features.base b
@@ -155,13 +168,14 @@ JOIN features.splits                     s  ON b.observation_id = s.observation_
 LEFT JOIN features.observations          ob ON b.observation_id = ob.observation_id
 LEFT JOIN features.observers_entropy     oe ON b.observation_id = oe.observation_id
 LEFT JOIN features.label                 l  ON b.observation_id = l.observation_id
-
---LEFT JOIN features.identifications       i  ON b.observation_id = i.observation_id
---LEFT JOIN features.identifiers           ir ON b.observation_id = ii.observation_id
 JOIN features.identifications            i  ON b.observation_id = i.observation_id
 LEFT JOIN features.taxon                 t  ON b.observation_id = t.observation_id
 LEFT JOIN features.taxa_confusion        c  ON b.taxon_id = c.taxon_id
 LEFT JOIN staged.users                   u  ON b.user_id = u.user_id
 
+LEFT JOIN graph.clustering_coefficient   cc ON b.taxon_id = cc.taxon_id
+LEFT JOIN graph.double_hop_stats         dh ON b.taxon_id = dh.taxon_id
+
+
 WHERE l.label IS NOT NULL
-ORDER BY b.created_at
+ORDER BY b.created_at;
