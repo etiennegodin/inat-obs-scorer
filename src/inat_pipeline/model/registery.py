@@ -101,8 +101,8 @@ SEARCH_SPACES = {
         # The three that matter most — search these hard
         "classifier__learning_rate": {
             "type": "float",
-            "low": 0.01,
-            "high": 0.1,
+            "low": 0.001,
+            "high": 0.05,
             "log": True,
             # log=True means Optuna samples 0.01, 0.012, 0.015...
             # rather than 0.01, 0.11, 0.21 — much smarter for rates
