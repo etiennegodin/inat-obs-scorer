@@ -111,15 +111,15 @@ SELECT
 
      --Fixed Taxon confusion stats
     IFNULL(c.has_similar_species, FALSE)    AS has_similar_species,
-    COALESCE(c.neighborhood_difficulty,0)   AS neighborhood_difficulty,
+    COALESCE(c.neighborhood_difficulty_dist_weighted,0)   AS neighborhood_difficulty,
     COALESCE(c.neighborhood_difficulty_inv_dist, 0) AS neighborhood_difficulty_inv_dist,
 
     c.similar_species_count,
 
-    c.nbor_obs_count_sum,
+    --c.nbor_obs_count_sum,
     c.nbor_obs_count_mean,
-    c.nbor_obs_count_std,
-    c.nbor_obs_count_max,
+    --c.nbor_obs_count_std,
+    --c.nbor_obs_count_max,
 
     c.nbor_rg_rate_mean,
     c.nbor_rg_rate_std,
@@ -127,9 +127,9 @@ SELECT
 
     c.weighted_mean_neighbor_rg_rate,
     c.nbor_rg_rate_inv_dist_weighted,
-    c.neighborhood_difficulty_dist_weighted,
 
-    c.nbor_dist_max,
+
+    --c.nbor_dist_max,
     c.nbor_dist_mean,
 
     c.rg_rate_vs_neighbors,
@@ -145,7 +145,7 @@ SELECT
     c.rg_percentile_dist_weighted,
 
     c.neighbor_genus_diversity,
-    c.neighbor_rank_min,
+    --c.neighbor_rank_min,
 
     c.magnet_score,
 
