@@ -2,6 +2,7 @@ import pandas as pd
 
 from .config import PipelineConfig
 from .core import build_pipeline
+from .registery import LIGHTGBM_GPU_PARAMS
 
 
 def train_final_model(
@@ -25,6 +26,10 @@ def train_final_model(
 
     # Inject random state
     classifier_params["random_state"] = config.random_seed
+
+    # Inject gpu params if flagged
+    if config.use_gpu:
+        classifier_params.update(LIGHTGBM_GPU_PARAMS)
 
     final_pipeline = build_pipeline(config, classifier_params=classifier_params)
     final_pipeline.fit(X_train, y_train)

@@ -62,8 +62,14 @@ CLASSIFIER_REGISTRY = {
     "lightgbm": (
         "lightgbm",
         "LGBMClassifier",
-        {"verbose": -1},
+        {"verbose": 1},
     ),
+}
+
+LIGHTGBM_GPU_PARAMS = {
+    "device": "gpu",
+    "gpu_platform_id": 0,  # usually 0 for single-GPU machines
+    "gpu_device_id": 0,
 }
 
 
@@ -101,7 +107,7 @@ SEARCH_SPACES = {
         # The three that matter most — search these hard
         "classifier__learning_rate": {
             "type": "float",
-            "low": 0.001,
+            "low": 0.009,
             "high": 0.05,
             "log": True,
             # log=True means Optuna samples 0.01, 0.012, 0.015...
@@ -110,13 +116,13 @@ SEARCH_SPACES = {
         "classifier__num_leaves": {
             "type": "int",
             "low": 31,
-            "high": 127,
+            "high": 150,
             # rule of thumb: never exceed 2^(max_depth)
             # for depth=7 that's 128 — 200 is already generous
         },
         "classifier__min_child_samples": {
             "type": "int",
-            "low": 50,
+            "low": 100,
             "high": 300,
             # on imbalanced data (like iNat RG), push this higher
             # it prevents the model from memorizing rare patterns

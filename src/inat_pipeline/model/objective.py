@@ -10,7 +10,7 @@ from sklearn.model_selection import cross_val_score
 
 from .config import PipelineConfig
 from .core import CustomCvSplit, build_pipeline
-from .registery import SEARCH_SPACES
+from .registery import LIGHTGBM_GPU_PARAMS, SEARCH_SPACES
 
 # Suppress noisy warnings during hyperparameter search
 warnings.filterwarnings("ignore", category=UserWarning)
@@ -57,13 +57,21 @@ def make_objective(
 
     custom_cv = CustomCvSplit(n_splits=config.cv_folds)
 
+    # Set base params
+    base_params = {}
+
+    # Inject gpu params if flagged
+    if config.use_gpu:
+        base_params.update(LIGHTGBM_GPU_PARAMS)
+
     def objective(trial: optuna.Trial) -> float:
         # ── Step 1: Ask Optuna for hyperparameter suggestions ─────────────────
         # trial.suggest_* methods implement Bayesian optimization:
         # early trials explore randomly; later trials focus on promising regions.
 
         logger.debug("Optuna objective")
-        trial_params = {}
+        # Copy base params
+        trial_params = base_params
         trial_params["random_state"] = config.random_seed
 
         for param_name, spec in search_space.items():

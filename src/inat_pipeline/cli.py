@@ -45,9 +45,6 @@ def features_cmd(args: Namespace, app: ApplicationService):
 
 
 def train_cmd(args: Namespace, app: ApplicationService):
-    if args.gpu:
-        raise NotImplementedError("Not implemented")
-
     try:
         result = app.train(args)
     except InatPipelineError as e:
