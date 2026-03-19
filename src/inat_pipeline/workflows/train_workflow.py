@@ -58,7 +58,7 @@ def execute(
     # ── 1. Data ───────────────────────────────────────────────────────────────
 
     X_train, y_train, X_val, y_val, X_test, y_test, data_stats = model.load_and_split(
-        deps.DB_PATH, config
+        deps._DATA_FOLDER / "features.parquet", config
     )
 
     # ── 2. MLflow setup ───────────────────────────────────────────────────────

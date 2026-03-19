@@ -8,7 +8,6 @@ from sklearn.compose import ColumnTransformer
 from sklearn.model_selection import BaseCrossValidator
 from sklearn.pipeline import Pipeline
 
-from ..db import DuckDBAdapter
 from .config import PipelineConfig
 from .registery import (
     CATEGORICAL_IMPUTER_REGISTRY,
@@ -46,7 +45,7 @@ class CustomCvSplit(BaseCrossValidator):
 
 
 def load_and_split(
-    db_path: Path, config: PipelineConfig
+    features_path: Path, config: PipelineConfig
 ) -> tuple[
     pd.DataFrame,
     pd.DataFrame,
@@ -56,8 +55,7 @@ def load_and_split(
     pd.DataFrame,
     dict,
 ]:
-    with DuckDBAdapter(db_path) as con:
-        df = con.execute("SELECT * FROM features.training", {}).df()
+    df = pd.read_parquet(features_path)
 
     # Fix timezone
     df["created_at"] = df["created_at"].dt.tz_convert("UTC").dt.tz_localize(None)

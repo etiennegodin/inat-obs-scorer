@@ -48,7 +48,9 @@ def execute(deps: Dependencies):
         sql_features.execute("training")
 
         # Export to data version controlled file
+        output_path = deps._DATA_FOLDER / "features.parquet"
         con.execute(
             f"""COPY features.training TO
-            '{deps._DATA_FOLDER / 'features.parquet'}' (FORMAT PARQUET);"""
+            '{output_path}' (FORMAT PARQUET);"""
         )
+        logger.info(f"Exported features matrix to {output_path}")
