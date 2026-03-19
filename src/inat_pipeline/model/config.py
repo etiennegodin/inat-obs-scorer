@@ -36,6 +36,7 @@ class PipelineConfig:
     n_trials: int = 10  # Optuna: number of hyperparameter combos to try
     cv_folds: int = 5  # cross-validation folds per trial
     scoring_metric: str = "roc_auc"  # what Optuna optimizes for
+    run_name: str = field(init=False)  # Run name
 
     # Flags
     ct_verbose_feature_names_out: bool = False
@@ -47,6 +48,8 @@ class PipelineConfig:
             raise IncompatiblePipelineModules(
                 "'use_gpu' is only supported with lightgbm classifier"
             )
+
+        self.run_name = f"{self.classifier}_optuna"
 
     def set_features(self, df: pd.DataFrame) -> None:
         try:

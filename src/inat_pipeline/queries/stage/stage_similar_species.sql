@@ -5,7 +5,7 @@ CREATE OR REPLACE TABLE staged.similar_species AS
 
 WITH unpacked AS (
     SELECT
-    taxon_id::INT AS taxon_id,
+    taxon_id::BIGINT AS taxon_id,
     data."count" AS "count",
     UNNEST(data.taxon, RECURSIVE := true)
 
@@ -15,9 +15,9 @@ WITH unpacked AS (
             raw_json,
             '{
                 "taxon":{
-                    "id":"UBIGINT",
+                    "id":"BIGINT",
                 },
-                "count":"UBIGINT",
+                "count":"BIGINT",
             }'
             ) AS data
             FROM raw.api_similar_species

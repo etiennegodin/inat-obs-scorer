@@ -66,12 +66,10 @@ def execute(
     mlflow.set_experiment(config.experiment_name)
 
     features_diff = model.utils.get_feature_diff(
-        config.features,
-        config.experiment_name,
+        config,
     )
-    logger.info(features_diff)
 
-    with mlflow.start_run(run_name=f"{config.classifier}_optuna") as parent_run:
+    with mlflow.start_run(run_name=config.run_name) as parent_run:
         parent_run_id = parent_run.info.run_id
         logger.info(f"\n{'=' * 60}")
         logger.info(f"MLflow Run ID: {parent_run_id}")

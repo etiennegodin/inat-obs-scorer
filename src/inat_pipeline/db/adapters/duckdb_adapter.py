@@ -16,7 +16,9 @@ class DuckDBAdapter:
     def __enter__(self):
         logger.debug("Opening DuckDB connection: %s", self.db_path)
         try:
-            self._con = duckdb.connect(self.db_path)
+            self._con = duckdb.connect(
+                self.db_path, config={"allow_unsigned_extensions": "true"}
+            )
         except duckdb.IOException as e:
             raise DBConnectionError(str(e), file=self.db_path)
 
@@ -24,9 +26,8 @@ class DuckDBAdapter:
         self._con.execute("INSTALL spatial;")
         self._con.execute("LOAD spatial;")
 
-        # Graph
-        self._con.install_extension("duckpgq", repository="community")
-        self._con.load_extension("duckpgq")
+        # duckpgq extension
+        # self._load_duckpgq_extension()
 
         return self
 
@@ -48,3 +49,14 @@ class DuckDBAdapter:
 
     def executemany(self, query: str, params: list[tuple]):
         return self._con.executemany(query, params)
+
+    def _load_duckpgq_extension2(self):
+        self._con.execute(
+            "SET custom_extension_repository = 'http://duckpgq.s3.eu-north-1.amazonaws.com';"
+        )
+        self._con.execute("FORCE INSTALL 'duckpgq';")
+        self._con.execute("LOAD 'duckpgq';")
+
+    def _load_duckpgq_extension(self):
+        self._con.execute("INSTALL duckpgq FROM community;;")
+        self._con.execute("LOAD 'duckpgq';")

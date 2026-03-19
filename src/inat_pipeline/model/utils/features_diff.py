@@ -1,18 +1,17 @@
 import ast
 import json
 import logging
-from typing import Sequence
 
 import mlflow
 from mlflow.tracking import MlflowClient
+
+from ..config import PipelineConfig
 
 logger = logging.getLogger(__name__)
 
 
 def get_feature_diff(
-    current_features: Sequence[str],
-    experiment_name: str,
-    param_name: str = "features",
+    config: PipelineConfig,
     n_runs: int = 1,
     tracking_uri: str | None = None,
 ) -> dict[str, list[str]] | None:
@@ -34,11 +33,12 @@ def get_feature_diff(
     if tracking_uri:
         mlflow.set_tracking_uri(tracking_uri)
 
-    current = set(current_features)
+    current = set(config.features)
 
     prev_features, run_id = _fetch_previous_features(
-        experiment_name=experiment_name,
-        param_name=param_name,
+        experiment_name=config.experiment_name,
+        run_name=config.run_name,
+        param_name="features",
         n_runs=n_runs,
     )
 
@@ -48,8 +48,8 @@ def get_feature_diff(
 
     added = sorted(current - prev)
     removed = sorted(prev - current)
-    common = sorted(current & prev)
-    return {"added": added, "removed": removed, "common": common}
+    # common = sorted(current & prev)
+    return {"added": added, "removed": removed}
 
 
 def _parse_feature_param(raw: str) -> list[str]:
@@ -80,6 +80,7 @@ def _parse_feature_param(raw: str) -> list[str]:
 
 def _fetch_previous_features(
     experiment_name: str,
+    run_name: str,
     param_name: str,
     n_runs: int = 1,
 ) -> tuple[list[str], str] | tuple[None, None]:
@@ -95,12 +96,14 @@ def _fetch_previous_features(
 
     runs = client.search_runs(
         experiment_ids=[experiment.experiment_id],
-        # filter_string=f"params.{param_name} != ''",
-        order_by=["start_time ASC"],
+        filter_string=f"params.{param_name} != ''",
+        order_by=["start_time DESC"],
         max_results=n_runs + 10,  # small buffer in case some runs lack the param
     )
 
-    finished = [r for r in runs if r.info.status == "FINISHED"]
+    this_runs = [r for r in runs if r.info.run_name == run_name]
+
+    finished = [r for r in this_runs if r.info.status == "FINISHED"]
     if len(finished) < n_runs:
         return None, None
 
