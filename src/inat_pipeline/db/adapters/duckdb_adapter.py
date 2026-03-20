@@ -39,8 +39,8 @@ class DuckDBAdapter:
         return False
 
     def execute(self, query: str, params: Any | None = None, script: str | None = None):
-        logger.debug(query)
-        logger.debug(params)
+        # logger.debug(query)
+        # logger.debug(params)
         try:
             return self._con.execute(query, params)
         except duckdb.CatalogException as e:

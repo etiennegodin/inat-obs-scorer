@@ -36,7 +36,7 @@ SELECT
     i.category,
     l.label AS is_rg,
     -- outcome is only "known" if the obs was old enough when the ID was left
-    CASE WHEN i.created_at - o.created_at > INTERVAL to_days(:gap_days)
+    CASE WHEN i.created_at - o.created_at > to_days(:gap_days)
          THEN 1 ELSE 0 END  AS outcome_settled
 
 FROM staged.identifications i
@@ -45,21 +45,3 @@ JOIN staged.observations o
 JOIN features.label l
     ON l.observation_id = i.observation_id
 WHERE i.user_id != o.user_id;
-
-
-CREATE OR REPLACE TABLE graph.network_events AS
-SELECT
-    *,
-    -- first time this specific counterpart appeared for this user+role
-    CASE WHEN ROW_NUMBER() OVER (
-        PARTITION BY user_id, role, counterpart_id
-        ORDER BY created_at
-    ) = 1 THEN 1 ELSE 0 END  AS is_new_counterpart,
-
-    -- first time this taxon appeared for this user+role
-    CASE WHEN ROW_NUMBER() OVER (
-        PARTITION BY user_id, role, taxon_id
-        ORDER BY created_at
-    ) = 1 THEN 1 ELSE 0 END  AS is_new_taxon
-
-FROM graph.network_events

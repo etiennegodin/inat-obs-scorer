@@ -38,10 +38,10 @@ def execute(deps: Dependencies):
         sql_features.execute_many(
             "community_taxon_windowed",
             "research_grade_windowed",
+            "network_events_stats",
             "user_role_timeline",
             "base",
             "taxon",
-            "label",
             "observations",
             "identifications",
             "taxa_confusion",
