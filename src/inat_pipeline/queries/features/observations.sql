@@ -16,7 +16,7 @@ WITH base_obs AS(
         o.species,
         u.created_at              AS user_created_at,
         u.orcid,
-        t.taxon_rg_rate           AS expected_rg_rate,
+        t.taxon_rg_rate_shrunk           AS expected_rg_rate,
         rg.n_identifiers_at_window,
         rg.n_identifiers_agree_at_window,
         -- Honest RG label from macro (no leakage)
@@ -67,10 +67,10 @@ aggregates AS(
         -- To do shrinkage here at a = 5
 
         COALESCE(observer_taxon_obs_rg_count_at_t::FLOAT
-                / NULLIF(observer_taxon_obs_count_at_t, 0), 0)      AS observer_taxon_rg_rate_at_t_raw,
+                / NULLIF(observer_taxon_obs_count_at_t, 0), 0)      AS observer_taxon_rg_rate_shrunk_at_t_raw,
 
         COALESCE((5 * expected_rg_rate +  observer_taxon_obs_rg_count_at_t )
-            / (5 + observer_taxon_obs_count_at_t), 0 ) AS  observer_taxon_rg_rate_at_t,
+            / (5 + observer_taxon_obs_count_at_t), 0 ) AS  observer_taxon_rg_rate_shrunk_at_t,
 
         observer_taxon_obs_count_at_t::FLOAT
             / NULLIF(observer_obs_count_at_t, 0) AS observer_taxon_focus_rate,

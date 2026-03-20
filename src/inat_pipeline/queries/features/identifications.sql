@@ -47,10 +47,11 @@ identifier_features AS(
         -- Shrunk RG success rate as an identifier
 
         --When identifying for others, what's the RG rate of obs they chose to engage with? Selectivity signal |
-        (COALESCE(t.cumulative_settled_rg, 0) + 10 * obs.expected_rg_rate)
+        (COALESCE(t.cumulative_settled_rg, 0) + 10 * tx.global_rg_rate)
             / NULLIF(COALESCE(t.cumulative_settled_events, 0) + 10, 0)
                                                                     AS prior_identifier_rg_rate,
     FROM features.observations obs
+    JOIN features.taxon tx ON obs.observation_id = tx.observation_id
     ASOF JOIN graph.user_role_timeline t
         ON  t.user_id     = obs.user_id
         AND t.role        = 'identifier'

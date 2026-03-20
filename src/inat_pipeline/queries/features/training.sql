@@ -55,7 +55,7 @@ SELECT
         */
 
         oe.observer_species_entropy_norm AS obv_taxon_entropy,
-        ob.observer_taxon_rg_rate_at_t AS obv_taxon_rg_rate_at_t,
+        ob.observer_taxon_rg_rate_shrunk_at_t AS obv_taxon_rg_rate_shrunk_at_t,
         ob.observer_taxon_focus_rate AS obv_taxon_focus_rate,
 
 
@@ -100,7 +100,7 @@ SELECT
         COALESCE(i.reciprocity_ratio, 0) AS reciprocity_ratio,
 
      --Taxon features (fixed lookup)
-    t.taxon_rg_rate,
+    t.taxon_rg_rate_shrunk,
     t.rank_level,
     t.taxon_popularity_rank,
     t.rg_rate_source,

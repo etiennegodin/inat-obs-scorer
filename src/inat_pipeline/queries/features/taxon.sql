@@ -58,6 +58,13 @@ aggregates AS(
         AVG(n_ids_at_window) FILTER (WHERE is_rg) OVER taxon_history, 0
     ) AS taxon_avg_ids_to_rg,
 
+
+    -- Global prior
+    AVG(is_rg::FLOAT) OVER (
+        ORDER BY created_at
+        ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING
+    ) AS global_rg_rate,
+
     FROM base
 
     WINDOW
@@ -71,13 +78,6 @@ rates AS(
 
     SELECT *,
 
-    -- Popularity of taxon hierarchy at this time
-    LOG(source_obs_count + 1) AS taxon_popularity_rank,
-    LOG(genus_obs_count + 1) AS genus_popularity_rank,
-    LOG(family_obs_count + 1) AS family_popularity_rank,
-    LOG(order_obs_count + 1) AS order_popularity_rank,
-
-
     -- Raw rates at each level
     taxon_rg_obs::FLOAT  / NULLIF(taxon_obs_count, 0)  AS taxon_rg_rate_raw,
     genus_rg_obs::FLOAT  / NULLIF(genus_obs_count, 0)  AS genus_rg_rate,
@@ -85,11 +85,14 @@ rates AS(
     order_rg_obs::FLOAT  / NULLIF(order_obs_count, 0)  AS order_rg_rate,
 
 
-    -- Hierarchical prior
-    COALESCE(genus_rg_rate, family_rg_rate, order_rg_rate,0.5) AS hierarchical_prior,
-    (10 * hierarchical_prior + taxon_rg_obs) / (10 + taxon_obs_count) AS taxon_rg_rate_shrunk
+    -- Hierarchical prior for shrinkage
+    -- 0.5 cold start fallback
+    COALESCE(genus_rg_rate, family_rg_rate, order_rg_rate, global_rg_rate, 0.5) AS hierarchical_prior,
+
+    (10 * hierarchical_prior + taxon_rg_obs) / (10 + taxon_obs_count) AS taxon_rg_rate_shrunk,
 
     -- Which level actually provided the rate
+    /*
     CASE
         WHEN taxon_obs_count  >= 30 THEN 'species'
         WHEN genus_obs_count  >= 30 THEN 'genus'
@@ -98,15 +101,23 @@ rates AS(
         ELSE 'insufficient'
     END AS rg_rate_source,
 
-    CASE WHEN taxon_obs_count  < 30 THEN TRUE ELSE FALSE END AS taxon_cold_start,
 
-    COALESCE(taxon_rg_rate, 0) AS taxon_rg_rate_safe,
+    COALESCE(taxon_rg_rate_shrunk, 0) AS taxon_rg_rate_shrunk_safe,
     CASE rg_rate_source
         WHEN 'species' THEN taxon_obs_count
         WHEN 'genus'   THEN genus_obs_count
         WHEN 'family'  THEN family_obs_count
         WHEN 'order'   THEN order_obs_count
     END AS source_obs_count,
+    */
+
+    CASE WHEN taxon_obs_count  < 30 THEN TRUE ELSE FALSE END AS taxon_cold_start,
+
+    -- Popularity of taxon hierarchy at this time
+    LOG(taxon_obs_count + 1) AS taxon_popularity_rank,
+    LOG(genus_obs_count + 1) AS genus_popularity_rank,
+    LOG(family_obs_count + 1) AS family_popularity_rank,
+    LOG(order_obs_count + 1) AS order_popularity_rank,
 
     FROM aggregates
 
