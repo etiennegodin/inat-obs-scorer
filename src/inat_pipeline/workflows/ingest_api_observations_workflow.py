@@ -3,13 +3,13 @@ import logging
 
 from ..app.container import Dependencies
 from ..db import DuckDBAdapter, DuckDbSQL
-from ..inat_client import (
+from ..ingest.inat_client import (
     DuckDbWriter,
     EndpointConfig,
     RateLimiterFetcher,
     make_client,
 )
-from ..inat_client.registery import OBSERVATIONS_FIELDS
+from ..ingest.inat_client.registery import OBSERVATIONS_FIELDS
 
 logger = logging.getLogger(__name__)
 

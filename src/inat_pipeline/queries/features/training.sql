@@ -68,7 +68,7 @@ SELECT
 
         --Identifiers counts from obs history
         --LOG(ii.identifiers_total + 1) AS obv_n_identifier_log,
-        /*
+        /*global_rg_rate
         ii.identifiers_agreeing,
         ii.identifiers_improving,
         ii.identifiers_maverick,

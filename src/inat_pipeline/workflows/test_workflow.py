@@ -9,7 +9,7 @@ from sklearn.metrics import (
 )
 from sklearn.pipeline import Pipeline
 
-from .. import model
+from .. import train
 from ..app.container import Dependencies
 
 logger = logging.getLogger(__name__)
@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 def execute(deps: Dependencies) -> dict:
     # ── 1. Data ───────────────────────────────────────────────────────────────
 
-    X_train, y_train, X_val, y_val, X_test, y_test = model.load_and_split(
+    X_train, y_train, X_val, y_val, X_test, y_test = train.load_and_split(
         deps._DATA_FOLDER / "features.parquet"
     )
 

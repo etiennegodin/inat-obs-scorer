@@ -3,7 +3,7 @@ import logging
 
 from ..app.container import Dependencies
 from ..db import DuckDBAdapter, DuckDbSQL
-from ..inat_client import (
+from ..ingest.inat_client import (
     DuckDbWriter,
     EndpointConfig,
     RateLimiterFetcher,

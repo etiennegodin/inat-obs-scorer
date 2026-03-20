@@ -255,28 +255,58 @@ A natural positive-rate drift (57% → 52%) from train to val/test is expected a
 ---
 
 ## Project Structure
-
 ```
 inat_pipeline/
+├── api/
+├── app/
+│   ├── container.py         # App depencies
+│   └── service.py           # App entry point
+├── db/
+│   ├── adapters
+│   │   ├── duckdb_adapter.py
+│   ├── protocols.py
+│   └── sql.py
 ├── ingest/
-│   ├── local.py          # CSV ingestion
-│   └── api/
-│       ├── client.py     # Async Protocol-based API client
-│       ├── fetchers.py   # BatchEndpointClient, ParametrizedEndpointClient
-│       └── writers.py    # ThreadPoolExecutor-backed DuckDB writer
-├── features/
-│   ├── observer.py
-│   ├── taxon.py          # Bayesian shrinkage + hierarchical fallback
-│   ├── confusion_graph.py
-│   └── sql/              # All transforms as .sql files, injected via params CTE
-├── labels/
-│   └── community_taxon.sql  # Windowed RG label derivation
-├── training/
-│   ├── pipeline.py       # Registry-pattern component resolution
-│   ├── cv.py             # Custom CV loop with LightGBM eval_set support
-│   ├── optuna_study.py
-│   └── mlflow_logging.py
-└── cli.py                # Entrypoints: ingest / features / train / inference
+│   ├── inat_client/
+│   │   ├── base.py          # Async Protocol-based API client
+│   │   ├── clients.py       # BatchEndpointClient, ParametrizedEndpointClient
+│   │   ├── config.py        # ThreadPoolExecutor-backed DuckDB writer
+│   │   ├── factory.py
+│   │   ├── fetchers.py      # RateLimiterFetcher
+│   │   ├── protocols.py
+│   │   ├── registery.py     # Specific endpoint fields
+│   │   └── writers.py
+│   ├── local/
+│   │   ├── ingestors.py.py  # Expandable backend support *(v0.4)*
+│   │   └── protocols.py
+├── queries/                 # All .sql queries
+│   ├── api/                 # Prep raw data receiving
+│   ├── features/            # Features suite, injected via params CTE
+│   ├── graph/               # Graph queries for taxa confusion, with duckpgq
+│   ├── split/               # Train/Val/Test splits
+│   ├── stage/               # Raw data staging
+│   ├── params.py
+│   └──registery.py
+├── train/
+│   ├── utils/
+│   ├── config.py
+│   ├── core.py
+│   ├── explainability.py
+│   ├── final.py
+│   ├── objective.py
+│   └── registery.py
+├── utils/                   # Misc utils, logger, etc
+├── workflows/
+│   ├── features_workflow.py
+│   ├── ingest_api_observations_workflow.py
+│   ├── ingest_api_similar_species_workflow.py
+│   ├── ingest_api_workflow.py
+│   ├── ingest_local_workflow.py
+│   ├── test_workflow.py
+│   └── train_workflow.py
+├── exceptions.py         # Custom exceptions hierarchy
+└── cli.py                # Entrypoints: ingest / features / train / test / inference
+
 ```
 
 ---

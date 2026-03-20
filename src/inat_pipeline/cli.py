@@ -7,7 +7,7 @@ from pathlib import Path
 
 from .app import ApplicationService, Dependencies
 from .exceptions import InatPipelineError
-from .model.registery import (
+from .train.registery import (
     CLASSIFIER_REGISTRY,
     ENCODER_REGISTRY,
     IMPUTER_REGISTRY,

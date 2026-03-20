@@ -15,9 +15,9 @@ from sklearn.metrics import (
     roc_auc_score,
 )
 
-from .. import model
+from .. import train
 from ..app.container import Dependencies
-from ..model import explainability
+from ..train import explainability
 
 logger = logging.getLogger(__name__)
 
@@ -41,7 +41,7 @@ def execute(
     use_gpu: bool,
 ) -> dict:
     # Initialise pipeline configs
-    config = model.PipelineConfig(
+    config = train.PipelineConfig(
         classifier=classifier,
         numeric_imputer=imputer,
         reducer=reducer,
@@ -57,7 +57,7 @@ def execute(
 
     # ── 1. Data & Config setup ─────────────────────────────────────────────────
 
-    X_train, y_train, X_val, y_val, X_test, y_test = model.load_and_split(
+    X_train, y_train, X_val, y_val, X_test, y_test = train.load_and_split(
         deps._DATA_FOLDER / "features.parquet"
     )
 
@@ -67,10 +67,10 @@ def execute(
     config.change_feature_type("oauth_application_id")
 
     # Get features set stats
-    features_stats = model.utils.get_features_stats(X_train, y_train, config)
+    features_stats = train.utils.get_features_stats(X_train, y_train, config)
 
     # Get features diff from previous run
-    features_diff = model.utils.get_feature_diff(
+    features_diff = train.utils.get_feature_diff(
         config,
     )
 
@@ -101,8 +101,8 @@ def execute(
         explainability.log_feature_corr(X_train)
 
         # Log pipeline structure as a JSON artifact
-        sample_pipeline = model.build_pipeline(config)
-        pipeline_desc = model.helpers.describe_pipeline(sample_pipeline)
+        sample_pipeline = train.build_pipeline(config)
+        pipeline_desc = train.helpers.describe_pipeline(sample_pipeline)
         with open("pipeline_description.json", "w") as f:
             json.dump(pipeline_desc, f, indent=2, default=str)
         mlflow.log_artifact("pipeline_description.json")
@@ -118,7 +118,7 @@ def execute(
             # MedianPruner cuts off trials that are clearly underperforming early
         )
 
-        objective = model.objective.make_objective(
+        objective = train.objective.make_objective(
             config, X_train, y_train, parent_run_id
         )
 
@@ -145,7 +145,7 @@ def execute(
 
         # ── 4. Final model training ────────────────────────────────────────────
         logger.info("Training final model on full training set...")
-        final_model = model.train_final_model(config, best_params, X_train, y_train)
+        final_model = train.train_final_model(config, best_params, X_train, y_train)
 
         # ── 5. Evaluate on held-out test set ──────────────────────────────────
         y_pred = final_model.predict(X_val)
