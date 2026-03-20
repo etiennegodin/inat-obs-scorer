@@ -54,9 +54,22 @@ aggregates AS(
     COALESCE(SUM(is_rg::INT)            OVER order_history, 0)  AS order_rg_obs,
 
     -- ID convergence tendency
+
     COALESCE(
         AVG(n_ids_at_window) FILTER (WHERE is_rg) OVER taxon_history, 0
     ) AS taxon_avg_ids_to_rg,
+
+
+    /*
+        COALESCE(
+    AVG(n_ids_at_window) FILTER (
+        WHERE is_rg
+        AND created_at < current_obs.created_at - INTERVAL '90 days'
+    ) OVER taxon_history,
+    0
+    ) AS taxon_avg_ids_to_rg
+    */
+
 
 
     -- Global prior
@@ -76,7 +89,7 @@ aggregates AS(
 
 rates AS(
 
-    SELECT *,
+    SELECT *EXCLUDE(global_rg_rate),
 
     -- Raw rates at each level
     taxon_rg_obs::FLOAT  / NULLIF(taxon_obs_count, 0)  AS taxon_rg_rate_raw,
@@ -90,26 +103,15 @@ rates AS(
     COALESCE(genus_rg_rate, family_rg_rate, order_rg_rate, global_rg_rate, 0.5) AS hierarchical_prior,
 
     (10 * hierarchical_prior + taxon_rg_obs) / (10 + taxon_obs_count) AS taxon_rg_rate_shrunk,
-
-    -- Which level actually provided the rate
-    /*
+    global_rg_rate,
+    -- Which level actually provided the prior
     CASE
-        WHEN taxon_obs_count  >= 30 THEN 'species'
-        WHEN genus_obs_count  >= 30 THEN 'genus'
-        WHEN family_obs_count >= 30 THEN 'family'
-        WHEN order_obs_count  >= 30 THEN 'order'
-        ELSE 'insufficient'
-    END AS rg_rate_source,
-
-
-    COALESCE(taxon_rg_rate_shrunk, 0) AS taxon_rg_rate_shrunk_safe,
-    CASE rg_rate_source
-        WHEN 'species' THEN taxon_obs_count
-        WHEN 'genus'   THEN genus_obs_count
-        WHEN 'family'  THEN family_obs_count
-        WHEN 'order'   THEN order_obs_count
-    END AS source_obs_count,
-    */
+        WHEN genus_rg_rate  > 0 THEN 1
+        WHEN family_rg_rate > 0 THEN 2
+        WHEN order_rg_rate  > 0 THEN 3
+        WHEN global_rg_rate > 0 THEN 4
+        ELSE 5
+    END AS rg_rate_prior_source,
 
     CASE WHEN taxon_obs_count  < 30 THEN TRUE ELSE FALSE END AS taxon_cold_start,
 
@@ -133,4 +135,5 @@ SELECT
     t.species
 
 FROM rates r
-LEFT JOIN staged.taxa t ON r.taxon_id = t.taxon_id;
+LEFT JOIN staged.taxa t ON r.taxon_id = t.taxon_id
+ORDER BY observation_id;

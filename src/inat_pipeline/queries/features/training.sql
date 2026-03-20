@@ -100,16 +100,16 @@ SELECT
         COALESCE(i.reciprocity_ratio, 0) AS reciprocity_ratio,
 
      --Taxon features (fixed lookup)
-    t.taxon_rg_rate_shrunk,
+    --t.taxon_rg_rate_shrunk,
+    t.global_rg_rate,
     t.rank_level,
     t.taxon_popularity_rank,
-    t.rg_rate_source,
-    t.taxon_avg_ids_to_rg,
+    t.rg_rate_prior_source,
     t.taxon_cold_start,
     t.genus_popularity_rank,
-    --t.family_popularity_rank,
     t.genus_rg_rate,
     t.family_rg_rate,
+    t.taxon_avg_ids_to_rg,
 
 
      --Fixed Taxon confusion stats

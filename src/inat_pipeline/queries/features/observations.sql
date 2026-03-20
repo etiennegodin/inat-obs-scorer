@@ -64,13 +64,13 @@ aggregates AS(
         COALESCE(COUNT(*)           OVER observer_taxon_history, 0)  AS observer_taxon_obs_count_at_t,
         COALESCE(SUM(is_rg::INT)    OVER observer_taxon_history, 0) AS observer_taxon_obs_rg_count_at_t,
 
-        -- To do shrinkage here at a = 5
+        -- To do shrinkage here at a = 15 hyperparam
 
         COALESCE(observer_taxon_obs_rg_count_at_t::FLOAT
-                / NULLIF(observer_taxon_obs_count_at_t, 0), 0)      AS observer_taxon_rg_rate_shrunk_at_t_raw,
+                / NULLIF(observer_taxon_obs_count_at_t, 0), 0)      AS observer_taxon_rg_rate_raw_at_t,
 
-        COALESCE((5 * expected_rg_rate +  observer_taxon_obs_rg_count_at_t )
-            / (5 + observer_taxon_obs_count_at_t), 0 ) AS  observer_taxon_rg_rate_shrunk_at_t,
+        COALESCE((15 * expected_rg_rate + observer_taxon_obs_rg_count_at_t)
+            / (15 + observer_taxon_obs_count_at_t), 0) AS observer_taxon_rg_rate_shrunk_at_t
 
         observer_taxon_obs_count_at_t::FLOAT
             / NULLIF(observer_obs_count_at_t, 0) AS observer_taxon_focus_rate,
