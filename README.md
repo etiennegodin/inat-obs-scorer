@@ -13,9 +13,9 @@
 
 ## Overview
 
-iNaturalist accumulates millions of wildlife observations submitted by citizen scientists. A subset of these earn **Research Grade (RG)** status — a quality threshold that makes observations useful for biodiversity science. Getting there requires community agreement from knowledgeable identifiers, but expert attention is a scarce resource.
+iNaturalist accumulates millions of wildlife observations submitted by citizen scientists. A subset of these earn **Research Grade (RG)** status — a quality threshold that makes observations useful for biodiversity science. Getting there requires community taxon agreement from knowledgeable identifiers, but expert attention is a scarce resource.
 
-This project builds a **binary classifier** that scores each open "Needs ID" observation on its probability of reaching Research Grade, enabling triage of expert review queues. It is scoped to the plant kingdom (*Plantae*) in Québec and is designed as a production-style ML system, not a notebook.
+This project builds a **binary classifier** that scores each open "Needs ID" observation on its probability of reaching Research Grade, enabling triage of expert review queues. It is scoped to the plant kingdom (*Plantae*) in Québec and is designed as a production-style ML system.
 
 ### Problem framing
 
@@ -81,7 +81,7 @@ Most ML pipelines guard against one form of leakage. This project explicitly add
 
 ### 2. Community taxon re-derived from first principles
 
-iNaturalist's Research Grade algorithm is non-trivial: it involves a taxonomic tree traversal that scores cumulative agreement at each node. Rather than trusting the scraped `quality_grade` column, this project implements the actual algorithm as a **DuckDB table macro** (`community_taxon_windowed(eval_interval)`) — parameterized by an evaluation timestamp to enable fully point-in-time label computation.
+iNaturalist's [Community taxon](https://help.inaturalist.org/en/support/solutions/articles/151000173076-what-are-the-community-taxon-and-the-observation-taxon-) algorithm is non-trivial: it involves a taxonomic tree traversal that scores cumulative agreement at each node. Rather than trusting the scraped `quality_grade` column, this project implements the actual algorithm as a **DuckDB table macro** (`community_taxon_windowed(eval_interval)`) — parameterized by an evaluation timestamp to enable fully point-in-time label computation.
 
 ```sql
 -- Threshold: cumulative_agreement / (agreements + disagreements + ancestor_disagreements) ≥ 2/3
@@ -89,7 +89,12 @@ iNaturalist's Research Grade algorithm is non-trivial: it involves a taxonomic t
 -- research_grade_windowed() wraps this and surfaces is_rg as the external label
 ```
 
-### 3. Taxon difficulty with Bayesian shrinkage and hierarchical fallback
+
+### 3. Research grade label
+
+[Label](https://help.inaturalist.org/en/support/solutions/articles/151000169936)
+
+### 4. Taxon difficulty with Bayesian shrinkage and hierarchical fallback
 
 Rare taxa have too few observations to compute a reliable RG rate. A naive approach either drops them or overfits to small samples. This project uses:
 
@@ -97,15 +102,17 @@ Rare taxa have too few observations to compute a reliable RG rate. A naive appro
 - **Hierarchical fallback**: species → genus → family → order → global mean, applied when the shrunk estimate is still unreliable
 - All rates computed **point-in-time** on the training partition only, then applied to val/test — never recomputed on the full dataset
 
-### 4. Species confusion graph features
+### 5. Species confusion graph features
 
-Taxonomically similar species compete for identifier attention and create systematic misidentification patterns. The confusion graph encodes:
+Visually similar species create systematic misidentification patterns. The confusion graph encodes:
 
 - **Neighborhood difficulty**: how hard is the local species cluster to disambiguate?
-- **Asymmetric sink flag**: is this taxon disproportionately the *recipient* of misidentifications from similar species?
+- **Asymmetric sink flag**: is this taxon disproportionately the *recipient* of misidentifications from visually similar species?
 - **Focal taxon rank within neighborhood**: where does this species sit in terms of identifier confidence?
 
-### 5. Protocol-based async API client
+*Graph figures*
+
+### 6. Protocol-based async API client
 
 The enrichment layer uses a fully async client designed around Python `Protocol` interfaces rather than inheritance, keeping fetchers and writers decoupled and independently testable.
 
@@ -119,7 +126,7 @@ Exponential backoff + jitter — handles iNaturalist rate limiting gracefully
 _resolve_id cascade      — flexible ID field mapping across endpoint shapes
 ```
 
-### 6. Modular scikit-learn pipeline with registry pattern
+### 7. Modular scikit-learn pipeline with registry pattern
 
 Each pipeline stage (imputer, encoder, scaler, reducer, classifier) is registered by name and resolved at runtime from CLI arguments, enabling clean experiment configuration without code changes:
 
@@ -161,7 +168,7 @@ inat_pipe train \
 | Validation  *(v0.3)* | Pydantic models for config and schema enforcement |
 | Serving *(v0.3)* | FastAPI |
 
-**Current performance**: ROC-AUC **~0.88** on out-of-time test set.
+**Current performance**: ROC-AUC **~0.88** on out-of-time val set.
 
 ---
 
@@ -227,7 +234,7 @@ Splits use hard date-range boundaries derived from a `SplitConfig` dataclass anc
   ~60%                  ~16%            ~24%
 ```
 
-A natural positive-rate drift (57% → 52%) from train to test is expected and is not a sign of overfitting — it reflects the evolving composition of the iNaturalist community over time.
+A natural positive-rate drift (57% → 52%) from train to val/test is expected and is not a sign of overfitting — it reflects the evolving composition of the iNaturalist community over time.
 
 ---
 
@@ -280,11 +287,11 @@ inat_pipeline/
 - Schema drift assertions + lightweight feature versioning tied to MLflow runs
 
 ### 🔲 v0.4 — Advanced features and routing
-- Shap evaluation at uncertain observations with incorrect classification
+- Shap evaluation at borderline observations with incorrect classification
 - Additionnal features ideas:
-  - Phenology indicators
+  - Phenology alignement indicators
   - Observer × top-identifier expertise interaction term
-  - Geographic / Species range
+  - Geographic range signal
 - Survival model (time-to-RG)
 - Rare species → expert routing
 - AWS S3 ingestion source migration
