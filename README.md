@@ -269,10 +269,9 @@ inat_pipeline/
 - scikit-learn Pipeline with registry pattern
 - LightGBM + Optuna + MLflow
 - SHAP explainability
-- Bayesian shrinkage for taxon RG rates
 - Windowed community taxon and RG label re-derivation
 - DVC for data versioning
-
+- Bayesian shrinkage for taxon RG rates
 
 ### 🔲 v0.3 — System design and serving
 - FastAPI inference endpoint (`POST /score`)
@@ -281,7 +280,11 @@ inat_pipeline/
 - Schema drift assertions + lightweight feature versioning tied to MLflow runs
 
 ### 🔲 v0.4 — Advanced features and routing
-- ID velocity features (time-to-first-ID, burst patterns)
+- Shap evaluation at uncertain observations with incorrect classification
+- Additionnal features ideas:
+  - Phenology indicators
+  - Observer × top-identifier expertise interaction term
+  - Geographic / Species range
 - Survival model (time-to-RG)
 - Rare species → expert routing
 - AWS S3 ingestion source migration
