@@ -12,7 +12,7 @@ SELECT
     b.photo_count,
     b.has_description,
     b.has_tags,
-    b.tag_count,
+    --b.tag_count,
     --b.has_license,
     b.positional_accuracy_m,
     b.geoprivacy IS NOT NULL                AS geoprivacy_set,
@@ -64,7 +64,7 @@ SELECT
         ob.pct_obs_with_description AS obv_pct_obs_with_description,
         ob.pct_obs_with_license AS obv_pct_obs_with_license,
         ob.pct_obs_from_mobile AS obv_pct_obs_from_mobile,
-        ob.has_orcid AS obv_has_orcid,
+        --ob.has_orcid AS obv_has_orcid,
 
         --Identifiers counts from obs history
         --LOG(ii.identifiers_total + 1) AS obv_n_identifier_log,
@@ -126,9 +126,9 @@ SELECT
 
     c.nbor_rg_rate_mean,
     c.nbor_rg_rate_std,
-    c.nbor_rg_rate_min,
+    --c.nbor_rg_rate_min,
 
-    c.weighted_mean_neighbor_rg_rate,
+    --c.weighted_mean_neighbor_rg_rate,
     c.nbor_rg_rate_inv_dist_weighted,
 
 
