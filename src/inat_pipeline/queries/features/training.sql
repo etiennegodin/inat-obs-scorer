@@ -34,7 +34,7 @@ SELECT
          --Temporal
         date_part('day',ob.observer_tenure) AS obv_tenure_days,
         ob.is_veteran AS obv_is_veteran,
-        date_part('day',ob.lag_since_last_obs) AS obv_lag_days_since_last_post,
+        --date_part('day',ob.lag_since_last_obs) AS obv_lag_days_since_last_post,
 
         -- Observations
         LOG(ob.observer_obs_count_at_t + 1) AS obv_obs_count_log,
@@ -107,7 +107,7 @@ SELECT
     t.taxon_avg_ids_to_rg,
     t.taxon_cold_start,
     t.genus_popularity_rank,
-    t.family_popularity_rank,
+    --t.family_popularity_rank,
     t.genus_rg_rate,
     t.family_rg_rate,
 
