@@ -1,6 +1,8 @@
 CREATE OR REPLACE TABLE features.training AS
 SELECT
     --Identity
+
+    b.observation_id,
     s.split,
 
     --Label
@@ -176,4 +178,4 @@ LEFT JOIN graph.double_hop_stats         dh ON b.taxon_id = dh.taxon_id
 
 
 WHERE l.label IS NOT NULL
-ORDER BY b.created_at;
+ORDER BY b.observation_id;

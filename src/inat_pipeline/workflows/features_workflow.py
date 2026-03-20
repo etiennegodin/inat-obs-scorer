@@ -17,13 +17,27 @@ def execute(deps: Dependencies):
         sql_split = DuckDbSQL(con, deps.QUERY_FOLDER / "split")
         sql_graph = DuckDbSQL(con, deps.QUERY_FOLDER / "graph", ignore_params=True)
 
+        # Train/Val/Test splits
+        params = TrainingSplitParams(
+            cutoff_date=date(2024, 1, 1),
+            max_val_size=50000,
+            val_window_days=250,
+            max_test_size=90000,
+            gap_days=90,
+        )
+        sql_split.execute("split", params=params)
+        splits_report(sql_split, params)
+
         sql_graph.execute("confusion_graph")
         sql_graph.execute("confusion_graph_metrics")
+
+        # features with gap days :
+        sql_features.execute("label", params=params)
+        sql_features.execute("network_events", params=params)
 
         sql_features.execute_many(
             "community_taxon_windowed",
             "research_grade_windowed",
-            "network_events",
             "user_role_timeline",
             "base",
             "taxon",
@@ -33,16 +47,6 @@ def execute(deps: Dependencies):
             "taxa_confusion",
             "observers_entropy",
         )
-
-        # Train/Val/Test splits
-        params = TrainingSplitParams(
-            cutoff_date=date(2024, 1, 1),
-            max_val_size=50000,
-            val_window_days=250,
-            max_test_size=90000,
-        )
-        sql_split.execute("split", params=params)
-        splits_report(sql_split, params)
 
         # Final merge
         sql_features.execute("training")
