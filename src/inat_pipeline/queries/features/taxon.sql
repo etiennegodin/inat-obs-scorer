@@ -70,22 +70,26 @@ aggregates AS(
 rates AS(
 
     SELECT *,
+
+    -- Popularity of taxon hierarchy at this time
+    LOG(source_obs_count + 1) AS taxon_popularity_rank,
+    LOG(genus_obs_count + 1) AS genus_popularity_rank,
+    LOG(family_obs_count + 1) AS family_popularity_rank,
+    LOG(order_obs_count + 1) AS order_popularity_rank,
+
+
     -- Raw rates at each level
     taxon_rg_obs::FLOAT  / NULLIF(taxon_obs_count, 0)  AS taxon_rg_rate_raw,
     genus_rg_obs::FLOAT  / NULLIF(genus_obs_count, 0)  AS genus_rg_rate,
     family_rg_obs::FLOAT / NULLIF(family_obs_count, 0) AS family_rg_rate,
     order_rg_obs::FLOAT  / NULLIF(order_obs_count, 0)  AS order_rg_rate,
 
-    -- Hard cascade fallback
-    CASE
-        WHEN taxon_obs_count  >= 30 THEN taxon_rg_rate_raw
-        WHEN genus_obs_count  >= 30 THEN genus_rg_rate
-        WHEN family_obs_count >= 30 THEN family_rg_rate
-        WHEN order_obs_count  >= 30 THEN order_rg_rate
-        ELSE COALESCE(taxon_rg_rate_raw, genus_rg_rate, family_rg_rate, order_rg_rate)
-    END AS taxon_rg_rate,
 
-        -- Which level actually provided the rate
+    -- Hierarchical prior
+    COALESCE(genus_rg_rate, family_rg_rate, order_rg_rate,0.5) AS hierarchical_prior,
+    (10 * hierarchical_prior + taxon_rg_obs) / (10 + taxon_obs_count) AS taxon_rg_rate_shrunk
+
+    -- Which level actually provided the rate
     CASE
         WHEN taxon_obs_count  >= 30 THEN 'species'
         WHEN genus_obs_count  >= 30 THEN 'genus'
@@ -93,6 +97,7 @@ rates AS(
         WHEN order_obs_count  >= 30 THEN 'order'
         ELSE 'insufficient'
     END AS rg_rate_source,
+
     CASE WHEN taxon_obs_count  < 30 THEN TRUE ELSE FALSE END AS taxon_cold_start,
 
     COALESCE(taxon_rg_rate, 0) AS taxon_rg_rate_safe,
@@ -102,11 +107,6 @@ rates AS(
         WHEN 'family'  THEN family_obs_count
         WHEN 'order'   THEN order_obs_count
     END AS source_obs_count,
-
-    LOG(source_obs_count + 1) AS taxon_popularity_rank,
-    LOG(genus_obs_count + 1) AS genus_popularity_rank,
-    LOG(family_obs_count + 1) AS family_popularity_rank,
-    LOG(order_obs_count + 1) AS order_popularity_rank,
 
     FROM aggregates
 

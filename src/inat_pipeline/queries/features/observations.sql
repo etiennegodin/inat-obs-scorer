@@ -55,17 +55,22 @@ aggregates AS(
             / NULLIF(COALESCE(COUNT(*) OVER observer_history, 0) + 10, 0)
                                                                 AS observer_rg_rate_at_t,
 
-        COALESCE(COUNT(*) OVER observer_history, 0) >= 20              AS rg_rate_is_reliable,
 
 
         -- Raw ratio for reputation (unshrunk, used for rank)
         COALESCE(observer_rg_rate_at_t /  NULLIF(expected_rg_rate, 0),0) AS observer_reputation_raw,
-        observer_obs_count_at_t >= 20 AS rg_rate_is_reliable,
+            observer_obs_count_at_t >= 20 AS rg_rate_is_reliable,
 
         COALESCE(COUNT(*)           OVER observer_taxon_history, 0)  AS observer_taxon_obs_count_at_t,
         COALESCE(SUM(is_rg::INT)    OVER observer_taxon_history, 0) AS observer_taxon_obs_rg_count_at_t,
-        COALESCE(observer_taxon_obs_count_at_t::FLOAT
-                / NULLIF(observer_taxon_obs_rg_count_at_t, 0), 0)      AS observer_taxon_rg_rate_at_t,
+
+        -- To do shrinkage here at a = 5
+
+        COALESCE(observer_taxon_obs_rg_count_at_t::FLOAT
+                / NULLIF(observer_taxon_obs_count_at_t, 0), 0)      AS observer_taxon_rg_rate_at_t_raw,
+
+        COALESCE((5 * expected_rg_rate +  observer_taxon_obs_rg_count_at_t )
+            / (5 + observer_taxon_obs_count_at_t), 0 ) AS  observer_taxon_rg_rate_at_t,
 
         observer_taxon_obs_count_at_t::FLOAT
             / NULLIF(observer_obs_count_at_t, 0) AS observer_taxon_focus_rate,

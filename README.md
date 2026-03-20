@@ -7,7 +7,7 @@
 [![LightGBM](https://img.shields.io/badge/model-LightGBM-brightgreen)](https://lightgbm.readthedocs.io/)
 [![MLflow](https://img.shields.io/badge/tracking-MLflow-orange)](https://mlflow.org/)
 [![DuckDB](https://img.shields.io/badge/storage-DuckDB-yellow)](https://duckdb.org/)
-[![ROC-AUC](https://img.shields.io/badge/ROC--AUC-0.887-success)]()
+[![ROC-AUC](https://img.shields.io/badge/ROC--AUC-0.88-success)]()
 
 ---
 
@@ -15,7 +15,7 @@
 
 iNaturalist accumulates millions of wildlife observations submitted by citizen scientists. A subset of these earn **Research Grade (RG)** status — a quality threshold that makes observations useful for biodiversity science. Getting there requires community taxon agreement from knowledgeable identifiers, but expert attention is a scarce resource.
 
-This project builds a **binary classifier** that scores each open "Needs ID" observation on its probability of reaching Research Grade, enabling triage of expert review queues. It is scoped to the plant kingdom (*Plantae*) in Québec and is designed as a production-style ML system.
+This project builds a **binary classifier** that scores each open "Needs ID" observation on its probability of reaching Research Grade, enabling triage of expert review queues. It is currently scoped to the plant kingdom (*Plantae*) in Québec and is designed as a production-style ML system.
 
 ### Problem framing
 
@@ -81,18 +81,34 @@ Most ML pipelines guard against one form of leakage. This project explicitly add
 
 ### 2. Community taxon re-derived from first principles
 
-iNaturalist's [Community taxon](https://help.inaturalist.org/en/support/solutions/articles/151000173076-what-are-the-community-taxon-and-the-observation-taxon-) algorithm is non-trivial: it involves a taxonomic tree traversal that scores cumulative agreement at each node. Rather than trusting the scraped `quality_grade` column, this project implements the actual algorithm as a **DuckDB table macro** (`community_taxon_windowed(eval_interval)`) — parameterized by an evaluation timestamp to enable fully point-in-time label computation.
+iNaturalist's [Community taxon](https://help.inaturalist.org/en/support/solutions/articles/151000173076-what-are-the-community-taxon-and-the-observation-taxon-) algorithm is non-trivial: it involves a taxonomic tree traversal that scores cumulative agreement at each node. Rather than trusting the current state of `quality_grade`, this project implements the actual algorithm as a **DuckDB table macro** (`community_taxon_windowed(eval_interval)`) — parameterized by an evaluation timestamp to enable fully point-in-time label computation.
 
 ```sql
 -- Threshold: cumulative_agreement / (agreements + disagreements + ancestor_disagreements) ≥ 2/3
 -- Minimum count: 2 identifications required
--- research_grade_windowed() wraps this and surfaces is_rg as the external label
 ```
 
 
 ### 3. Research grade label
 
-[Label](https://help.inaturalist.org/en/support/solutions/articles/151000169936)
+Using community taxon and these labels to reach rg
+
+> The building block of iNaturalist is the verifiable observation. A verifiable observation is an observation that:
+> - has a date
+> - is georeferenced (i.e. has lat/lon coordinates)
+> - has photos or sounds
+> - isn't of a captive or cultivated organism
+>
+>Verifiable observations are labeled Needs ID until they either attain Research grade status, or are voted to Casual via the Data Quality Assessment.
+>
+> Observations become Research Grade when
+>
+> - the community agrees on species-level ID or lower, i.e. when more than 2/3 of identifiers agree on a taxon
+> - the community taxon and the observation taxon agree
+> - or the community agrees on an ID between family and species and votes that the community taxon is as good as it can be
+>
+
+ From [What is the Data Quality Assessment and how do observations qualify to become "Research Grade"?](https://help.inaturalist.org/en/support/solutions/articles/151000169936)
 
 ### 4. Taxon difficulty with Bayesian shrinkage and hierarchical fallback
 
@@ -168,7 +184,7 @@ inat_pipe train \
 | Validation  *(v0.3)* | Pydantic models for config and schema enforcement |
 | Serving *(v0.3)* | FastAPI |
 
-**Current performance**: ROC-AUC **~0.88** on out-of-time val set.
+**Current performance**: ROC-AUC **~0.887** on out-of-time val set.
 
 ---
 
@@ -290,11 +306,12 @@ inat_pipeline/
 - Shap evaluation at borderline observations with incorrect classification
 - Additionnal features ideas:
   - Phenology alignement indicators
+  - Observation phenology annotations
   - Observer × top-identifier expertise interaction term
   - Geographic range signal
 - Survival model (time-to-RG)
 - Rare species → expert routing
-- AWS S3 ingestion source migration
+- AWS S3 ingestion source migration to facilitate scope expansion
 
 ---
 
