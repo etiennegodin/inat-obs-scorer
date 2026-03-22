@@ -1,0 +1,8 @@
+{
+  "classifier__learning_rate": 0.013446918935160465,
+  "classifier__num_leaves": 144,
+  "classifier__min_child_samples": 223,
+  "classifier__n_estimators": 450,
+  "classifier__reg_alpha": 0.08037596877988709,
+  "classifier__reg_lambda": 8.217150878460814
+}

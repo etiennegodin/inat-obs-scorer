@@ -126,7 +126,6 @@ Visually similar species create systematic misidentification patterns. The confu
 - **Asymmetric sink flag**: is this taxon disproportionately the *recipient* of misidentifications from visually similar species?
 - **Focal taxon rank within neighborhood**: where does this species sit in terms of identifier confidence?
 
-*Graph figures*
 
 ### 6. Protocol-based async API client
 
@@ -175,12 +174,13 @@ inat_pipe train \
 
 | Concern | Tool |
 |---|---|
-| Storage & transforms | DuckDB (SQL-first, no ORM) |
+| Storage & transforms | DuckDB (SQL-first, no ORM), DuckPGQ |
 | Pipeline composition | scikit-learn `Pipeline` |
 | Model | LightGBM |
 | Hyperparameter search | Optuna (fANOVA importance logged to MLflow) |
 | Experiment tracking | MLflow (params, metrics, artifacts, model registry) |
 | Explainability | SHAP (feature importance, beeswarm plots) |
+| Data versioning | DVC |
 | Validation  *(v0.3)* | Pydantic models for config and schema enforcement |
 | Serving *(v0.3)* | FastAPI |
 
@@ -270,14 +270,14 @@ inat_pipeline/
 │   ├── inat_client/
 │   │   ├── base.py          # Async Protocol-based API client
 │   │   ├── clients.py       # BatchEndpointClient, ParametrizedEndpointClient
-│   │   ├── config.py        # ThreadPoolExecutor-backed DuckDB writer
+│   │   ├── config.py
 │   │   ├── factory.py
 │   │   ├── fetchers.py      # RateLimiterFetcher
 │   │   ├── protocols.py
 │   │   ├── registery.py     # Specific endpoint fields
-│   │   └── writers.py
+│   │   └── writers.py       # ThreadPoolExecutor-backed DuckDB writer
 │   ├── local/
-│   │   ├── ingestors.py.py  # Expandable backend support *(v0.4)*
+│   │   ├── ingestors.py     # Expandable backend support *(v0.4)*
 │   │   └── protocols.py
 ├── queries/                 # All .sql queries
 │   ├── api/                 # Prep raw data receiving
@@ -331,6 +331,8 @@ inat_pipeline/
 - Cold-start fallback paths via precomputed inference cache
 - Run manifest and pipeline lineage table (idempotent retries)
 - Schema drift assertions + lightweight feature versioning tied to MLflow runs
+- Pydantic models for config and schema enforcement
+
 
 ### 🔲 v0.4 — Advanced features and routing
 - Shap evaluation at borderline observations with incorrect classification
@@ -348,7 +350,7 @@ inat_pipeline/
 ## Scope & Limitations
 
 - Currently scoped to **Plantae** observations in **Québec**
-
+- taxon_avg_ids_to_rg uses the final scraped ID count for historical observations rather than a true point-in-time count, introducing mild upward bias for recent observations. The effect is partially attenuated by the `1 PRECEDING` window boundary and the front-loaded nature of iNaturalist ID activity
 ---
 
 *Built as a portfolio project modeled on a production ML team working within the iNaturalist ecosystem.*

@@ -62,7 +62,7 @@ CLASSIFIER_REGISTRY = {
     "lightgbm": (
         "lightgbm",
         "LGBMClassifier",
-        {"verbose": -1},
+        {"verbose": -1, "is_unbalance": True},
     ),
 }
 
@@ -107,16 +107,16 @@ SEARCH_SPACES = {
         # The three that matter most — search these hard
         "classifier__learning_rate": {
             "type": "float",
-            "low": 0.0075,
-            "high": 0.05,
+            "low": 0.009,
+            "high": 0.03,
             "log": True,
             # log=True means Optuna samples 0.01, 0.012, 0.015...
             # rather than 0.01, 0.11, 0.21 — much smarter for rates
         },
         "classifier__num_leaves": {
             "type": "int",
-            "low": 31,
-            "high": 150,
+            "low": 100,
+            "high": 200,
             # rule of thumb: never exceed 2^(max_depth)
             # for depth=7 that's 128 — 200 is already generous
         },
@@ -130,22 +130,27 @@ SEARCH_SPACES = {
         # Secondary — worth including but narrow the range
         "classifier__n_estimators": {
             "type": "int",
-            "low": 400,
+            "low": 500,
             "high": 600,
-            "step": 50,
+            "step": 25,
             # prefer early stopping over a wide range here (see below)
         },
         "classifier__reg_alpha": {
             "type": "float",
-            "low": 1e-3,
+            "low": 1e-4,
             "high": 10.0,
             "log": True,
         },
         "classifier__reg_lambda": {
             "type": "float",
-            "low": 1e-3,
+            "low": 1e-4,
             "high": 10.0,
             "log": True,
+        },
+        "classifier__colsample_bytree": {
+            "type": "float",
+            "low": 0.6,
+            "high": 1.0,
         },
     },
 }
