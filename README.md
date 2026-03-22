@@ -185,7 +185,7 @@ inat_pipe train \
 | Validation  *(v0.3)* | Pydantic models for config and schema enforcement |
 | Serving *(v0.3)* | FastAPI |
 
-**Current performance**: ROC-AUC **~0.887** on out-of-time val set.
+**Current performance**: ROC-AUC **~0.88** on out-of-time val set.
 
 ---
 

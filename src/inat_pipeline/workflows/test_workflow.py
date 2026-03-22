@@ -31,14 +31,14 @@ def execute(deps: Dependencies) -> dict:
     pipeline: Pipeline
 
     # ── 5. Evaluate on held-out test set ──────────────────────────────────
-    y_pred = pipeline.predict(X_val)
-    y_pred_proba = pipeline.predict_proba(X_val)[:, 1]
+    y_pred = pipeline.predict(X_test)
+    y_pred_proba = pipeline.predict_proba(X_test)[:, 1]
 
     test_metrics = {
-        "test/test_roc_auc": roc_auc_score(y_val, y_pred_proba),
-        "test/test_avg_precision": average_precision_score(y_val, y_pred_proba),
-        "test/test_f1": f1_score(y_val, y_pred),
-        "test/test_accuracy": accuracy_score(y_val, y_pred),
+        "test/test_roc_auc": roc_auc_score(y_test, y_pred_proba),
+        "test/test_avg_precision": average_precision_score(y_test, y_pred_proba),
+        "test/test_f1": f1_score(y_test, y_pred),
+        "test/test_accuracy": accuracy_score(y_test, y_pred),
     }
 
     logger.info("\nTest set results:")

@@ -118,7 +118,7 @@ class ApplicationService:
     def test(self, args):
         logger.info("Starting testing workflow")
         try:
-            test_workflow.execute(self.deps)
+            return test_workflow.execute(self.deps)
 
         except InatPipelineError as e:
             logger.error("Test workflow failed: %s", e)
