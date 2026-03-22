@@ -64,12 +64,13 @@ CLASSIFIER_REGISTRY = {
         "LGBMClassifier",
         {
             "verbose": -1,
-            "n_estimators": 600,
+            "n_estimators": 1000,
             "n_jobs": -1,
             "bagging_freq": 2,
             "reg_lambda": 2.78350354178661,
             "reg_alpha": 7.372236030141749,
             "colsample_bytree": 0.8847606045236783,
+            "subsample": 0.76,
         },
     ),
 }
@@ -131,17 +132,11 @@ SEARCH_SPACES = {
         # Learning rate
         "classifier__learning_rate": {
             "type": "float",
-            "low": 0.02,
-            "high": 0.05,
+            "low": 0.01,
+            "high": 0.02,
             "log": True,
             # log=True means Optuna samples 0.01, 0.012, 0.015...
             # rather than 0.01, 0.11, 0.21 — much smarter for rates
-        },
-        # Subsampling
-        "classifier__subsample": {
-            "type": "float",
-            "low": 0.6,
-            "high": 0.9,
         },
     },
 }
