@@ -61,6 +61,8 @@ def load_and_split(
 
     # Fix timezone
     df["created_at"] = df["created_at"].dt.tz_convert("UTC").dt.tz_localize(None)
+
+    # Set index
     df.set_index("observation_id", inplace=True)
 
     # Double check ordered
@@ -83,9 +85,6 @@ def load_and_split(
 
     y_test = test["label"]
     test.pop("label")
-
-    # Double check for sorted
-    assert train["created_at"].is_monotonic_increasing
 
     return train, y_train, val, y_val, test, y_test
 
