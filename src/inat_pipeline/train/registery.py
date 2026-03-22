@@ -62,7 +62,7 @@ CLASSIFIER_REGISTRY = {
     "lightgbm": (
         "lightgbm",
         "LGBMClassifier",
-        {"verbose": -1, "n_jobs": -1},
+        {"verbose": -1, "n_estimators": 600, "n_jobs": -1},
     ),
 }
 
@@ -104,19 +104,11 @@ SEARCH_SPACES = {
         "classifier__solver": {"type": "categorical", "choices": ["lbfgs", "saga"]},
     },
     "lightgbm": {
-        # The three that matter most — search these hard
-        "classifier__learning_rate": {
-            "type": "float",
-            "low": 0.009,
-            "high": 0.03,
-            "log": True,
-            # log=True means Optuna samples 0.01, 0.012, 0.015...
-            # rather than 0.01, 0.11, 0.21 — much smarter for rates
-        },
+        # Capacity
         "classifier__num_leaves": {
             "type": "int",
-            "low": 100,
-            "high": 200,
+            "low": 15,
+            "high": 128,
             # rule of thumb: never exceed 2^(max_depth)
             # for depth=7 that's 128 — 200 is already generous
         },
@@ -124,17 +116,20 @@ SEARCH_SPACES = {
             "type": "int",
             "low": 100,
             "high": 300,
+            "log": True,
             # on imbalanced data (like iNat RG), push this higher
             # it prevents the model from memorizing rare patterns
         },
-        # Secondary — worth including but narrow the range
-        "classifier__n_estimators": {
-            "type": "int",
-            "low": 500,
-            "high": 600,
-            "step": 25,
-            # prefer early stopping over a wide range here (see below)
+        # Learning rate
+        "classifier__learning_rate": {
+            "type": "float",
+            "low": 0.05,
+            "high": 0.1,
+            "log": True,
+            # log=True means Optuna samples 0.01, 0.012, 0.015...
+            # rather than 0.01, 0.11, 0.21 — much smarter for rates
         },
+        # Regularisation
         "classifier__reg_alpha": {
             "type": "float",
             "low": 1e-4,
@@ -147,9 +142,20 @@ SEARCH_SPACES = {
             "high": 10.0,
             "log": True,
         },
+        # Subsampling
+        "classifier__bagging_freq": {
+            "type": "int",
+            "low": 1,
+            "high": 2,
+        },
+        "classifier__subsample": {
+            "type": "float",
+            "low": 0.5,
+            "high": 1.0,
+        },
         "classifier__colsample_bytree": {
             "type": "float",
-            "low": 0.6,
+            "low": 0.4,
             "high": 1.0,
         },
     },
