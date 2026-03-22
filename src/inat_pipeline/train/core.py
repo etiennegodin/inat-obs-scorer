@@ -46,6 +46,23 @@ class ExpandingWindowCvSplit(BaseCrossValidator):
         return self.n_folds
 
 
+class SlidingWindowCvSplit(BaseCrossValidator):
+    def __init__(self, n_folds=3):
+        self.n_folds = n_folds
+
+    def split(self, X, y=None, groups=None):
+        n_samples = len(X)
+        indices = np.arange(n_samples)
+        chunks = np.array_split(indices, self.n_folds + 1)
+        for i in range(self.n_folds):
+            train_idx = chunks[i]
+            val_idx = chunks[i + 1]
+            yield train_idx, val_idx
+
+    def get_n_splits(self, X=None, y=None, groups=None):
+        return self.n_folds
+
+
 def load_and_split(
     features_path: Path,
 ) -> tuple[

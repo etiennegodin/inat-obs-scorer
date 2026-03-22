@@ -78,6 +78,7 @@ Most ML pipelines guard against one form of leakage. This project explicitly add
 | **Label leakage** | Using scraped `quality_grade` reflects current state, not state at prediction time | Re-derive RG label from windowed identification history |
 | **Feature leakage** | Aggregating observer/taxon stats across the full dataset contaminates the past with the future | All window functions are bounded to `obs_created_at` |
 | **Split leakage** | Shuffling records within temporal partitions destroys gap buffer integrity | Hard date-range boundaries; val/test rows sorted by `created_at`, never shuffled |
+| **Cv split leakage** |  K-fold with shuffling violates temporal structure | Custom `ExpandingWindowCvSplit` wrapper to allow for an expanding window validation set so it is always in the future of the training set |
 
 ### 2. Community taxon re-derived from first principles
 
