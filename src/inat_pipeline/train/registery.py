@@ -62,7 +62,15 @@ CLASSIFIER_REGISTRY = {
     "lightgbm": (
         "lightgbm",
         "LGBMClassifier",
-        {"verbose": -1, "n_estimators": 600, "n_jobs": -1},
+        {
+            "verbose": -1,
+            "n_estimators": 600,
+            "n_jobs": -1,
+            "bagging_freq": 2,
+            "reg_lambda": 2.78350354178661,
+            "reg_alpha": 7.372236030141749,
+            "colsample_bytree": 0.8847606045236783,
+        },
     ),
 }
 
@@ -114,7 +122,7 @@ SEARCH_SPACES = {
         },
         "classifier__min_child_samples": {
             "type": "int",
-            "low": 100,
+            "low": 150,
             "high": 300,
             "log": True,
             # on imbalanced data (like iNat RG), push this higher
@@ -123,40 +131,17 @@ SEARCH_SPACES = {
         # Learning rate
         "classifier__learning_rate": {
             "type": "float",
-            "low": 0.05,
-            "high": 0.1,
+            "low": 0.02,
+            "high": 0.05,
             "log": True,
             # log=True means Optuna samples 0.01, 0.012, 0.015...
             # rather than 0.01, 0.11, 0.21 — much smarter for rates
         },
-        # Regularisation
-        "classifier__reg_alpha": {
-            "type": "float",
-            "low": 1e-4,
-            "high": 10.0,
-            "log": True,
-        },
-        "classifier__reg_lambda": {
-            "type": "float",
-            "low": 1e-4,
-            "high": 10.0,
-            "log": True,
-        },
         # Subsampling
-        "classifier__bagging_freq": {
-            "type": "int",
-            "low": 1,
-            "high": 2,
-        },
         "classifier__subsample": {
             "type": "float",
-            "low": 0.5,
-            "high": 1.0,
-        },
-        "classifier__colsample_bytree": {
-            "type": "float",
-            "low": 0.4,
-            "high": 1.0,
+            "low": 0.6,
+            "high": 0.9,
         },
     },
 }
