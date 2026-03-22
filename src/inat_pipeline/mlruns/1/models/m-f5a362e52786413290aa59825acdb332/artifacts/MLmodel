@@ -1,0 +1,98 @@
+artifact_path: /home/etienne/projects/inatML/src/inat_pipeline/mlruns/1/models/m-f5a362e52786413290aa59825acdb332/artifacts
+flavors:
+  python_function:
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.sklearn
+    model_path: model.pkl
+    predict_fn: predict
+    python_version: 3.12.12
+  sklearn:
+    code: null
+    pickled_model: model.pkl
+    serialization_format: cloudpickle
+    sklearn_version: 1.8.0
+    skops_trusted_types: null
+is_signature_from_type_hint: false
+mlflow_version: 3.10.1
+model_id: m-f5a362e52786413290aa59825acdb332
+model_size_bytes: 7288416
+model_uuid: m-f5a362e52786413290aa59825acdb332
+prompts: null
+run_id: 539b8c40f0f94372aa8567140bc78934
+saved_input_example_info:
+  artifact_path: input_example.json
+  pandas_orient: split
+  serving_input_path: serving_input_example.json
+  type: dataframe
+signature:
+  inputs: '[{"type": "double", "name": "photo_count", "required": true}, {"type":
+    "boolean", "name": "has_description", "required": true}, {"type": "boolean", "name":
+    "has_tags", "required": true}, {"type": "double", "name": "positional_accuracy_m",
+    "required": false}, {"type": "boolean", "name": "geoprivacy_set", "required":
+    true}, {"type": "string", "name": "oauth_application_id", "required": true}, {"type":
+    "datetime", "name": "created_at", "required": true}, {"type": "double", "name":
+    "obs_to_submit_lag_days", "required": true}, {"type": "double", "name": "observed_week",
+    "required": true}, {"type": "double", "name": "observed_day", "required": true},
+    {"type": "double", "name": "observed_year", "required": true}, {"type": "double",
+    "name": "submitted_hour", "required": true}, {"type": "double", "name": "submitted_day",
+    "required": true}, {"type": "double", "name": "submitted_week", "required": true},
+    {"type": "double", "name": "submitted_year", "required": true}, {"type": "double",
+    "name": "obv_tenure_days", "required": true}, {"type": "boolean", "name": "obv_is_veteran",
+    "required": true}, {"type": "double", "name": "obv_obs_count_log", "required":
+    true}, {"type": "double", "name": "obv_rg_rate_lifetime", "required": true}, {"type":
+    "double", "name": "obv_reputation_score", "required": true}, {"type": "double",
+    "name": "obv_reputation_rank", "required": true}, {"type": "boolean", "name":
+    "obv_rg_rate_is_reliable", "required": true}, {"type": "double", "name": "obv_n_identifiers_agree_mean_rank",
+    "required": true}, {"type": "double", "name": "obv_n_identifiers_mean_rank", "required":
+    true}, {"type": "double", "name": "obv_taxon_diversity_species", "required": true},
+    {"type": "double", "name": "obv_taxon_entropy", "required": false}, {"type": "double",
+    "name": "obv_taxon_rg_rate_shrunk_at_t", "required": true}, {"type": "double",
+    "name": "obv_taxon_focus_rate", "required": false}, {"type": "double", "name":
+    "obv_avg_photo_count", "required": true}, {"type": "double", "name": "obv_pct_obs_with_description",
+    "required": true}, {"type": "double", "name": "obv_pct_obs_with_license", "required":
+    true}, {"type": "double", "name": "obv_pct_obs_from_mobile", "required": true},
+    {"type": "double", "name": "prior_ids_received", "required": true}, {"type": "double",
+    "name": "prior_identifier_diversity", "required": true}, {"type": "double", "name":
+    "prior_observer_rg_rate", "required": true}, {"type": "double", "name": "prior_ids_received_agree_rate",
+    "required": true}, {"type": "double", "name": "prior_ids_received_disagree_rate",
+    "required": true}, {"type": "double", "name": "prior_ids_given", "required": true},
+    {"type": "double", "name": "prior_taxa_identified", "required": true}, {"type":
+    "double", "name": "prior_ids_given_improving_rate", "required": true}, {"type":
+    "double", "name": "prior_ids_given_agree_rate", "required": true}, {"type": "double",
+    "name": "prior_ids_given_disagree_rate", "required": true}, {"type": "double",
+    "name": "prior_ids_vision_rate", "required": true}, {"type": "double", "name":
+    "reciprocity_ratio", "required": true}, {"type": "double", "name": "global_rg_rate",
+    "required": false}, {"type": "double", "name": "rank_level", "required": true},
+    {"type": "double", "name": "taxon_popularity_rank", "required": true}, {"type":
+    "double", "name": "rg_rate_prior_source", "required": true}, {"type": "boolean",
+    "name": "taxon_cold_start", "required": true}, {"type": "double", "name": "genus_popularity_rank",
+    "required": true}, {"type": "double", "name": "genus_rg_rate", "required": false},
+    {"type": "double", "name": "family_rg_rate", "required": false}, {"type": "double",
+    "name": "taxon_avg_ids_to_rg", "required": true}, {"type": "boolean", "name":
+    "has_similar_species", "required": true}, {"type": "double", "name": "neighborhood_difficulty_dist_weighted",
+    "required": true}, {"type": "double", "name": "neighborhood_difficulty_inv_dist",
+    "required": true}, {"type": "double", "name": "similar_species_count", "required":
+    true}, {"type": "double", "name": "nbor_obs_count_mean", "required": true}, {"type":
+    "double", "name": "nbor_rg_rate_mean", "required": true}, {"type": "double", "name":
+    "nbor_rg_rate_std", "required": true}, {"type": "double", "name": "nbor_rg_rate_inv_dist_weighted",
+    "required": false}, {"type": "double", "name": "nbor_dist_mean", "required": true},
+    {"type": "double", "name": "rg_rate_vs_neighbors", "required": true}, {"type":
+    "double", "name": "nbor_count_same_genus", "required": true}, {"type": "double",
+    "name": "nbor_count_cross_genus", "required": true}, {"type": "double", "name":
+    "nbor_count_cross_family", "required": true}, {"type": "double", "name": "cross_genus_confusion_rate",
+    "required": true}, {"type": "double", "name": "max_confusion_boundary_crossed",
+    "required": true}, {"type": "double", "name": "rg_percentile_in_neighborhood",
+    "required": true}, {"type": "double", "name": "rg_percentile_dist_weighted", "required":
+    true}, {"type": "double", "name": "neighbor_genus_diversity", "required": true},
+    {"type": "double", "name": "magnet_score", "required": true}, {"type": "double",
+    "name": "clustering_coefficient", "required": true}, {"type": "double", "name":
+    "double_hop_nbrhd_size", "required": true}, {"type": "double", "name": "double_hop_nbrhd_genus",
+    "required": true}, {"type": "double", "name": "double_hop_nbrhd_family", "required":
+    true}, {"type": "double", "name": "genus_crossover_count", "required": true},
+    {"type": "double", "name": "family_crossover_count", "required": true}]'
+  outputs: '[{"type": "tensor", "tensor-spec": {"dtype": "bool", "shape": [-1]}}]'
+  params: null
+type_hint_from_example: false
+utc_time_created: '2026-03-20 21:57:05.554513'

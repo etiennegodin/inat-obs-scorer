@@ -1,0 +1,8 @@
+                precision    recall  f1-score   support
+
+        not_rg       0.84      0.71      0.77     23843
+research_grade       0.77      0.88      0.82     26157
+
+      accuracy                           0.80     50000
+     macro avg       0.80      0.79      0.79     50000
+  weighted avg       0.80      0.80      0.80     50000
