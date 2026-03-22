@@ -69,76 +69,80 @@ def make_objective(
         # trial.suggest_* methods implement Bayesian optimization:
         # early trials explore randomly; later trials focus on promising regions.
 
-        logger.debug("Optuna objective")
-        # Copy base params
-        trial_params = base_params
-        trial_params["random_state"] = config.random_seed
+        try:
+            logger.debug("Optuna objective")
+            # Copy base params
+            trial_params = base_params
+            trial_params["random_state"] = config.random_seed
 
-        for param_name, spec in search_space.items():
-            suggest_type = spec["type"]
-            kwargs = {k: v for k, v in spec.items() if k != "type"}
+            for param_name, spec in search_space.items():
+                suggest_type = spec["type"]
+                kwargs = {k: v for k, v in spec.items() if k != "type"}
 
-            # Strip "classifier__" prefix — we pass raw params to the classifier
-            short_name = param_name.replace("classifier__", "")
+                # Strip "classifier__" prefix — we pass raw params to the classifier
+                short_name = param_name.replace("classifier__", "")
 
-            if suggest_type == "int":
-                trial_params[short_name] = trial.suggest_int(param_name, **kwargs)
-            elif suggest_type == "float":
-                trial_params[short_name] = trial.suggest_float(param_name, **kwargs)
-            elif suggest_type == "categorical":
-                trial_params[short_name] = trial.suggest_categorical(
-                    param_name, **kwargs
+                if suggest_type == "int":
+                    trial_params[short_name] = trial.suggest_int(param_name, **kwargs)
+                elif suggest_type == "float":
+                    trial_params[short_name] = trial.suggest_float(param_name, **kwargs)
+                elif suggest_type == "categorical":
+                    trial_params[short_name] = trial.suggest_categorical(
+                        param_name, **kwargs
+                    )
+
+            # ── Step 2: Build pipeline with suggested params ──────────────────────
+            pipeline = build_pipeline(config, classifier_params=trial_params)
+
+            logger.debug(pipeline.named_steps["classifier"])
+
+            # ── Step 3: Cross-validate ────────────────────────────────────────────
+
+            start = time.time()
+            logger.debug("Start tscv")
+
+            logger.debug(custom_cv)
+
+            scores = cross_val_score(
+                pipeline,
+                X_train,
+                y_train,
+                cv=custom_cv,
+                scoring=config.scoring_metric,
+                n_jobs=1,  # paralellism use in lightbm vs fold
+                error_score="raise",
+            )
+            elapsed = time.time() - start
+            logger.debug(f"End cv {elapsed}")
+
+            mean_score = float(np.mean(scores))
+            std_score = float(np.std(scores))
+
+            logger.debug(f"Mean score {mean_score}")
+
+            # ── Step 4: Log this trial as a child MLflow run ──────────────────────
+            with mlflow.start_run(
+                run_name=f"trial_{trial.number:04d}",
+                nested=True,  # child of the parent run
+            ):
+                # Log every suggested hyperparameter
+                mlflow.log_params({f"trial_{k}": v for k, v in trial_params.items()})
+                mlflow.log_metrics(
+                    {
+                        f"cv_{config.scoring_metric}_mean": mean_score,
+                        f"cv_{config.scoring_metric}_std": std_score,
+                        "cv_duration_seconds": elapsed,
+                    }
                 )
 
-        # ── Step 2: Build pipeline with suggested params ──────────────────────
-        pipeline = build_pipeline(config, classifier_params=trial_params)
-
-        logger.debug(pipeline.named_steps["classifier"])
-
-        # ── Step 3: Cross-validate ────────────────────────────────────────────
-
-        start = time.time()
-        logger.debug("Start tscv")
-
-        logger.debug(custom_cv)
-
-        scores = cross_val_score(
-            pipeline,
-            X_train,
-            y_train,
-            cv=custom_cv,
-            scoring=config.scoring_metric,
-            n_jobs=1,  # paralellism use in lightbm vs fold
-            error_score="raise",
-        )
-        elapsed = time.time() - start
-        logger.debug(f"End cv {elapsed}")
-
-        mean_score = float(np.mean(scores))
-        std_score = float(np.std(scores))
-
-        logger.debug(f"Mean score {mean_score}")
-
-        # ── Step 4: Log this trial as a child MLflow run ──────────────────────
-        with mlflow.start_run(
-            run_name=f"trial_{trial.number:04d}",
-            nested=True,  # child of the parent run
-        ):
-            # Log every suggested hyperparameter
-            mlflow.log_params({f"trial_{k}": v for k, v in trial_params.items()})
-            mlflow.log_metrics(
-                {
-                    f"cv_{config.scoring_metric}_mean": mean_score,
-                    f"cv_{config.scoring_metric}_std": std_score,
-                    "cv_duration_seconds": elapsed,
-                }
+            print(
+                f"  Trial {trial.number:3d}: {config.scoring_metric}={mean_score:.4f} "
+                f"±{std_score:.4f}  [{elapsed:.1f}s]"
             )
 
-        print(
-            f"  Trial {trial.number:3d}: {config.scoring_metric}={mean_score:.4f} "
-            f"±{std_score:.4f}  [{elapsed:.1f}s]"
-        )
-
-        return mean_score  # Optuna maximizes this
+            return mean_score  # Optuna maximizes this
+        except Exception as e:
+            logger.error(f"Error on trial #{trial.number}: {e}")
+            raise
 
     return objective
