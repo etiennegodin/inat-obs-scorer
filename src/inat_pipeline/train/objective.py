@@ -9,7 +9,7 @@ import pandas as pd
 from sklearn.model_selection import cross_val_score
 
 from .config import PipelineConfig
-from .core import CustomCvSplit, build_pipeline
+from .core import ExpandingWindowCvSplit, build_pipeline
 from .registery import LIGHTGBM_GPU_PARAMS, SEARCH_SPACES
 
 # Suppress noisy warnings during hyperparameter search
@@ -55,7 +55,7 @@ def make_objective(
     """
     search_space = SEARCH_SPACES.get(config.classifier, {})
 
-    custom_cv = CustomCvSplit(n_splits=config.cv_folds)
+    custom_cv = ExpandingWindowCvSplit(n_folds=config.cv_folds)
 
     # Set base params
     base_params = {}

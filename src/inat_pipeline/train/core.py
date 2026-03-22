@@ -22,26 +22,28 @@ from .utils import _instantiate
 logger = logging.getLogger(__name__)
 
 
-class CustomCvSplit(BaseCrossValidator):
-    def __init__(self, n_splits=3):
-        self.n_splits = n_splits
+class ExpandingWindowCvSplit(BaseCrossValidator):
+    def __init__(self, n_folds=3, gap_size: int | None = None):
+        self.n_folds = n_folds
+        self.gap_size = gap_size
 
     def split(self, X, y=None, groups=None):
         n_samples = len(X)
         indices = np.arange(n_samples)
-        chunks = np.array_split(indices, self.n_splits)
-        for i in range(self.n_splits - 1):
-            # In a basic time-series CV,
-            # you train on the past and test on the next block
-            # For 3 equal sets:
-            # Iter 1: Train on Set 1, Test on Set 2
-            # Iter 2: Train on Set 1+2, Test on Set 3
+        chunks = np.array_split(indices, self.n_folds + 1)
+        for i in range(self.n_folds):
             train_idx = np.concatenate(chunks[: i + 1])
-            test_idx = chunks[i + 1]
-            yield train_idx, test_idx
+            val_idx = chunks[i + 1]
+
+            if self.gap_size is not None:
+                # Drop gap_size rows from tail of train and head of val
+                train_idx = train_idx[: -self.gap_size] if self.gap_size else train_idx
+                val_idx = val_idx[self.gap_size :] if self.gap_size else val_idx
+
+            yield train_idx, val_idx
 
     def get_n_splits(self, X=None, y=None, groups=None):
-        return 1
+        return self.n_folds
 
 
 def load_and_split(
@@ -59,7 +61,12 @@ def load_and_split(
 
     # Fix timezone
     df["created_at"] = df["created_at"].dt.tz_convert("UTC").dt.tz_localize(None)
+
+    # Set index
     df.set_index("observation_id", inplace=True)
+
+    # Double check ordered
+    df.sort_index()
 
     # Splits
     train = df[df["split"] == "train"]
