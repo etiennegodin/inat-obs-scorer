@@ -61,9 +61,10 @@ def load_and_split(
 
     # Fix timezone
     df["created_at"] = df["created_at"].dt.tz_convert("UTC").dt.tz_localize(None)
-
-    # Set obs id as index
     df.set_index("observation_id", inplace=True)
+
+    # Double check ordered
+    df.sort_index()
 
     # Splits
     train = df[df["split"] == "train"]

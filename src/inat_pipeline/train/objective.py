@@ -55,7 +55,7 @@ def make_objective(
     """
     search_space = SEARCH_SPACES.get(config.classifier, {})
 
-    custom_cv = ExpandingWindowCvSplit(n_splits=config.cv_folds)
+    custom_cv = ExpandingWindowCvSplit(n_folds=config.cv_folds)
 
     # Set base params
     base_params = {}
@@ -100,13 +100,15 @@ def make_objective(
         start = time.time()
         logger.debug("Start tscv")
 
+        logger.debug(custom_cv)
+
         scores = cross_val_score(
             pipeline,
             X_train,
             y_train,
             cv=custom_cv,
             scoring=config.scoring_metric,
-            n_jobs=-1,  # use all CPU cores
+            n_jobs=1,  # paralellism use in lightbm vs fold
             error_score="raise",
         )
         elapsed = time.time() - start

@@ -76,6 +76,8 @@ def execute(
 
     # ── 2. MLflow setup ───────────────────────────────────────────────────────
 
+    mlflow.end_run()  # force-close any dangling run
+
     mlflow.set_experiment(config.experiment_name)
 
     with mlflow.start_run(run_name=config.run_name) as parent_run:
