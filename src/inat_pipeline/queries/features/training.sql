@@ -12,8 +12,8 @@ SELECT
     b.photo_count,
     b.has_description,
     b.has_tags,
-    --b.tag_count,
-    --b.has_license,
+    b.tag_count,
+    b.has_license,
     b.positional_accuracy_m,
     b.geoprivacy IS NOT NULL                AS geoprivacy_set,
     COALESCE(b.oauth_application_id,0)      AS oauth_application_id,
@@ -21,20 +21,21 @@ SELECT
      --Temporal features
     b.created_at,
     date_part('day',b.obs_to_submit_lag_days) AS obs_to_submit_lag_days,
-    b.observed_week,
-    b.observed_day,
-    b.observed_year,
+    b.observed_week_sin,
+    b.observed_week_cos,
+    b.observed_month_sin,
+    b.observed_month_cos,
 
-    b.submitted_hour,
-    b.submitted_day,
-    b.submitted_week,
-    b.submitted_year,
+    b.submitted_week_sin,
+    b.submitted_week_cos,
+    b.submitted_month_sin,
+    b.submitted_month_cos,
 
      --Observer features (from observer_features, computed at observation time)
          --Temporal
         date_part('day',ob.observer_tenure) AS obv_tenure_days,
         ob.is_veteran AS obv_is_veteran,
-        --date_part('day',ob.lag_since_last_obs) AS obv_lag_days_since_last_post,
+        date_part('day',ob.lag_since_last_obs) AS obv_lag_days_since_last_post,
 
         -- Observations
         LOG(ob.observer_obs_count_at_t + 1) AS obv_obs_count_log,
@@ -48,11 +49,6 @@ SELECT
         ob.n_identifiers_mean_rank AS obv_n_identifiers_mean_rank,
          --Taxonomic
         ob.taxon_diversity_species AS obv_taxon_diversity_species,
-        /*
-        ob.taxon_diversity_species AS obv_taxon_diversity_genus,
-        ob.taxon_diversity_species AS obv_taxon_diversity_family,
-        ob.taxon_diversity_species AS obv_taxon_diversity_order,
-        */
 
         oe.observer_species_entropy_norm AS obv_taxon_entropy,
         ob.observer_taxon_rg_rate_shrunk_at_t AS obv_taxon_rg_rate_shrunk_at_t,
@@ -64,21 +60,11 @@ SELECT
         ob.pct_obs_with_description AS obv_pct_obs_with_description,
         ob.pct_obs_with_license AS obv_pct_obs_with_license,
         ob.pct_obs_from_mobile AS obv_pct_obs_from_mobile,
-        --ob.has_orcid AS obv_has_orcid,
-
-        --Identifiers counts from obs history
-        --LOG(ii.identifiers_total + 1) AS obv_n_identifier_log,
-        /*global_rg_rate
-        ii.identifiers_agreeing,
-        ii.identifiers_improving,
-        ii.identifiers_maverick,
-        ii.identifiers_vision,
-        */
-
+        ob.has_orcid AS obv_has_orcid,
 
 
         -- Observer as identifiers score
-        --u.observer_only,
+        u.observer_only,
 
         -- Roles stats from this observers
 
@@ -107,10 +93,9 @@ SELECT
     t.rg_rate_prior_source,
     t.taxon_cold_start,
     t.genus_popularity_rank,
-    t.genus_rg_rate,
-    t.family_rg_rate,
+    COALESCE(t.genus_rg_rate,0)  AS genus_rg_rate,
+    COALESCE(t.family_rg_rate,0) AS family_rg_rate,
     t.taxon_avg_ids_to_rg,
-
 
      --Fixed Taxon confusion stats
     IFNULL(c.has_similar_species, FALSE)    AS has_similar_species,
@@ -119,20 +104,19 @@ SELECT
 
     c.similar_species_count,
 
-    --c.nbor_obs_count_sum,
+    c.nbor_obs_count_sum,
     c.nbor_obs_count_mean,
-    --c.nbor_obs_count_std,
-    --c.nbor_obs_count_max,
+    c.nbor_obs_count_std,
+    c.nbor_obs_count_max,
 
     c.nbor_rg_rate_mean,
     c.nbor_rg_rate_std,
-    --c.nbor_rg_rate_min,
 
     --c.weighted_mean_neighbor_rg_rate,
     c.nbor_rg_rate_inv_dist_weighted,
 
 
-    --c.nbor_dist_max,
+    c.nbor_dist_max,
     c.nbor_dist_mean,
 
     c.rg_rate_vs_neighbors,
@@ -148,11 +132,9 @@ SELECT
     c.rg_percentile_dist_weighted,
 
     c.neighbor_genus_diversity,
-    --c.neighbor_rank_min,
+    c.neighbor_rank_min,
 
     c.magnet_score,
-
-
 
     -- Taxa confusion graph
     cc.clustering_coefficient,
@@ -163,6 +145,22 @@ SELECT
     dh.genus_crossover_count,
     dh.family_crossover_count,
 
+
+    -- Taxon seasonality
+
+    COALESCE(
+        tms.species_month_rg_rate,   -- species × month (preferred)
+        t.taxon_rg_rate_shrunk,      -- species overall (from taxon.sql)
+        tms.global_month_rg_rate      -- global monthly mean
+    ) AS taxon_monthly_rg_rate,
+
+    -- Cyclic distance: max is 6 months (opposite side of the year)
+
+    LEAST(
+        ABS(MONTH(b.observed_on) - tp.peak_month),
+        12 - ABS(MONTH(b.observed_on) - tp.peak_month)
+            ) AS months_from_peak_season
+
 FROM features.base b
 JOIN features.splits                     s  ON b.observation_id = s.observation_id
 LEFT JOIN features.observations          ob ON b.observation_id = ob.observation_id
@@ -172,7 +170,9 @@ JOIN features.identifications            i  ON b.observation_id = i.observation_
 LEFT JOIN features.taxon                 t  ON b.observation_id = t.observation_id
 LEFT JOIN features.taxa_confusion        c  ON b.taxon_id = c.taxon_id
 LEFT JOIN staged.users                   u  ON b.user_id = u.user_id
-
+LEFT JOIN features.taxon_month_stats     tms ON b.taxon_id = tms.taxon_id
+                                                AND tms.obs_month = MONTH(b.observed_on)
+LEFT JOIN features.taxon_peak_month      tp ON b.taxon_id = tp.taxon_id
 LEFT JOIN graph.clustering_coefficient   cc ON b.taxon_id = cc.taxon_id
 LEFT JOIN graph.double_hop_stats         dh ON b.taxon_id = dh.taxon_id
 
