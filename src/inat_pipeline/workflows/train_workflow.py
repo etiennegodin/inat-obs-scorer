@@ -178,15 +178,14 @@ def execute(
         # Ranking metrics
         try:
             ranking_curves_large = ranking.compute_ranking_curves(y_val, y_pred_proba)
-            ranking_curves_low = ranking.compute_ranking_curves(
+            ranking_curves_low = ranking.ranking_summary(
                 y_val, y_pred_proba, k_values=[0.001, 0.005, 0.01, 0.02, 0.05]
             )
-            ranking.plots.log_ranking(ranking_curves_large)
-            ranking.plots.log_plot_score_distribution(y_pred_proba)
-
-            mlflow.log_table(
-                data=ranking_curves_large, artifact_file="ranking_large.json"
+            mlflow.log_metric(
+                "lift_at_k5_per", ranking_curves_low["lift_at_k"].to_list()[-1]
             )
+            ranking.plots.log_ranking_plot(ranking_curves_large)
+            ranking.plots.log_score_distribution_plot(y_pred_proba, y_val)
             mlflow.log_table(data=ranking_curves_low, artifact_file="ranking_low.json")
 
         except Exception as e:

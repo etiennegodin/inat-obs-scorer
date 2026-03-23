@@ -244,7 +244,7 @@ def log_feature_importance_report(
     Logs whichever plots are applicable given the pipeline config.
     """
     try:
-        print("\nLogging explainability artifacts...")
+        logger.info("\nLogging explainability artifacts...")
         log_feature_importance(pipeline, config)
         log_pca_loadings(pipeline, config)
         log_shap_summary(pipeline, X_train, config)

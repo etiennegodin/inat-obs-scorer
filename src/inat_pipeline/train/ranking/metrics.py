@@ -42,8 +42,6 @@ def compute_ranking_curves(
 
     baseline_rate = total_pos / total
 
-    print(baseline_rate)
-
     # Sort observations by descending score once; reuse for all K values.
     order = np.argsort(y_score)[::-1]
     y_sorted = y_true[order]

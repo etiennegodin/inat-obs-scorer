@@ -8,12 +8,16 @@ returned by ``ranking_metrics.compute_ranking_curves``.
 
 from __future__ import annotations
 
+import logging
+
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 import mlflow
 import numpy as np
 import pandas as pd
 from matplotlib.figure import Figure
+
+logger = logging.getLogger(__name__)
 
 # ── palette ──────────────────────────────────────────────────────────────
 MODEL_COLOR = "#2563EB"  # blue
@@ -154,23 +158,23 @@ def plot_ranking_curves(
         )
 
     fig.suptitle(title, fontsize=13, fontweight="bold")
-
-    mlflow.log_figure(fig, title)
+    logger.info(f"Logged {title + '.png'}")
+    mlflow.log_figure(fig, title + ".png")
     plt.close(fig)
     return fig
 
 
-def log_plot_score_distribution(y_score: pd.DataFrame):
-    fig, ax = plt.subplots(3, 3, figsize=(5, 5))
-
-    ax.hist(y_score[y_score == 1], bins=50, alpha=0.6, label="True RG")
-    ax.hist(y_score[y_score == 0], bins=50, alpha=0.6, label="Not RG")
-    ax.xlabel("Predicted score")
+def log_score_distribution_plot(y_score_val: pd.DataFrame, y_val: pd.DataFrame):
+    fig, ax = plt.subplots(figsize=(5, 5))
+    ax.hist(y_score_val[y_val == 1], bins=50, alpha=0.6, label="True RG")
+    ax.hist(y_score_val[y_val == 0], bins=50, alpha=0.6, label="Not RG")
+    ax.set_xlabel("Predicted score")
     mlflow.log_figure(fig, "score_distribution.png")
+    logger.info("Logged score_distribution.png")
     plt.close(fig)
 
 
-def log_ranking(
+def log_ranking_plot(
     curves: pd.DataFrame,
     model_name: str = "LightGBM scorer",
     highlight_k: list[float] = (0.10, 0.20, 0.30),
