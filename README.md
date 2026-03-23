@@ -175,7 +175,7 @@ inat_pipe train \
 | Validation *(v0.3)* | Pydantic models for config and schema enforcement |
 | Serving *(v0.3)* | FastAPI |
 
-**Current performance**: ROC-AUC **~0.88** on out-of-time val set.
+**Current performance**: ROC-AUC **0.88** on out-of-time val set.
 
 ---
 
@@ -199,7 +199,7 @@ evaluated accordingly.
 | 20% | 10,000 | 94.3% | 36.0% | 1.80× |
 | 50% | 25,000 | 82.3% | 78.6% | 1.57× |
 
-
+---
 
 ![Ranking metrics](docs/ranking_metrics.png)
 
@@ -207,6 +207,7 @@ At 500 observations reviewed (1% of queue), **98.2% are genuine RG candidates** 
 the model produces near-zero wasted expert effort in the operational budget range.
 Precision stays above 98% all the way to 2,500 reviews; recall is the binding constraint
 at this scale.
+
 ### What the metrics imply for next features
 
 The lift curve flattens around 1.88× across the entire operational zone (50–2,500 reviews),
