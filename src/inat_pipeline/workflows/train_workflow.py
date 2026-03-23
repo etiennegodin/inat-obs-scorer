@@ -196,7 +196,6 @@ def execute(
 
         except Exception as e:
             logger.error(e)
-            raise
 
         # ── 6. Features explainability ─────────────────────────────────────────────
         # Saves features explainability artifacts to mlflow

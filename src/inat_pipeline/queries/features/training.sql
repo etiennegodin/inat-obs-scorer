@@ -88,7 +88,7 @@ SELECT
      --Taxon features (fixed lookup)
     --t.taxon_rg_rate_shrunk,
     t.global_rg_rate,
-    t.rank_level AS tx_rank_level,
+    --t.rank_level AS tx_rank_level,
     t.taxon_popularity_rank AS tx_popularity_rank,
     t.rg_rate_prior_source AS tx_rg_rate_prior_source,
     t.taxon_cold_start AS tx_cold_start,
