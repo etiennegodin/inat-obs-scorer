@@ -16,17 +16,19 @@ o.observed_on,
 o.created_at,
 o.created_at - o.observed_on AS obs_to_submit_lag_days,
 
-SIN(2*PI * WEEK(o.observed_on) / 52) AS observed_week_sin,
-COS(2*PI * WEEK(o.observed_on) / 52) AS observed_week_cos,
+YEAR(o.created_at) AS submitted_year,
 
-SIN(2*PI * MONTH(o.observed_on) / 12) AS observed_month_sin,
-COS(2*PI * MONTH(o.observed_on) / 12) AS observed_month_cos,
+SIN(2*pi() * WEEK(o.observed_on) / 52) AS observed_week_sin,
+COS(2*pi() * WEEK(o.observed_on) / 52) AS observed_week_cos,
 
-SIN(2*PI * WEEK(o.created_at) / 52) AS submitted_week_sin,
-COS(2*PI * WEEK(o.created_at) / 52) AS submitted_week_cos,
+SIN(2*pi() * MONTH(o.observed_on) / 12) AS observed_month_sin,
+COS(2*pi() * MONTH(o.observed_on) / 12) AS observed_month_cos,
 
-SIN(2*PI * MONTH(o.created_at) / 12) AS submitted_month_sin,
-COS(2*PI * MONTH(o.created_at) / 12) AS submitted_month_cos,
+SIN(2*pi() * WEEK(o.created_at) / 52) AS submitted_week_sin,
+COS(2*pi() * WEEK(o.created_at) / 52) AS submitted_week_cos,
+
+SIN(2*pi() * MONTH(o.created_at) / 12) AS submitted_month_sin,
+COS(2*pi() * MONTH(o.created_at) / 12) AS submitted_month_cos,
 
 
 -- Documentation quality (submission-time)

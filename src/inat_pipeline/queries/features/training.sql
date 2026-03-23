@@ -29,7 +29,7 @@ SELECT
     b.submitted_week_sin,
     b.submitted_week_cos,
     b.submitted_month_sin,
-    b.submitted_month_cos
+    b.submitted_month_cos,
 
      --Observer features (from observer_features, computed at observation time)
          --Temporal
