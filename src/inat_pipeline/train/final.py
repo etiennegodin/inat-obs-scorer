@@ -24,8 +24,9 @@ def train_final_model(
         k.replace("classifier__", ""): v for k, v in best_params.items()
     }
 
-    # Inject random state
+    # Inject classifier params from config
     classifier_params["random_state"] = config.random_seed
+    classifier_params["n_jobs"] = config.n_jobs
 
     # Inject gpu params if flagged
     if config.use_gpu:

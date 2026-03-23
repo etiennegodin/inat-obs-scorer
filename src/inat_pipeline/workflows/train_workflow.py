@@ -39,6 +39,7 @@ def execute(
     cv_folds: int,
     random_seed: int,
     use_gpu: bool,
+    n_jobs: int,
 ) -> dict:
     # Initialise pipeline configs
     config = train.PipelineConfig(
@@ -52,6 +53,7 @@ def execute(
         random_seed=random_seed,
         use_gpu=use_gpu,
         version=deps.version,
+        n_jobs=n_jobs,
         # experiment_name= deps.git_branch
     )
 
@@ -103,7 +105,9 @@ def execute(
         explainability.log_feature_corr(X_train)
 
         # Log pipeline structure as a JSON artifact
-        sample_pipeline = train.build_pipeline(config)
+        sample_pipeline = train.build_pipeline(
+            config, classifier_params={"n_jobs": config.n_jobs}
+        )
         pipeline_desc = train.helpers.describe_pipeline(sample_pipeline)
         with open("pipeline_description.json", "w") as f:
             json.dump(pipeline_desc, f, indent=2, default=str)

@@ -98,6 +98,7 @@ class ApplicationService:
                 cv_folds=args.cv_folds,
                 random_seed=args.seed,
                 use_gpu=args.gpu,
+                n_jobs=args.n_jobs,
             )
         except InatPipelineError as e:
             logger.error("Train workflow failed: %s", e)

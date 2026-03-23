@@ -58,7 +58,7 @@ def make_objective(
     custom_cv = ExpandingWindowCvSplit(n_folds=config.cv_folds)
 
     # Set base params
-    base_params = {}
+    base_params = {"n_jobs": config.n_jobs}
 
     # Inject gpu params if flagged
     if config.use_gpu:
