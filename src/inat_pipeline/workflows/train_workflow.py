@@ -183,7 +183,9 @@ def execute(
         try:
             ranking_curves_large = ranking.compute_ranking_curves(y_val, y_pred_proba)
             ranking_curves_low = ranking.ranking_summary(
-                y_val, y_pred_proba, k_values=[0.001, 0.005, 0.01, 0.02, 0.05]
+                y_val,
+                y_pred_proba,
+                k_values=[0.001, 0.005, 0.01, 0.02, 0.05, 0.1, 0.2, 0.5],
             )
             mlflow.log_metric(
                 "lift_at_k5_per", ranking_curves_low["lift_at_k"].to_list()[-1]

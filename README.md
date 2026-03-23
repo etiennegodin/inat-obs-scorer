@@ -19,7 +19,7 @@ This project builds a **binary classifier** that scores each open "Needs ID" obs
 
 **Highlights:** temporal-safe label re-derivation from iNaturalist's identification
 algorithm · Bayesian-shrunk taxon difficulty features · Protocol-based async enrichment
-pipeline · 98.2% precision at 500 observations reviewed · ROC-AUC 0.88 on out-of-time val set
+pipeline · 98.2% precision at 500 observations reviewed · ROC-AUC 0.88 on out-of-time val set.
 
 ### Problem framing
 
@@ -159,6 +159,9 @@ inat_pipe train \
 | **Confusion graph** | Neighborhood difficulty, sink-species flag, focal taxon rank in cluster |
 | **Temporal** | Day of year, hour of submission, time elapsed since submission |
 
+
+![Shap features](docs/shap_beeswarm.png)
+
 ---
 
 ## ML Stack
@@ -203,6 +206,9 @@ At 500 observations reviewed (1% of queue), **98.2% are genuine RG candidates** 
 the model produces near-zero wasted expert effort in the operational budget range.
 Precision stays above 98% all the way to 2,500 reviews; recall is the binding constraint
 at this scale.
+
+![Ranking metrics](docs/ranking_metrics.png)
+
 
 ### What the metrics imply for next features
 
