@@ -78,7 +78,7 @@ Most ML pipelines guard against one form of leakage. This project explicitly ide
 | **Label leakage** | Scraped `quality_grade` reflects current state, not state at prediction time | RG label re-derived from windowed identification history via DuckDB table macro |
 | **Feature leakage** | Aggregating observer/taxon stats across the full dataset contaminates past observations with future signal | All window functions bounded to `created_at` |
 | **Split leakage** | Shuffling within temporal partitions destroys gap buffer integrity | Hard date-range boundaries from `SplitConfig`; val/test rows ordered by `created_at`, never shuffled |
-| **CV split leakage** | Standard K-fold with shuffling violates temporal structure, producing optimistically biased estimates | CV folds respect temporal order via sklearn's `TimeSeriesSplit` (expanding window); gap buffers applied to the final train/val/test split only — see [Scope & Limitations](#scope--limitations) |
+| **CV split leakage** | Standard K-fold with shuffling violates temporal structure, producing optimistically biased estimates | Custom `ExpandingWindowCvSplit(BaseCrossValidator)` — equal-chunk expanding window, sklearn-compatible, with a `gap_size` hook designed in; gap buffer not yet active — see [Scope & Limitations](#scope--limitations) |
 
 ### 2. Research Grade — a two-stage label
 
