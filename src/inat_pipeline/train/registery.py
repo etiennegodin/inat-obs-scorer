@@ -122,7 +122,7 @@ SEARCH_SPACES = {
         },
         "classifier__min_child_samples": {
             "type": "int",
-            "low": 100,
+            "low": 150,
             "high": 300,
             # on imbalanced data (like iNat RG), push this higher
             # it prevents the model from memorizing rare patterns
@@ -130,7 +130,7 @@ SEARCH_SPACES = {
         # Secondary — worth including but narrow the range
         "classifier__n_estimators": {
             "type": "int",
-            "low": 400,
+            "low": 500,
             "high": 550,
             "step": 25,
             # prefer early stopping over a wide range here (see below)

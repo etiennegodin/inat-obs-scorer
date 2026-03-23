@@ -146,21 +146,6 @@ SELECT
     dh.family_crossover_count,
 
 
-    -- Taxon seasonality
-
-    COALESCE(
-        tms.species_month_rg_rate,   -- species × month (preferred)
-        t.taxon_rg_rate_shrunk,      -- species overall (from taxon.sql)
-        tms.global_month_rg_rate      -- global monthly mean
-    ) AS taxon_monthly_rg_rate,
-
-    -- Cyclic distance: max is 6 months (opposite side of the year)
-
-    LEAST(
-        ABS(MONTH(b.observed_on) - tp.peak_month),
-        12 - ABS(MONTH(b.observed_on) - tp.peak_month)
-            ) AS months_from_peak_season
-
 FROM features.base b
 JOIN features.splits                     s  ON b.observation_id = s.observation_id
 LEFT JOIN features.observations          ob ON b.observation_id = ob.observation_id
@@ -170,9 +155,6 @@ JOIN features.identifications            i  ON b.observation_id = i.observation_
 LEFT JOIN features.taxon                 t  ON b.observation_id = t.observation_id
 LEFT JOIN features.taxa_confusion        c  ON b.taxon_id = c.taxon_id
 LEFT JOIN staged.users                   u  ON b.user_id = u.user_id
-LEFT JOIN features.taxon_month_stats     tms ON b.taxon_id = tms.taxon_id
-                                                AND tms.obs_month = MONTH(b.observed_on)
-LEFT JOIN features.taxon_peak_month      tp ON b.taxon_id = tp.taxon_id
 LEFT JOIN graph.clustering_coefficient   cc ON b.taxon_id = cc.taxon_id
 LEFT JOIN graph.double_hop_stats         dh ON b.taxon_id = dh.taxon_id
 
