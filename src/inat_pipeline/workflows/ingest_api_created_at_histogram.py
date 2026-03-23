@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 def execute(deps: Dependencies, rate: int, ignore_not_found: bool) -> None:
     SOURCE_TABLE_NAME = "staged.species_list"
-    TARGET_TABLE_NAME = "raw.species_histogram_quebec"
+    TARGET_TABLE_NAME = "raw.obs_histogram_na_created"
     SOURCE_KEY = "taxon_id"
 
     with DuckDBAdapter(deps.DB_PATH) as con:
@@ -43,9 +43,9 @@ def execute(deps: Dependencies, rate: int, ignore_not_found: bool) -> None:
 
         # Custom params
         params = {
-            "place_id": 13336,
-            "interval": "week",
-            "date_field": "observed",
+            "place_id": 97394,  # North america
+            "interval": "week_of_year",
+            "date_field": "created",
             "years": years,
         }
 
@@ -56,7 +56,7 @@ def execute(deps: Dependencies, rate: int, ignore_not_found: bool) -> None:
                 id_param="taxon_id",
                 params=params,
                 write_empty_rows=ignore_not_found,
-                per_page=1000,  # large per-page for all weeks in one response
+                per_page=53,
             )
             fetcher = RateLimiterFetcher(rate=rate, ignore_not_found=ignore_not_found)
 
