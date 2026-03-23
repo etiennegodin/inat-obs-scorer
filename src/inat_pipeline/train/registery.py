@@ -62,18 +62,7 @@ CLASSIFIER_REGISTRY = {
     "lightgbm": (
         "lightgbm",
         "LGBMClassifier",
-        {
-            "verbose": -1,
-            "n_estimators": 1000,
-            "n_jobs": -1,
-            "bagging_freq": 2,
-            "reg_lambda": 2.78350354178661,
-            "reg_alpha": 7.372236030141749,
-            "colsample_bytree": 0.8847606045236783,
-            "subsample": 0.76,
-            "learning_rate": 0.01,
-            "min_child_samples": 150,
-        },
+        {"verbose": -1, "n_estimators": 600, "n_jobs": -1},
     ),
 }
 
@@ -118,10 +107,56 @@ SEARCH_SPACES = {
         # Capacity
         "classifier__num_leaves": {
             "type": "int",
-            "low": 127,
+            "low": 15,
             "high": 128,
             # rule of thumb: never exceed 2^(max_depth)
             # for depth=7 that's 128 — 200 is already generous
-        }
+        },
+        "classifier__min_child_samples": {
+            "type": "int",
+            "low": 100,
+            "high": 300,
+            "log": True,
+            # on imbalanced data (like iNat RG), push this higher
+            # it prevents the model from memorizing rare patterns
+        },
+        # Learning rate
+        "classifier__learning_rate": {
+            "type": "float",
+            "low": 0.05,
+            "high": 0.1,
+            "log": True,
+            # log=True means Optuna samples 0.01, 0.012, 0.015...
+            # rather than 0.01, 0.11, 0.21 — much smarter for rates
+        },
+        # Regularisation
+        "classifier__reg_alpha": {
+            "type": "float",
+            "low": 1e-4,
+            "high": 10.0,
+            "log": True,
+        },
+        "classifier__reg_lambda": {
+            "type": "float",
+            "low": 1e-4,
+            "high": 10.0,
+            "log": True,
+        },
+        # Subsampling
+        "classifier__bagging_freq": {
+            "type": "int",
+            "low": 1,
+            "high": 2,
+        },
+        "classifier__subsample": {
+            "type": "float",
+            "low": 0.5,
+            "high": 1.0,
+        },
+        "classifier__colsample_bytree": {
+            "type": "float",
+            "low": 0.4,
+            "high": 1.0,
+        },
     },
 }
