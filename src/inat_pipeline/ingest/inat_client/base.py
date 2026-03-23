@@ -84,17 +84,22 @@ class BaseInatClient(ABC):
                     )
                 logger.debug("No results for source_id %s", source_id)
                 break
-
-            # Try to find id in response, otherwise fall back on source_id
-            tagged = [
-                {
-                    "_source_id": _resolve_id(item, source_id, *self.config.id_fields),
-                    **item,
-                }
-                for item in results
-            ]
+            if isinstance(results, list):
+                # Try to find id in response, otherwise fall back on source_id
+                tagged = [
+                    {
+                        "_source_id": _resolve_id(
+                            item, source_id, *self.config.id_fields
+                        ),
+                        **item,
+                    }
+                    for item in results
+                ]
+            else:
+                results["_source_id"] = source_id
+                tagged = [results]
             try:
-                await self.queue.put(tagged)  # backpressure if consumer is slow
+                await self.queue.put(tagged)
             except Exception as e:
                 logger.error(f"FAILED to queue result: {e}")
 

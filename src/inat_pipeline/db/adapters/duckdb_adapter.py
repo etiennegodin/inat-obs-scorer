@@ -52,3 +52,6 @@ class DuckDBAdapter:
 
     def executemany(self, query: str, params: list[tuple]):
         return self._con.executemany(query, params)
+
+    def commit(self):
+        return self._con.commit()
