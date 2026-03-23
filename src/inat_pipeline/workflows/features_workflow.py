@@ -46,6 +46,7 @@ def execute(deps: Dependencies):
             "identifications",
             "taxa_confusion",
             "observers_entropy",
+            "taxon_seasonal",
         )
 
         # Final merge
