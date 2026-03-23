@@ -107,16 +107,16 @@ SEARCH_SPACES = {
         # The three that matter most — search these hard
         "classifier__learning_rate": {
             "type": "float",
-            "low": 0.02,
-            "high": 0.05,
+            "low": 0.009,
+            "high": 0.03,
             "log": True,
             # log=True means Optuna samples 0.01, 0.012, 0.015...
             # rather than 0.01, 0.11, 0.21 — much smarter for rates
         },
         "classifier__num_leaves": {
             "type": "int",
-            "low": 25,
-            "high": 128,
+            "low": 100,
+            "high": 200,
             # rule of thumb: never exceed 2^(max_depth)
             # for depth=7 that's 128 — 200 is already generous
         },
@@ -130,9 +130,9 @@ SEARCH_SPACES = {
         # Secondary — worth including but narrow the range
         "classifier__n_estimators": {
             "type": "int",
-            "low": 10,
-            "high": 20,
-            "step": 5,
+            "low": 500,
+            "high": 600,
+            "step": 25,
             # prefer early stopping over a wide range here (see below)
         },
         "classifier__reg_alpha": {
