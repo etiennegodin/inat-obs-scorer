@@ -11,6 +11,20 @@
 
 ---
 
+## Highlights
+
+- Built an **end-to-end ML pipeline** (data → features → model → API)
+- Achieved **ROC-AUC: 0.88** on out-of-time validation
+- Designed a **leakage-safe temporal pipeline** (features + labels reconstructed at prediction time)
+- Implemented **custom time-aware cross-validation**
+- Engineered advanced features:
+  - Bayesian-smoothed taxon difficulty
+  - Species confusion graph
+  - Observer reliability metrics
+- Deployed inference endpoint with **FastAPI**
+
+---
+
 ## Overview
 
 iNaturalist accumulates millions of wildlife observations submitted by citizen scientists. A subset of these earn **Research Grade (RG)** status — a quality threshold that makes observations useful for biodiversity science. Getting there requires community taxon agreement from knowledgeable identifiers, but expert attention is a scarce resource.
@@ -29,6 +43,24 @@ Community consensus   → What has the community already signalled?
 ```
 
 The core modelling challenge is **temporal**: all features must be reconstructed at the exact moment of each observation, and the label itself must be derived from a point-in-time simulation of iNaturalist's identification algorithm — not the current scraped state.
+
+---
+
+## Why this is hard
+
+- Labels are **dynamic** (depend on future community activity)
+- High risk of **temporal leakage**
+- Data distribution shifts over time
+- Sparse data for rare species
+
+---
+
+## Results
+
+- **ROC-AUC:** ~0.88 (out-of-time validation)
+
+*(Optional but strongly recommended to add)*
+- Top 20% predictions capture ~X% of future Research Grade observations
 
 ---
 
