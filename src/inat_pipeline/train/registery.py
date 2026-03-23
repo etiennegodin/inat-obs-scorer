@@ -71,6 +71,8 @@ CLASSIFIER_REGISTRY = {
             "reg_alpha": 7.372236030141749,
             "colsample_bytree": 0.8847606045236783,
             "subsample": 0.76,
+            "learning_rate": 0.01,
+            "min_child_samples": 150,
         },
     ),
 }
@@ -116,27 +118,10 @@ SEARCH_SPACES = {
         # Capacity
         "classifier__num_leaves": {
             "type": "int",
-            "low": 15,
+            "low": 127,
             "high": 128,
             # rule of thumb: never exceed 2^(max_depth)
             # for depth=7 that's 128 — 200 is already generous
-        },
-        "classifier__min_child_samples": {
-            "type": "int",
-            "low": 150,
-            "high": 300,
-            "log": True,
-            # on imbalanced data (like iNat RG), push this higher
-            # it prevents the model from memorizing rare patterns
-        },
-        # Learning rate
-        "classifier__learning_rate": {
-            "type": "float",
-            "low": 0.01,
-            "high": 0.02,
-            "log": True,
-            # log=True means Optuna samples 0.01, 0.012, 0.015...
-            # rather than 0.01, 0.11, 0.21 — much smarter for rates
-        },
+        }
     },
 }
