@@ -93,8 +93,8 @@ SELECT
     t.rg_rate_prior_source,
     t.taxon_cold_start,
     t.genus_popularity_rank,
-    COALESCE(t.genus_rg_rate,0),  AS genus_rg_rate
-    COALESCE(t.family_rg_rate,0), AS family_rg_rate
+    COALESCE(t.genus_rg_rate,0)  AS genus_rg_rate,
+    COALESCE(t.family_rg_rate,0) AS family_rg_rate,
     t.taxon_avg_ids_to_rg,
 
      --Fixed Taxon confusion stats
