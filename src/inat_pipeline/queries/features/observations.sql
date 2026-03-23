@@ -57,9 +57,10 @@ aggregates AS(
 
 
 
-        -- Raw ratio for reputation (unshrunk, used for rank)
         COALESCE(observer_rg_rate_at_t /  NULLIF(expected_rg_rate, 0),0) AS observer_reputation_raw,
-            observer_obs_count_at_t >= 20 AS rg_rate_is_reliable,
+        COALESCE(NULLIF(observer_rg_rate_at_t, 0) -  NULLIF(expected_rg_rate, 0),0) AS observer_reputation_diff,
+
+        observer_obs_count_at_t >= 20 AS rg_rate_is_reliable,
 
         COALESCE(COUNT(*)           OVER observer_taxon_history, 0)  AS observer_taxon_obs_count_at_t,
         COALESCE(SUM(is_rg::INT)    OVER observer_taxon_history, 0) AS observer_taxon_obs_rg_count_at_t,

@@ -20,6 +20,7 @@ dependencies = [
     "tqdm",
     "shap",
     "sqlparams",
+    "psutil",
 
 ]
 

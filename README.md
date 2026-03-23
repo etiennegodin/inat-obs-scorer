@@ -11,25 +11,15 @@
 
 ---
 
-## Highlights
-
-- Built an **end-to-end ML pipeline** (data → features → model → API)
-- Achieved **ROC-AUC: 0.88** on out-of-time validation
-- Designed a **leakage-safe temporal pipeline** (features + labels reconstructed at prediction time)
-- Implemented **custom time-aware cross-validation**
-- Engineered advanced features:
-  - Bayesian-smoothed taxon difficulty
-  - Species confusion graph
-  - Observer reliability metrics
-- Deployed inference endpoint with **FastAPI**
-
----
-
 ## Overview
 
 iNaturalist accumulates millions of wildlife observations submitted by citizen scientists. A subset of these earn **Research Grade (RG)** status — a quality threshold that makes observations useful for biodiversity science. Getting there requires community taxon agreement from knowledgeable identifiers, but expert attention is a scarce resource.
 
 This project builds a **binary classifier** that scores each open "Needs ID" observation on its probability of reaching Research Grade, enabling triage of expert review queues. It is currently scoped to the plant kingdom (*Plantae*) in Québec and is designed as a production-style ML system.
+
+**Highlights:** temporal-safe label re-derivation from iNaturalist's identification
+algorithm · Bayesian-shrunk taxon difficulty features · Protocol-based async enrichment
+pipeline · 98.2% precision at 500 observations reviewed · ROC-AUC 0.88 on out-of-time val set
 
 ### Problem framing
 
@@ -43,24 +33,6 @@ Community consensus   → What has the community already signalled?
 ```
 
 The core modelling challenge is **temporal**: all features must be reconstructed at the exact moment of each observation, and the label itself must be derived from a point-in-time simulation of iNaturalist's identification algorithm — not the current scraped state.
-
----
-
-## Why this is hard
-
-- Labels are **dynamic** (depend on future community activity)
-- High risk of **temporal leakage**
-- Data distribution shifts over time
-- Sparse data for rare species
-
----
-
-## Results
-
-- **ROC-AUC:** ~0.88 (out-of-time validation)
-
-*(Optional but strongly recommended to add)*
-- Top 20% predictions capture ~X% of future Research Grade observations
 
 ---
 
@@ -206,6 +178,46 @@ inat_pipe train \
 **Current performance**: ROC-AUC **~0.88** on out-of-time val set.
 
 ---
+
+## Ranking Performance
+
+ROC-AUC measures discrimination globally, but the operational question is different:
+**given a fixed review budget, how precisely does the model surface genuine RG candidates?**
+
+Expert identifier time is the scarce resource. The realistic daily capacity of a small
+identifier team is in the hundreds of observations, not tens of thousands. The model is
+evaluated accordingly.
+
+| k (reviewed) | n | precision@k | recall@k | lift@k |
+|---|---|---|---|---|
+| 0.1% | 50 | 100.0% | 0.19% | 1.91× |
+| 0.5% | 250 | 98.0% | 0.94% | 1.87× |
+| **1%** | **500** | **98.2%** | **1.88%** | **1.88×** |
+| 2% | 1,000 | 98.6% | 3.77% | 1.88× |
+| 5% | 2,500 | 98.5% | 9.42% | 1.88× |
+| 10% | 5,000 | 97.1% | 18.6% | 1.86× |
+| 20% | 10,000 | 94.3% | 36.0% | 1.80× |
+| 50% | 25,000 | 82.3% | 78.6% | 1.57× |
+
+At 500 observations reviewed (1% of queue), **98.2% are genuine RG candidates** —
+the model produces near-zero wasted expert effort in the operational budget range.
+Precision stays above 98% all the way to 2,500 reviews; recall is the binding constraint
+at this scale.
+
+### What the metrics imply for next features
+
+The lift curve flattens around 1.88× across the entire operational zone (50–2,500 reviews),
+suggesting the model has saturated its current signal for the highest-confidence observations.
+Gains at low-k will require features that better separate the *hardest true positives*
+from *easy negatives* — the boundary cases the model currently hedges on. High-priority
+feature directions:
+
+- **ID velocity signals**: time-to-first-ID and identification burst patterns — fast early
+  agreement is a strong prior for RG that current features don't directly encode
+- **Observer × taxon interaction**: an observer's track record on *this specific taxon*,
+  not just their global RG rate
+- **Phenology alignment**: whether the observation date is consistent with expected
+  seasonal occurrence for the taxon
 
 ## Data Pipeline CLI
 

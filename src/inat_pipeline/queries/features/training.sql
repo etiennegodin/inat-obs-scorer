@@ -40,7 +40,7 @@ SELECT
         -- Observations
         LOG(ob.observer_obs_count_at_t + 1) AS obv_obs_count_log,
         ob.observer_rg_rate_at_t AS obv_rg_rate_lifetime,
-        ob.observer_reputation_raw AS obv_reputation_score,
+        ob.observer_reputation_diff AS obv_reputation_score,
         ob.observer_reputation_rank AS obv_reputation_rank,
         ob.rg_rate_is_reliable AS obv_rg_rate_is_reliable,
 
@@ -48,11 +48,11 @@ SELECT
         ob.n_identifiers_agree_mean_rank AS obv_n_identifiers_agree_mean_rank,
         ob.n_identifiers_mean_rank AS obv_n_identifiers_mean_rank,
          --Taxonomic
-        ob.taxon_diversity_species AS obv_taxon_diversity_species,
+        ob.taxon_diversity_species AS obv_tx_diversity_species,
 
-        oe.observer_species_entropy_norm AS obv_taxon_entropy,
-        ob.observer_taxon_rg_rate_shrunk_at_t AS obv_taxon_rg_rate_shrunk_at_t,
-        ob.observer_taxon_focus_rate AS obv_taxon_focus_rate,
+        oe.observer_species_entropy_norm AS obv_tx_entropy,
+        ob.observer_taxon_rg_rate_shrunk_at_t AS obv_tx_rg_rate,
+        ob.observer_taxon_focus_rate AS obv_tx_focus_rate,
 
 
          --Metadata
@@ -64,86 +64,86 @@ SELECT
 
 
         -- Observer as identifiers score
-        u.observer_only,
+        u.observer_only AS obv_obv_only,
 
         -- Roles stats from this observers
 
-        COALESCE(i.prior_ids_received,0) AS prior_ids_received,
-        COALESCE(i.prior_identifier_diversity,0) AS prior_identifier_diversity,
+        COALESCE(i.prior_ids_received,0) AS id_prior_ids_received,
+        COALESCE(i.prior_identifier_diversity,0) AS id_prior_identifier_diversity,
         --COALESCE(i.prior_taxa_received_on,0) AS prior_taxa_received_on,
-        COALESCE(i.prior_observer_rg_rate,0) AS prior_observer_rg_rate,
-        COALESCE(i.prior_ids_received_agree_rate, 0) AS prior_ids_received_agree_rate,
-        COALESCE(i.prior_ids_received_disagree_rate, 0) AS prior_ids_received_disagree_rate,
+        COALESCE(i.prior_observer_rg_rate,0) AS id_prior_observer_rg_rate,
+        COALESCE(i.prior_ids_received_agree_rate, 0) AS id_prior_ids_received_agree_rate,
+        COALESCE(i.prior_ids_received_disagree_rate, 0) AS id_prior_ids_received_disagree_rate,
 
-        COALESCE(i.prior_ids_given, 0) AS prior_ids_given,
+        COALESCE(i.prior_ids_given, 0) AS id_prior_ids_given,
         --COALESCE(i.prior_observers_helped, 0) AS prior_observers_helped,
-        COALESCE(i.prior_taxa_identified, 0) AS prior_taxa_identified,
-        COALESCE(i.prior_ids_given_improving_rate, 0) AS prior_ids_given_improving_rate,
-        COALESCE(i.prior_ids_given_agree_rate, 0) AS prior_ids_given_agree_rate,
-        COALESCE(i.prior_ids_given_disagree_rate, 0) AS prior_ids_given_disagree_rate,
-        COALESCE(i.prior_ids_vision_rate, 0) AS prior_ids_vision_rate,
+        COALESCE(i.prior_taxa_identified, 0) AS id_prior_taxa_identified,
+        COALESCE(i.prior_ids_given_improving_rate, 0) AS id_prior_ids_given_improving_rate,
+        COALESCE(i.prior_ids_given_agree_rate, 0) AS id_prior_ids_given_agree_rate,
+        COALESCE(i.prior_ids_given_disagree_rate, 0) AS id_prior_ids_given_disagree_rate,
+        COALESCE(i.prior_ids_vision_rate, 0) AS id_prior_ids_vision_rate,
 
-        COALESCE(i.reciprocity_ratio, 0) AS reciprocity_ratio,
+        COALESCE(i.reciprocity_ratio, 0) AS id_reciprocity_ratio,
 
      --Taxon features (fixed lookup)
     --t.taxon_rg_rate_shrunk,
     t.global_rg_rate,
-    t.rank_level,
-    t.taxon_popularity_rank,
-    t.rg_rate_prior_source,
-    t.taxon_cold_start,
-    t.genus_popularity_rank,
-    COALESCE(t.genus_rg_rate,0)  AS genus_rg_rate,
-    COALESCE(t.family_rg_rate,0) AS family_rg_rate,
-    t.taxon_avg_ids_to_rg,
+    t.rank_level AS tx_rank_level,
+    t.taxon_popularity_rank AS tx_popularity_rank,
+    t.rg_rate_prior_source AS tx_rg_rate_prior_source,
+    t.taxon_cold_start AS tx_cold_start,
+    t.genus_popularity_rank AS tx_genus_popularity_rank,
+    COALESCE(t.genus_rg_rate,0)  AS tx_genus_rg_rate,
+    COALESCE(t.family_rg_rate,0) AS tx_family_rg_rate,
+    t.taxon_avg_ids_to_rg AS tx_avg_ids_to_rg,
 
      --Fixed Taxon confusion stats
-    IFNULL(c.has_similar_species, FALSE)    AS has_similar_species,
-    COALESCE(c.neighborhood_difficulty_dist_weighted,0)   AS neighborhood_difficulty_dist_weighted,
-    COALESCE(c.neighborhood_difficulty_inv_dist, 0) AS neighborhood_difficulty_inv_dist,
+    IFNULL(c.has_similar_species, FALSE)    AS tx_conf_has_similar,
+    COALESCE(c.neighborhood_difficulty_dist_weighted,0)   AS tx_conf_nbrhd_diff_dist_weighted,
+    COALESCE(c.neighborhood_difficulty_inv_dist, 0) AS tx_conf_nbrhd_diff_inv_dist,
 
-    c.similar_species_count,
+    c.similar_species_count AS tx_conf_similar_species_count,
 
-    c.nbor_obs_count_sum,
-    c.nbor_obs_count_mean,
-    c.nbor_obs_count_std,
-    c.nbor_obs_count_max,
+    c.nbor_obs_count_sum AS tx_conf_nbrhd_obs_count_sum,
+    c.nbor_obs_count_mean AS tx_conf_nbrhd_obs_count_mean,
+    c.nbor_obs_count_std AS tx_conf_nbrhd_obs_count_std,
+    c.nbor_obs_count_max AS tx_conf_nbrhd_obs_count_max,
 
-    c.nbor_rg_rate_mean,
-    c.nbor_rg_rate_std,
+    c.nbor_rg_rate_mean AS tx_conf_nbrhd_rg_rate_mean,
+    c.nbor_rg_rate_std AS tx_conf_nbrhd_rg_rate_std,
 
     --c.weighted_mean_neighbor_rg_rate,
-    c.nbor_rg_rate_inv_dist_weighted,
+    c.nbor_rg_rate_inv_dist_weighted AS tx_conf_nbrhd_rg_rate_inv_dist_weighted,
 
 
-    c.nbor_dist_max,
-    c.nbor_dist_mean,
+    c.nbor_dist_max AS tx_conf_nbrhd_dist_max,
+    c.nbor_dist_mean AS tx_conf_nbrhd_dist_mean,
 
-    c.rg_rate_vs_neighbors,
+    c.rg_rate_vs_neighbors AS tx_conf_rate_vs_neighbors,
 
-    c.nbor_count_same_genus,
-    c.nbor_count_cross_genus,
-    c.nbor_count_cross_family,
+    c.nbor_count_same_genus AS tx_conf_nbrhd_same_genus,
+    c.nbor_count_cross_genus AS tx_conf_nbrhd_cross_genus,
+    c.nbor_count_cross_family AS tx_conf_nbrhd_cross_family,
 
-    c.cross_genus_confusion_rate,
-    c.max_confusion_boundary_crossed,
+    c.cross_genus_confusion_rate AS tx_conf_cross_genus_conf_rate,
+    c.max_confusion_boundary_crossed AS tx_conf_max_conf_boundary_crossed,
 
-    c.rg_percentile_in_neighborhood,
-    c.rg_percentile_dist_weighted,
+    c.rg_percentile_in_neighborhood AS tx_conf_rg_perc_in_nbrhd,
+    c.rg_percentile_dist_weighted AS tx_conf_rg_perc_dist_weighted,
 
-    c.neighbor_genus_diversity,
-    c.neighbor_rank_min,
+    c.neighbor_genus_diversity AS tx_conf_nbrhd_genus_div,
+    c.neighbor_rank_min AS tx_conf__rank_min,
 
-    c.magnet_score,
+    c.magnet_score AS tx_confusion_magnet_score,
 
     -- Taxa confusion graph
-    cc.clustering_coefficient,
+    cc.clustering_coefficient AS tx_conf_2hop_clustering_coefficient,
 
-    dh.double_hop_nbrhd_size,
-    dh.double_hop_nbrhd_genus,
-    dh.double_hop_nbrhd_family,
-    dh.genus_crossover_count,
-    dh.family_crossover_count,
+    dh.double_hop_nbrhd_size AS tx_conf_2hop_size,
+    dh.double_hop_nbrhd_genus AS tx_conf_2hop_genus,
+    dh.double_hop_nbrhd_family AS tx_conf_2hop_family,
+    dh.genus_crossover_count AS tx_conf_genus_crossovers,
+    dh.family_crossover_count AS tx_conf_family_crossover,
 
 
 FROM features.base b

@@ -5,6 +5,8 @@ import sys
 from argparse import Namespace
 from pathlib import Path
 
+import psutil
+
 from .app import ApplicationService, Dependencies
 from .exceptions import InatPipelineError
 from .train.registery import (
@@ -173,7 +175,10 @@ def create_parser() -> argparse.ArgumentParser:
     )
 
     train_parser.add_argument(
-        "--test", "-t", default=False, action="store_true", help="Run a quick test"
+        "--n-jobs",
+        default=-1,
+        type=n_jobs,
+        help="Number of cores to use. Use -1 for all, -2 for all but one.",
     )
     train_parser.add_argument(
         "--gpu", "-g", default=False, action="store_true", help="Use gpu with lightgbm"
@@ -246,3 +251,11 @@ def min_trials_folds(x):
 
 def random_seed() -> int:
     return random.randint(1, 1000)
+
+
+def n_jobs(x) -> int:
+    if x == -1:
+        return x
+    if x < -1:
+        return psutil.cpu_count(logical=False) - 1
+    return x

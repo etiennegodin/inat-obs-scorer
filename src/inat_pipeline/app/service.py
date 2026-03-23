@@ -86,15 +86,6 @@ class ApplicationService:
 
     def train(self, args):
         logger.info("Starting training workflow")
-
-        # Catch if test mode
-        if args.test:
-            logger.info("Test mode, limited to 3 trials and 2 cv_folds")
-            n_trials = 3
-            cv_folds = 3
-        else:
-            n_trials = args.n_trials
-            cv_folds = args.cv_folds
         try:
             return train_workflow.execute(
                 self.deps,
@@ -103,8 +94,8 @@ class ApplicationService:
                 scaler=args.scaler,
                 encoder=args.encoder,
                 imputer=args.imputer,
-                n_trials=n_trials,
-                cv_folds=cv_folds,
+                n_trials=args.n_trials,
+                cv_folds=args.cv_folds,
                 random_seed=args.seed,
                 use_gpu=args.gpu,
             )
