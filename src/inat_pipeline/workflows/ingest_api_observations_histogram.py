@@ -38,17 +38,16 @@ def execute(deps: Dependencies, rate: int, ignore_not_found: bool) -> None:
         )
         items = df[SOURCE_KEY].to_list()
 
-        items = items[:2]
+        # Set years
         years = [y for y in range(2010, 2026)]
 
+        # Custom params
         params = {
             "place_id": 13336,
             "interval": "week",
             "date_field": "observed",
             "years": years,
         }
-
-        # fields = {"date_field=obser}
 
         if items:
             # Set up configs
@@ -57,8 +56,7 @@ def execute(deps: Dependencies, rate: int, ignore_not_found: bool) -> None:
                 id_param="taxon_id",
                 params=params,
                 write_empty_rows=ignore_not_found,
-                per_page=1000,
-                chunk_size=1,
+                per_page=1000,  # large per-page for all weeks in one response
             )
             fetcher = RateLimiterFetcher(rate=rate, ignore_not_found=ignore_not_found)
 
