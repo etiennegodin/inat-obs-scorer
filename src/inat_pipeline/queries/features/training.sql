@@ -21,14 +21,15 @@ SELECT
      --Temporal features
     b.created_at,
     date_part('day',b.obs_to_submit_lag_days) AS obs_to_submit_lag_days,
-    b.observed_week,
-    b.observed_day,
-    b.observed_year,
+    b.observed_week_sin,
+    b.observed_week_cos,
+    b.observed_month_sin,
+    b.observed_month_cos,
 
-    b.submitted_hour,
-    b.submitted_day,
-    b.submitted_week,
-    b.submitted_year,
+    b.submitted_week_sin,
+    b.submitted_week_cos,
+    b.submitted_month_sin,
+    b.submitted_month_cos
 
      --Observer features (from observer_features, computed at observation time)
          --Temporal
