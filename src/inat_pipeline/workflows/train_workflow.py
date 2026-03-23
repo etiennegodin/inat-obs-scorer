@@ -17,7 +17,7 @@ from sklearn.metrics import (
 
 from .. import train
 from ..app.container import Dependencies
-from ..train import explainability
+from ..train import explainability, ranking
 
 logger = logging.getLogger(__name__)
 
@@ -174,6 +174,24 @@ def execute(
             f.write(report)
         mlflow.log_artifact("classification_report.txt")
         Path("classification_report.txt").unlink()
+
+        # Ranking metrics
+        try:
+            ranking_curves_large = ranking.compute_ranking_curves(y_val, y_pred_proba)
+            ranking_curves_low = ranking.compute_ranking_curves(
+                y_val, y_pred_proba, k_values=[0.001, 0.005, 0.01, 0.02, 0.05]
+            )
+            ranking.plots.log_ranking(ranking_curves_large)
+            ranking.plots.log_plot_score_distribution(y_pred_proba)
+
+            mlflow.log_table(
+                data=ranking_curves_large, artifact_file="ranking_large.json"
+            )
+            mlflow.log_table(data=ranking_curves_low, artifact_file="ranking_low.json")
+
+        except Exception as e:
+            logger.error(e)
+            raise
 
         # ── 6. Features explainability ─────────────────────────────────────────────
         # Saves features explainability artifacts to mlflow
