@@ -1,7 +1,7 @@
 # inat-obs-scorer
 
 > **Expert Review Prioritization Engine for iNaturalist**
-> *Which "Needs ID" observations are most likely to reach Research Grade — and should be reviewed first?*
+> *Which "Needs ID" observations are most uncertain and should be reviewed first?*
 
 [![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/)
 [![LightGBM](https://img.shields.io/badge/model-LightGBM-brightgreen)](https://lightgbm.readthedocs.io/)
@@ -331,7 +331,6 @@ inat_pipeline/
 - Run manifest and pipeline lineage table (idempotent retries)
 
 ### 🔲 v0.4 — Additionnal features and routing
-- Rare species → expert routing
 - AWS S3 ingestion source migration to facilitate scope expansion
 - Additional feature directions:
   - Phenology alignment indicators
