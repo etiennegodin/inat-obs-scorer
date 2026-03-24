@@ -24,6 +24,10 @@ settled_at_window AS (
     SELECT 180, observation_id, is_rg FROM research_grade_windowed(INTERVAL '6 months')
     UNION ALL
     SELECT 365, observation_id, is_rg FROM research_grade_windowed(INTERVAL '1 year')
+    UNION ALL
+    SELECT 540, observation_id, is_rg FROM research_grade_windowed(INTERVAL '18 months')
+    UNION ALL
+    SELECT 730, observation_id, is_rg FROM research_grade_windowed(INTERVAL '2 years')
 
 )
 SELECT
