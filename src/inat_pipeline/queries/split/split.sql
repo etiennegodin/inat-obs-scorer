@@ -4,7 +4,7 @@ WITH params AS (
     SELECT
         CAST(:cutoff_date        AS DATE) AS cutoff_date,
         CAST(:val_start          AS DATE) AS val_start,    -- cutoff + gap
-        CAST(:val_end          AS DATE) AS val_end,    -- cutoff + gap
+        CAST(:val_end          AS DATE)   AS val_end,      -- cutoff + gap
         CAST(:test_start         AS DATE) AS test_start,   -- val_end + gap
         :max_val_size                     AS max_val_size,
         :max_test_size                    AS max_test_size

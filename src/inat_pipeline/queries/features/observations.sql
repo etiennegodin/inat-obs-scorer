@@ -88,7 +88,6 @@ aggregates AS(
         COUNT(DISTINCT("order")) OVER observer_history AS taxon_diversity_order,
         COUNT(DISTINCT(family)) OVER observer_history AS taxon_diversity_family,
         COUNT(DISTINCT(genus))  OVER observer_history AS taxon_diversity_genus,
-        COALESCE(COUNT(DISTINCT(species)) OVER observer_history,0) AS taxon_diversity_species,
 
         -- ── Community engagement received ────────────────────────────
         AVG(n_identifiers_at_window) OVER observer_history AS n_identifiers_mean,
@@ -132,17 +131,6 @@ ranked AS (
             PARTITION BY DATE_TRUNC('month', created_at)
             ORDER BY observer_reputation_raw
             ) AS observer_reputation_rank,
-
-        -- how much does this obs have more ids than others around same time
-        PERCENT_RANK() OVER (
-            PARTITION BY DATE_TRUNC('month', created_at)
-            ORDER BY n_identifiers_mean
-            ) AS n_identifiers_mean_rank,
-
-        PERCENT_RANK() OVER (
-            PARTITION BY DATE_TRUNC('month', created_at)
-                ORDER BY n_identifiers_agree_mean
-                ) AS n_identifiers_agree_mean_rank,
 
         FROM aggregates
 )

@@ -177,7 +177,6 @@ SELECT a.*,
     -- Relative stand
 
     -- Summary statistic
-    ROUND((1 - a.weighted_mean_neighbor_rg_rate) * LOG(a.similar_species_count + 1), 4) AS neighborhood_difficulty,
     ROUND((1 - a.nbor_rg_rate_inv_dist_weighted) * LOG(a.similar_species_count + 1), 4) AS neighborhood_difficulty_inv_dist
 
 
