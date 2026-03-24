@@ -1,4 +1,6 @@
 -- Run once per interval, union the results
+CREATE OR REPLACE TABLE eda.settlement AS
+
 WITH intervals AS (
     SELECT unnest([7, 14, 30, 60, 90, 180]) AS days
 ),
@@ -18,6 +20,11 @@ settled_at_window AS (
     SELECT 60, observation_id, is_rg FROM research_grade_windowed(INTERVAL '60 days')
     UNION ALL
     SELECT 90, observation_id, is_rg FROM research_grade_windowed(INTERVAL '90 days')
+    UNION ALL
+    SELECT 180, observation_id, is_rg FROM research_grade_windowed(INTERVAL '6 months')
+    UNION ALL
+    SELECT 365, observation_id, is_rg FROM research_grade_windowed(INTERVAL '1 year')
+
 )
 SELECT
     w.days,

@@ -25,19 +25,27 @@ def execute(deps: Dependencies):
             max_test_size=90000,
             gap_days=90,
         )
+        # Macros
+        sql_features.execute_many(
+            "community_taxon_windowed",
+            "research_grade_windowed",
+        )
+
+        # Label
+        sql_features.execute("label", params=params)
+
+        # Splits
         sql_split.execute("split", params=params)
         splits_report(sql_split, params)
 
+        # Confusion graphs
         sql_graph.execute("confusion_graph")
         sql_graph.execute("confusion_graph_metrics")
 
         # features with gap days :
-        sql_features.execute("label", params=params)
         sql_features.execute("network_events", params=params)
 
         sql_features.execute_many(
-            "community_taxon_windowed",
-            "research_grade_windowed",
             "network_events_stats",
             "user_role_timeline",
             "base",

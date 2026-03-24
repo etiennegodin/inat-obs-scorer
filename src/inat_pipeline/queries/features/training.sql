@@ -45,11 +45,7 @@ SELECT
         ob.rg_rate_is_reliable AS obv_rg_rate_is_reliable,
 
          --Identifiers interactions
-        ob.n_identifiers_agree_mean_rank AS obv_n_identifiers_agree_mean_rank,
-        ob.n_identifiers_mean_rank AS obv_n_identifiers_mean_rank,
          --Taxonomic
-        ob.taxon_diversity_species AS obv_tx_diversity_species,
-
         oe.observer_species_entropy_norm AS obv_tx_entropy,
         ob.observer_taxon_rg_rate_shrunk_at_t AS obv_tx_rg_rate,
         ob.observer_taxon_focus_rate AS obv_tx_focus_rate,
