@@ -374,6 +374,7 @@ inat_pipeline/
 ### 🔲 v0.3 — System design and serving
 - FastAPI inference endpoint (`POST /score`)
 - Cold-start fallback paths via precomputed inference cache
+- Triage queue filtering to P(RG) 0.2-0.85 band
 - Run manifest and pipeline lineage table (idempotent retries)
 - Schema drift assertions + lightweight feature versioning tied to MLflow runs
 - Pydantic models for config and schema enforcement
@@ -381,10 +382,10 @@ inat_pipeline/
 ### 🔲 v0.4 — Advanced features and routing
 - SHAP evaluation at borderline observations with incorrect classification
 - Additional feature directions:
+  - Attention proxy
   - Phenology alignment indicators
   - Observer × top-identifier expertise interaction term
   - Geographic range signal
-- Survival model (time-to-RG)
 - Rare species → expert routing
 - AWS S3 ingestion source migration to facilitate scope expansion
 
