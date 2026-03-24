@@ -23,6 +23,6 @@ def splits_report(sql: SQLEngine, params: TrainingSplitParams):
     print("\n", "-" * 50, "\n")
     print(df_splits)
     print(split_total, "observations in splits")
-    print(f"Lost {removed} observations ~{round((removed/true_total) * 100, 3)}%")
+    print(f"Lost {removed} observations ~{round((removed / true_total) * 100, 3)}%")
     print(f"Total observation available in val split {total_val_avail}")
     print("\n", "-" * 50, "\n")

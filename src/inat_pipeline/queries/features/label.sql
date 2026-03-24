@@ -1,6 +1,5 @@
 CREATE OR REPLACE TABLE features.label AS
 
---test
 SELECT
     * EXCLUDE (is_rg),
     is_rg AS label

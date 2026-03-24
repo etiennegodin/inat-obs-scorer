@@ -125,7 +125,7 @@ def make_objective(
                 roc_aucs.append(roc_auc)
                 pr_aucs.append(pr_auc)
 
-                logger.debug(f"Fold {fold_idx +1} / {config.cv_folds} done ")
+                logger.debug(f"Fold {fold_idx + 1} / {config.cv_folds} done ")
 
             elapsed = time.time() - start
             logger.debug(f"End cv {elapsed}")

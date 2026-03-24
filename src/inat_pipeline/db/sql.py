@@ -87,8 +87,7 @@ class SQLEngine(ABC):
         self.con.execute(query, values, script=script_name)
 
         logger.info(
-            f"Executed {script_name}.sql, "
-            f"took {round((time.monotonic() - start), 3)}s"
+            f"Executed {script_name}.sql, took {round((time.monotonic() - start), 3)}s"
         )
 
     def fetch(

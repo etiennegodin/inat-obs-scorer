@@ -118,7 +118,7 @@ def log_pca_loadings(pipeline, config, top_n: int = 8, n_components: int = 8):
 
     loadings_df = pd.DataFrame(
         components[:, top_feature_idx],
-        index=[f"PC{i+1} ({v:.1%})" for i, v in enumerate(explained_var)],
+        index=[f"PC{i + 1} ({v:.1%})" for i, v in enumerate(explained_var)],
         columns=[feature_names[i] for i in top_feature_idx],
     )
     fig, ax = plt.subplots(figsize=(max(12, top_n * 1.5), n_components * 0.9 + 2))
@@ -174,7 +174,7 @@ def log_shap_summary(
         )
     else:
         n_components = X_transformed.shape[1]
-        feature_names = [f"PC{i+1}" for i in range(n_components)]
+        feature_names = [f"PC{i + 1}" for i in range(n_components)]
 
     X_transformed_df = pd.DataFrame(X_transformed, columns=feature_names)
 

@@ -3,7 +3,7 @@ CREATE OR REPLACE TABLE features.observers_entropy AS
 WITH base_obs AS (
     -- Same base as features.observers — just pull what entropy needs
     SELECT
-        o.id        AS observation_id,
+        o.id AS observation_id,
         o.user_id,
         o.created_at,
         o.species
@@ -37,18 +37,18 @@ entropy AS (
         observation_id,
         user_id,
         total_obs,
-        cardinality(species_hist)    AS distinct_species_count,
+        cardinality(species_hist) AS distinct_species_count,
 
         list_reduce(
             list_transform(
                 map_values(species_hist),
                 c -> -(c::FLOAT / total_obs) * log2(c::FLOAT / total_obs)
             ),
-            (a,b) -> a + b
-        )  AS observer_species_entropy,
+            (a, b) -> a + b
+        ) AS observer_species_entropy,
         CASE
             WHEN distinct_species_count > 1
-            THEN observer_species_entropy / log2(distinct_species_count)
+                THEN observer_species_entropy / log2(distinct_species_count)
             ELSE 0
         END AS observer_species_entropy_norm
     FROM species_histograms

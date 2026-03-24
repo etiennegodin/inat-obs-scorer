@@ -39,9 +39,9 @@ class ParametrizedEndpointClient(BaseInatClient):
     """
 
     def __init__(self, config: EndpointConfig, fetcher, writer):
-        assert (
-            config.id_param is not None
-        ), "ParametrizedEndpointClient requires config.id_param"
+        assert config.id_param is not None, (
+            "ParametrizedEndpointClient requires config.id_param"
+        )
         super().__init__(config, fetcher, writer)
 
     def _iter_requests(self, ids: list) -> Iterator[tuple[Any, dict]]:

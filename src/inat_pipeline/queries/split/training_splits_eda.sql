@@ -2,10 +2,10 @@
 
 SELECT
     s.split,
-    COUNT(s.observation_id)                        AS n_obs,
-    ROUND(AVG(l.label::FLOAT), 3)      AS pos_rate
+    COUNT(s.observation_id) AS n_obs,
+    ROUND(AVG(l.label::FLOAT), 3) AS pos_rate
 
-FROM   features.splits s
+FROM features.splits s
 JOIN features.label l on s.observation_id = l.observation_id
 GROUP BY split
 ORDER BY n_obs DESC;
