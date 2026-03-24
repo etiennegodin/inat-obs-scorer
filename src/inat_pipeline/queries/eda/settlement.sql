@@ -11,7 +11,11 @@ settled_final AS (
 ),
 settled_at_window AS (
     -- What's RG at each checkpoint
-    SELECT 7  AS days, observation_id, is_rg FROM research_grade_windowed(INTERVAL '7 days')
+    SELECT 1  AS days, observation_id, is_rg FROM research_grade_windowed(INTERVAL '1 days')
+    UNION ALL
+    SELECT 3, observation_id, is_rg FROM research_grade_windowed(INTERVAL '14 days')
+    UNION ALL
+    SELECT 7, observation_id, is_rg FROM research_grade_windowed(INTERVAL '14 days')
     UNION ALL
     SELECT 14, observation_id, is_rg FROM research_grade_windowed(INTERVAL '14 days')
     UNION ALL
