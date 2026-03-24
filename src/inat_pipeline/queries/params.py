@@ -22,9 +22,9 @@ class IngestCSVParams:
 @dataclass
 class TrainingSplitParams:
     cutoff_date: date
-    label_window: int = 90
+    label_window_days: int = 90
     gap_days: int = 30
-    score_window: int = 14
+    score_window_days: int = 14
     val_window_days: int = 270
     max_val_size: int = 50000
     max_test_size: int = 80000
@@ -33,10 +33,11 @@ class TrainingSplitParams:
     test_start: int = field(init=False)
 
     def __post_init__(self):
+        # Assert score window is higher than label_window_days
+        assert self.gap_days >= self.score_window_days
+        assert self.label_window_days > self.score_window_days + self.gap_days
+
         # Dynamic date cutoffs based on gap days and val_window_days
         self.val_start = self.cutoff_date + timedelta(days=self.gap_days)
         self.val_end = self.val_start + timedelta(days=self.val_window_days)
         self.test_start = self.val_end + timedelta(days=self.gap_days)
-
-        # Assert score window is higher than label_window
-        assert self.gap_days >= self.score_window
