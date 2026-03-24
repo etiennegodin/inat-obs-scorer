@@ -33,6 +33,7 @@ def execute(deps: Dependencies):
             "community_taxon_windowed",
             "research_grade_windowed",
         )
+        sql_features.execute("identifications_at_window", params=params)
 
         # Label
         sql_features.execute("label", params=params)
@@ -56,7 +57,6 @@ def execute(deps: Dependencies):
         # Time-windowed features :
         sql_features.execute("taxon", params=params)
         sql_features.execute("observations", params=params)
-        sql_features.execute("identifications_at_window", params=params)
 
         # With dependencies
         sql_features.execute_many(

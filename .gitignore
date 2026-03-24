@@ -32,6 +32,8 @@ notebooks/*
 *.parquet
 *.zip
 
+.sqlfluffignore
+
 # Data
 data/*
 !data/*.dvc

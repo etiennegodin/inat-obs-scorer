@@ -1,7 +1,7 @@
 -- features/identifications_at_window.sql
 --
 -- Point-in-time identification dynamics features.
--- Anchored at created_at + :score_window_days — the inference moment.
+-- Anchored at created_at +  — the inference moment.
 --
 -- Parameter : score_window_days  INT  (e.g. 7)
 --
@@ -10,8 +10,15 @@
 --             research_grade_windowed(eval_interval) macro
 
 CREATE OR REPLACE TABLE features.identifications_at_window AS
+WITH params AS (
 
-WITH window_ids AS (
+    SELECT
+
+    to_days(:score_window_days) AS score_window_days,
+
+),
+
+window_ids AS (
 
     SELECT
         i.observation_id,
@@ -26,11 +33,12 @@ WITH window_ids AS (
         ) AS id_seq
 
     FROM staged.identifications i
+    CROSS JOIN params p
     JOIN staged.observations     o ON i.observation_id = o.id
 
     WHERE i."current" IS TRUE
       AND i.own_observation IS FALSE                              -- external IDs only
-      AND i.created_at <= o.created_at + to_days(:score_window_days)
+      AND i.created_at <= o.created_at + p.score_window_days
 
 ),
 
@@ -72,9 +80,10 @@ community_state AS (
         community_taxon_id IS NOT NULL                      AS has_community_taxon_at_window,
         consensus_level_rg                                  AS community_consensus_at_window,
         -- NULL-safe equality: handles observations with no community taxon yet
+    -- sqlfluff:off
         community_taxon_id IS NOT DISTINCT FROM taxon_id   AS community_matches_submitted_at_window
-
-    FROM research_grade_windowed(to_days(:score_window_days))
+    FROM research_grade_windowed((SELECT score_window_days FROM params))
+    -- sqlfluff:on
 
 )
 
