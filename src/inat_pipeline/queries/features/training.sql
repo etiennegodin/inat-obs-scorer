@@ -96,6 +96,7 @@ SELECT
     COALESCE(t.genus_rg_rate,0)  AS tx_genus_rg_rate,
     COALESCE(t.family_rg_rate,0) AS tx_family_rg_rate,
     t.taxon_avg_ids_to_rg AS tx_avg_ids_to_rg,
+    t.taxon_id_source,
 
      --Fixed Taxon confusion stats
     IFNULL(c.has_similar_species, FALSE)    AS tx_conf_has_similar,

@@ -183,6 +183,6 @@ SELECT a.*,
 
 FROM aggregates a
 JOIN nbor_taxa_diversity     n ON n.taxon_id = a.taxon_id
-JOIN staged.taxa_assymetry s ON s.taxon_id = a.taxon_id
+JOIN staged.taxa_asymmetry s ON s.taxon_id = a.taxon_id
 JOIN ranked                  r ON r.focal_taxon_id = a.taxon_id
 WHERE r.is_focal = TRUE

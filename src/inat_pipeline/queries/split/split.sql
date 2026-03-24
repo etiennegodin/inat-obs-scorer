@@ -21,7 +21,8 @@ base AS(
 -- Everything before cutoff is train.
 train_obs AS (
     SELECT observation_id, 'train' AS split
-    FROM   base, params p
+    FROM   base
+    CROSS JOIN params p
     WHERE  created_at < p.cutoff_date
 ),
 
@@ -32,7 +33,8 @@ val_obs AS (
     FROM (
         SELECT observation_id,
                ROW_NUMBER() OVER (ORDER BY created_at, MD5(observation_id::TEXT)) AS rn
-        FROM   base, params p
+        FROM   base
+        CROSS JOIN params p
         WHERE  created_at >= p.val_start
           AND  created_at < p.val_end
     ) ranked, params p
@@ -45,7 +47,8 @@ test_obs AS (
     FROM (
         SELECT observation_id,
                ROW_NUMBER() OVER (ORDER BY created_at, MD5(observation_id::TEXT)) AS rn
-        FROM   base, params p
+        FROM   base,
+        CROSS JOIN params p
         WHERE  created_at >= p.test_start
     ) ranked, params p
     WHERE rn <= p.max_test_size

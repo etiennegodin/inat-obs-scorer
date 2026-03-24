@@ -394,6 +394,7 @@ inat_pipeline/
 
 - Currently scoped to **Plantae** observations in **Québec**
 - Identifier-level features are not yet implemented; observer features serve as a proxy
+- taxa_confusion featrues are not point in time, assumes statis background knowledge
 - `taxon_avg_ids_to_rg` uses the final scraped ID count rather than a true point-in-time count, introducing mild upward bias for recent observations. The effect is partially attenuated by the `1 PRECEDING` window boundary and the front-loaded nature of iNaturalist identification activity
 - CV fold boundaries do not include gap buffers — gap buffer logic is applied to the final train/val/test split only
 

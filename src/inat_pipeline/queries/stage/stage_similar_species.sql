@@ -33,7 +33,7 @@ FROM unpacked;
 -- 2 Compute taxa assymetry
 
 
-CREATE OR REPLACE TABLE staged.taxa_assymetry AS
+CREATE OR REPLACE TABLE staged.taxa_asymmetry AS
 WITH child_nodes AS(
     SELECT DISTINCT similar_taxon_id AS node_id
     FROM staged.similar_species

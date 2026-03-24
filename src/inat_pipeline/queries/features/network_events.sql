@@ -1,4 +1,4 @@
-CREATE OR REPLACE TABLE graph.network_events AS
+CREATE OR REPLACE TABLE graph.network_events_raw AS
 
 -- Observer perspective: "I received an ID on my observation"
 SELECT

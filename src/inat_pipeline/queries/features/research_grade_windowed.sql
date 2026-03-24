@@ -37,7 +37,7 @@ SELECT
         WHEN LENGTH(o.observation_photos) = 0      THEN FALSE
         WHEN o.captive_cultivated 0                THEN FALSE
         -- Community taxon doesn't match submitted taxon
-        WHEN t.community_taxon != o.taxon_id       THEN FALSE
+        WHEN t.community_taxon != o.taxon_id       THEN TRUE
         ELSE TRUE
 
     END AS verifiable,
