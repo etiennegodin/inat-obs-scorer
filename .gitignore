@@ -30,6 +30,7 @@ notebooks/*
 *.log
 *.sh
 *.parquet
+*.zip
 
 # Data
 data/*

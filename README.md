@@ -7,7 +7,6 @@
 [![LightGBM](https://img.shields.io/badge/model-LightGBM-brightgreen)](https://lightgbm.readthedocs.io/)
 [![MLflow](https://img.shields.io/badge/tracking-MLflow-orange)](https://mlflow.org/)
 [![DuckDB](https://img.shields.io/badge/storage-DuckDB-yellow)](https://duckdb.org/)
-[![ROC-AUC](https://img.shields.io/badge/ROC--AUC-0.88-success)]()
 
 ---
 
@@ -19,7 +18,7 @@ This project builds a **binary classifier** that scores each open "Needs ID" obs
 
 **Highlights:** temporal-safe label re-derivation from iNaturalist's identification
 algorithm · Bayesian-shrunk taxon difficulty features · Protocol-based async enrichment
-pipeline · 98.2% precision at 500 observations reviewed · ROC-AUC 0.88 on out-of-time val set.
+pipeline
 
 ### Problem framing
 
@@ -82,7 +81,7 @@ Most ML pipelines guard against one form of leakage. This project explicitly ide
 | **Label leakage** | Scraped `quality_grade` reflects current state, not state at prediction time | RG label re-derived from windowed identification history via DuckDB table macro |
 | **Feature leakage** | Aggregating observer/taxon stats across the full dataset contaminates past observations with future signal | All window functions bounded to `created_at` |
 | **Split leakage** | Shuffling within temporal partitions destroys gap buffer integrity | Hard date-range boundaries from `SplitConfig`; val/test rows ordered by `created_at`, never shuffled |
-| **CV split leakage** | Standard K-fold with shuffling violates temporal structure, producing optimistically biased estimates | Custom `ExpandingWindowCvSplit(BaseCrossValidator)` — equal-chunk expanding window, sklearn-compatible, with a `gap_size` hook designed in; gap buffer not yet active — see [Scope & Limitations](#scope--limitations) |
+| **CV split leakage** | Standard K-fold with shuffling violates temporal structure, producing optimistically biased estimates | Custom `ExpandingWindowCvSplit(BaseCrossValidator)` — equal-chunk expanding window, sklearn-compatible, with a `gap_size` hook designed in
 
 ### 2. Research Grade — a two-stage label
 
@@ -174,54 +173,6 @@ inat_pipe train \
 | Data versioning | DVC |
 | Validation *(v0.3)* | Pydantic models for config and schema enforcement |
 | Serving *(v0.3)* | FastAPI |
-
-**Current performance**: ROC-AUC **0.88** on out-of-time val set.
-
----
-
-## Ranking Performance
-
-ROC-AUC measures discrimination globally, but the operational question is different:
-**given a fixed review budget, how precisely does the model surface genuine RG candidates?**
-
-Expert identifier time is the scarce resource. The realistic daily capacity of a small
-identifier team is in the hundreds of observations, not tens of thousands. The model is
-evaluated accordingly.
-
-| k (reviewed) | n | precision@k | recall@k | lift@k |
-|---|---|---|---|---|
-| 0.1% | 50 | 100.0% | 0.19% | 1.91× |
-| 0.5% | 250 | 98.0% | 0.94% | 1.87× |
-| **1%** | **500** | **98.2%** | **1.88%** | **1.88×** |
-| 2% | 1,000 | 98.6% | 3.77% | 1.88× |
-| 5% | 2,500 | 98.5% | 9.42% | 1.88× |
-| 10% | 5,000 | 97.1% | 18.6% | 1.86× |
-| 20% | 10,000 | 94.3% | 36.0% | 1.80× |
-| 50% | 25,000 | 82.3% | 78.6% | 1.57× |
-
----
-
-![Ranking metrics](docs/ranking_metrics.png)
-
-At 500 observations reviewed (1% of queue), **98.2% are genuine RG candidates** —
-the model produces near-zero wasted expert effort in the operational budget range.
-Precision stays above 98% all the way to 2,500 reviews; recall is the binding constraint
-at this scale.
-
-### What the metrics imply for next features
-
-The lift curve flattens around 1.88× across the entire operational zone (50–2,500 reviews),
-suggesting the model has saturated its current signal for the highest-confidence observations.
-Gains at low-k will require features that better separate the *hardest true positives*
-from *easy negatives* — the boundary cases the model currently hedges on. High-priority
-feature directions:
-
-- **ID velocity signals**: time-to-first-ID and identification burst patterns — fast early
-  agreement is a strong prior for RG that current features don't directly encode
-- **Observer × taxon interaction**: an observer's track record on *this specific taxon*,
-  not just their global RG rate
-- **Phenology alignment**: whether the observation date is consistent with expected
-  seasonal occurrence for the taxon
 
 ## Data Pipeline CLI
 
@@ -374,29 +325,23 @@ inat_pipeline/
 ### 🔲 v0.3 — System design and serving
 - FastAPI inference endpoint (`POST /score`)
 - Cold-start fallback paths via precomputed inference cache
-- Triage queue filtering to P(RG) 0.2-0.85 band
-- Run manifest and pipeline lineage table (idempotent retries)
+- Triage queue filtering
 - Schema drift assertions + lightweight feature versioning tied to MLflow runs
 - Pydantic models for config and schema enforcement
+- Run manifest and pipeline lineage table (idempotent retries)
 
-### 🔲 v0.4 — Advanced features and routing
-- SHAP evaluation at borderline observations with incorrect classification
+### 🔲 v0.4 — Additionnal features and routing
+- Rare species → expert routing
+- AWS S3 ingestion source migration to facilitate scope expansion
 - Additional feature directions:
-  - Attention proxy
   - Phenology alignment indicators
   - Observer × top-identifier expertise interaction term
   - Geographic range signal
-- Rare species → expert routing
-- AWS S3 ingestion source migration to facilitate scope expansion
-
 ---
 
 ## Scope & Limitations
 
 - Currently scoped to **Plantae** observations in **Québec**
-- Identifier-level features are not yet implemented; observer features serve as a proxy
-- `taxon_avg_ids_to_rg` uses the final scraped ID count rather than a true point-in-time count, introducing mild upward bias for recent observations. The effect is partially attenuated by the `1 PRECEDING` window boundary and the front-loaded nature of iNaturalist identification activity
-- CV fold boundaries do not include gap buffers — gap buffer logic is applied to the final train/val/test split only
 
 ---
 
