@@ -45,6 +45,8 @@ class DuckDBAdapter:
             return self._con.execute(query, params)
         except duckdb.ParserException as e:
             raise DBError(str(e), script=script, details={"params": params}) from e
+        except duckdb.InvalidInputException as e:
+            raise DBError(str(e), script=script, details={"params": params}) from e
         except duckdb.CatalogException as e:
             raise DBError(str(e), script=script) from e
         except duckdb.BinderException as e:

@@ -13,6 +13,10 @@ authors = [{ name="Etienne Godin", email="etiennegodin@duck.com" }]
 
 dependencies = [
     "pandas",
+    "numpy",
+    "matplotlib",
+    "plotly",
+    "jupyterlab",
     "scikit-learn",
     "lightgbm",
     "optuna",
@@ -25,7 +29,8 @@ dependencies = [
     "aiohttp",
     "aiofiles",
     "aiolimiter",
-    "duckdb",
+    "duckdb == 1.4.3",
+    "seaborn"
 
 
 
@@ -37,7 +42,10 @@ dev = [
     "pytest-cov",
     "pytest-dependency",
     "ruff",
-    "sqlfluff","dvc",
+    "sqlfluff",
+    "dvc",
+    "jupyterlab"
+
 ]
 
 [project.scripts]   # <-- entry point CLI
