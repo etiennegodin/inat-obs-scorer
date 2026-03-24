@@ -1,6 +1,10 @@
 CREATE OR REPLACE TABLE features.observations AS
+WITH config AS (
+    SELECT to_days(:score_window) AS window_val
 
-WITH base_obs AS(
+),
+
+base_obs AS(
     SELECT
         o.id                      AS observation_id,
         o.user_id,
@@ -28,7 +32,7 @@ WITH base_obs AS(
     JOIN features.taxon t
         ON t.observation_id = o.id
     -- All identifications within score window
-    LEFT JOIN research_grade_windowed(to_days(:score_window) rg
+    LEFT JOIN research_grade_windowed((SELECT window_val FROM config)) rg
         ON rg.observation_id = o.id
 ),
 

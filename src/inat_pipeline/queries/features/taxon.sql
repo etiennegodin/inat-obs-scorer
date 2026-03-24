@@ -1,7 +1,11 @@
 CREATE OR REPLACE TABLE features.taxon AS
 
+WITH config AS (
+    SELECT to_days(:score_window) AS window_val
 
-WITH base AS (
+),
+
+base AS (
     SELECT
         rg.observation_id,
         -- use computed taxon_id first, if null fallback to observation_id
@@ -19,8 +23,8 @@ WITH base AS (
         t.genus_id,
         t.family_id,
         t.order_id,
-        t.rank_level
-    FROM research_grade_windowed(to_days(:score_window)) rg
+        t.rank_level,
+    FROM research_grade_windowed((SELECT window_val FROM config)) rg
     LEFT JOIN staged.taxa t ON rg.taxon_id = t.taxon_id
 ),
 
@@ -59,19 +63,6 @@ aggregates AS(
         AVG(n_ids_at_window) FILTER (WHERE is_rg) OVER taxon_history, 0
     ) AS taxon_avg_ids_to_rg,
 
-
-    /*
-        COALESCE(
-    AVG(n_ids_at_window) FILTER (
-        WHERE is_rg
-        AND created_at < current_obs.created_at - INTERVAL '90 days'
-    ) OVER taxon_history,
-    0
-    ) AS taxon_avg_ids_to_rg
-    */
-
-
-
     -- Global prior
     AVG(is_rg::FLOAT) OVER (
         ORDER BY created_at
@@ -97,13 +88,13 @@ rates AS(
     family_rg_obs::FLOAT / NULLIF(family_obs_count, 0) AS family_rg_rate,
     order_rg_obs::FLOAT  / NULLIF(order_obs_count, 0)  AS order_rg_rate,
 
-
     -- Hierarchical prior for shrinkage
     -- 0.5 cold start fallback
     COALESCE(genus_rg_rate, family_rg_rate, order_rg_rate, global_rg_rate, 0.5) AS hierarchical_prior,
 
     (10 * hierarchical_prior + taxon_rg_obs) / (10 + taxon_obs_count) AS taxon_rg_rate_shrunk,
     global_rg_rate,
+
     -- Which level actually provided the prior
     CASE
         WHEN genus_rg_rate  > 0 THEN 1
@@ -113,6 +104,7 @@ rates AS(
         ELSE 5
     END AS rg_rate_prior_source,
 
+    -- Flag cold start if few observations
     CASE WHEN taxon_obs_count  < 30 THEN TRUE ELSE FALSE END AS taxon_cold_start,
 
     -- Popularity of taxon hierarchy at this time
