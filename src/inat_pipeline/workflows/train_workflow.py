@@ -9,9 +9,11 @@ import optuna
 from mlflow.models.signature import infer_signature
 from sklearn.metrics import (
     accuracy_score,
+    auc,
     average_precision_score,
     classification_report,
     f1_score,
+    precision_recall_curve,
     roc_auc_score,
 )
 
@@ -157,8 +159,12 @@ def execute(
         y_pred = final_model.predict(X_val)
         y_pred_proba = final_model.predict_proba(X_val)[:, 1]
 
+        precision, recall, thresholds = precision_recall_curve(y_val, y_pred_proba)
+        pr_auc = auc(recall, precision)
+
         test_metrics = {
             "test/test_roc_auc": roc_auc_score(y_val, y_pred_proba),
+            "test/test_pr_auc": pr_auc,
             "test/test_avg_precision": average_precision_score(y_val, y_pred_proba),
             "test/test_f1": f1_score(y_val, y_pred),
             "test/test_accuracy": accuracy_score(y_val, y_pred),

@@ -6,7 +6,7 @@ import mlflow
 import numpy as np
 import optuna
 import pandas as pd
-from sklearn.model_selection import cross_val_score
+from sklearn.metrics import auc, precision_recall_curve, roc_auc_score
 
 from .config import PipelineConfig
 from .core import ExpandingWindowCvSplit, build_pipeline
@@ -99,26 +99,45 @@ def make_objective(
             # ── Step 3: Cross-validate ────────────────────────────────────────────
 
             start = time.time()
-            logger.debug("Start tscv")
+            logger.debug("Start cv")
 
-            logger.debug(custom_cv)
+            roc_aucs = []
+            pr_aucs = []
 
-            scores = cross_val_score(
-                pipeline,
-                X_train,
-                y_train,
-                cv=custom_cv,
-                scoring=config.scoring_metric,
-                n_jobs=1,  # paralellism use in lightbm vs fold
-                error_score="raise",
-            )
+            for fold_idx, (train_idx, val_idx) in enumerate(custom_cv.split(X_train)):
+                X_train_fold = X_train.iloc[train_idx]
+                y_train_fold = y_train.iloc[train_idx]
+
+                X_val_fold = X_train.iloc[val_idx]
+                y_val_fold = y_train.iloc[val_idx]
+
+                pipeline.fit(X_train_fold, y_train_fold)
+
+                y_pred = pipeline.predict_proba(X_val_fold)[:, 1]
+
+                # --- Metrics ---
+                roc_auc = roc_auc_score(y_val_fold, y_pred)
+                precision, recall, thresholds = precision_recall_curve(
+                    y_val_fold, y_pred
+                )
+                pr_auc = auc(recall, precision)
+
+                roc_aucs.append(roc_auc)
+                pr_aucs.append(pr_auc)
+
+                logger.debug(f"Fold {fold_idx +1} / {config.cv_folds} done ")
+
             elapsed = time.time() - start
             logger.debug(f"End cv {elapsed}")
 
-            mean_score = float(np.mean(scores))
-            std_score = float(np.std(scores))
+            roc_auc_mean = float(np.mean(roc_aucs))
+            roc_auc_std = float(np.std(roc_aucs))
 
-            logger.debug(f"Mean score {mean_score}")
+            pr_auc_mean = float(np.mean(pr_aucs))
+            pr_auc_std = float(np.std(pr_aucs))
+
+            logger.debug(f"ROC-AUC: {roc_auc_mean}")
+            logger.debug(f"PR-AUC: {pr_auc_mean}")
 
             # ── Step 4: Log this trial as a child MLflow run ──────────────────────
             with mlflow.start_run(
@@ -129,18 +148,20 @@ def make_objective(
                 mlflow.log_params({f"trial_{k}": v for k, v in trial_params.items()})
                 mlflow.log_metrics(
                     {
-                        f"cv_{config.scoring_metric}_mean": mean_score,
-                        f"cv_{config.scoring_metric}_std": std_score,
+                        "cv_roc_auc_mean": roc_auc_mean,
+                        "cv_roc_auc_std": roc_auc_std,
+                        "cv_pr_auc_mean": pr_auc_mean,
+                        "cv_pr_auc_std": pr_auc_std,
                         "cv_duration_seconds": elapsed,
                     }
                 )
-
             print(
-                f"  Trial {trial.number:3d}: {config.scoring_metric}={mean_score:.4f} "
-                f"±{std_score:.4f}  [{elapsed:.1f}s]"
+                f"  Trial {trial.number:3d}: roc_auc={roc_auc_mean:.4f}"
+                f" ±{roc_auc_std:.4f} | pr_auc = {pr_auc_mean:.4f}"
+                f" ±{pr_auc_std:.4f} [{elapsed:.1f}s]"
             )
 
-            return mean_score  # Optuna maximizes this
+            return roc_auc_mean  # Optuna maximizes this
         except Exception as e:
             logger.error(f"Error on trial #{trial.number}: {e}")
             raise
