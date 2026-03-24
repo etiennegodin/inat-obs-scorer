@@ -60,18 +60,22 @@ strict = true
 [tool.pytest.ini_options]
 # Updated the cov path to match your project name
 addopts = "--cov=src/inat_pipeline --cov-report=term-missing --cov-report=html"
-
 [tool.sqlfluff.core]
 dialect = "duckdb"
-templater = "jinja"
-exclude_path = "target/,venv/"
+templater = "placeholder"
+rules = "layout"
+exclude_rules = "AM04, AL05, LT05"
 
-[tool.sqlfluff.indentation]
-tab_space_size = 4
-indented_joins = false
+[tool.sqlfluff.templater.placeholder]
+param_style = "colon"
 
 [tool.sqlfluff.layout.type.comma]
 spacing_before = "touch"
+
+[tool.sqlfluff.layout.type.colon]
+# This is perfect for keeping :param and ::INT compact
+spacing_before = "touch"
+spacing_after = "touch"
 
 [tool.sqlfluff.rules.capitalisation.keywords]
 capitalisation_policy = "upper"
