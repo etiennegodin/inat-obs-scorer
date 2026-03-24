@@ -36,6 +36,7 @@ def execute(deps: Dependencies):
 
         # Label
         sql_features.execute("label", params=params)
+
         # Splits
         sql_split.execute("split", params=params)
         splits_report(sql_split, params)
@@ -55,6 +56,7 @@ def execute(deps: Dependencies):
         # Time-windowed features :
         sql_features.execute("taxon", params=params)
         sql_features.execute("observations", params=params)
+        sql_features.execute("identifications_at_window", params=params)
 
         # With dependencies
         sql_features.execute_many(

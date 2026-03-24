@@ -21,6 +21,14 @@ dependencies = [
     "shap",
     "sqlparams",
     "psutil",
+    "requests",
+    "aiohttp",
+    "aiofiles",
+    "aiolimiter",
+    "duckdb","mlflow","shap", "sqlparams"
+
+
+
 
 ]
 
@@ -30,7 +38,7 @@ dev = [
     "pytest-cov",
     "pytest-dependency",
     "ruff",
-    "sqlfluff"
+    "sqlfluff","dvc",
 ]
 
 [project.scripts]   # <-- entry point CLI
