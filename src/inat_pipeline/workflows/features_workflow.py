@@ -4,7 +4,6 @@ from datetime import date
 from ..app.container import Dependencies
 from ..db import DuckDBAdapter, DuckDbSQL
 from ..queries.params import TrainingSplitParams
-from ..utils.splits import splits_report
 
 logger = logging.getLogger(__name__)
 
@@ -24,8 +23,11 @@ def execute(deps: Dependencies):
             val_window_days=250,
             max_test_size=90000,
             gap_days=90,
+            score_window=14,
         )
-        # Macros
+        """
+
+        # Macros registering
         sql_features.execute_many(
             "community_taxon_windowed",
             "research_grade_windowed",
@@ -33,24 +35,28 @@ def execute(deps: Dependencies):
 
         # Label
         sql_features.execute("label", params=params)
-
         # Splits
         sql_split.execute("split", params=params)
         splits_report(sql_split, params)
 
-        # Confusion graphs
+        # Static features
         sql_graph.execute("confusion_graph")
         sql_graph.execute("confusion_graph_metrics")
+        sql_features.execute("network_events_raw", params=params)
 
-        # features with gap days :
-        sql_features.execute("network_events", params=params)
-
+        # Bases and non paramterised queries
         sql_features.execute_many(
-            "network_events_stats",
+            "network_events",
             "user_role_timeline",
             "base",
-            "taxon",
-            "observations",
+        )
+        """
+        # Time-windowed features :
+        sql_features.execute("taxon", params=params)
+        sql_features.execute("observations", params=params)
+
+        # With dependencies
+        sql_features.execute_many(
             "identifications",
             "taxa_confusion",
             "observers_entropy",

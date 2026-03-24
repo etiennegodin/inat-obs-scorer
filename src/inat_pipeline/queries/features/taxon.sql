@@ -20,7 +20,7 @@ WITH base AS (
         t.family_id,
         t.order_id,
         t.rank_level
-    FROM research_grade_windowed(INTERVAL '999 years') rg
+    FROM research_grade_windowed(to_days(:score_window)) rg
     LEFT JOIN staged.taxa t ON rg.taxon_id = t.taxon_id
 ),
 

@@ -27,8 +27,8 @@ WITH base_obs AS(
         ON o.user_id = u.user_id
     JOIN features.taxon t
         ON t.observation_id = o.id
-    -- Unbounded window = all identifications ever, for current-state scoring
-    LEFT JOIN research_grade_windowed(INTERVAL '999 years') rg
+    -- All identifications within score window
+    LEFT JOIN research_grade_windowed(to_days(:score_window) rg
         ON rg.observation_id = o.id
 ),
 
