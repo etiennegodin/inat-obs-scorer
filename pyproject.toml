@@ -30,6 +30,7 @@ dev = [
     "pytest-cov",
     "pytest-dependency",
     "ruff",
+    "sqlfluff"
 ]
 
 [project.scripts]   # <-- entry point CLI
@@ -59,3 +60,18 @@ strict = true
 [tool.pytest.ini_options]
 # Updated the cov path to match your project name
 addopts = "--cov=src/inat_pipeline --cov-report=term-missing --cov-report=html"
+
+[tool.sqlfluff.core]
+dialect = "duckdb"
+templater = "jinja"
+exclude_path = "target/,venv/"
+
+[tool.sqlfluff.indentation]
+tab_space_size = 4
+indented_joins = false
+
+[tool.sqlfluff.layout.type.comma]
+spacing_before = "touch"
+
+[tool.sqlfluff.rules.capitalisation.keywords]
+capitalisation_policy = "upper"
