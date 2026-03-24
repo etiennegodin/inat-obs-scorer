@@ -4,6 +4,7 @@ from datetime import date
 from ..app.container import Dependencies
 from ..db import DuckDBAdapter, DuckDbSQL
 from ..queries.params import TrainingSplitParams
+from ..utils.splits import splits_report
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +26,6 @@ def execute(deps: Dependencies):
             gap_days=90,
             score_window=14,
         )
-        """
 
         # Macros registering
         sql_features.execute_many(
@@ -50,7 +50,7 @@ def execute(deps: Dependencies):
             "user_role_timeline",
             "base",
         )
-        """
+
         # Time-windowed features :
         sql_features.execute("taxon", params=params)
         sql_features.execute("observations", params=params)

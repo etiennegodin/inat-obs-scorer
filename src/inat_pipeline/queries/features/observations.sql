@@ -1,6 +1,6 @@
 CREATE OR REPLACE TABLE features.observations AS
 WITH config AS (
-    SELECT to_days(:score_window) AS window_val
+    SELECT to_days(:gap_days) AS window_val
 
 ),
 

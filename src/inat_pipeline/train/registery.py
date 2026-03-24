@@ -62,7 +62,7 @@ CLASSIFIER_REGISTRY = {
     "lightgbm": (
         "lightgbm",
         "LGBMClassifier",
-        {"verbose": -1, "n_estimators": 500},
+        {"verbose": -1, "n_estimators": 500, "bagging_freq": 1},
     ),
 }
 
@@ -143,11 +143,6 @@ SEARCH_SPACES = {
             "log": True,
         },
         # Subsampling
-        "classifier__bagging_freq": {
-            "type": "int",
-            "low": 1,
-            "high": 2,
-        },
         "classifier__subsample": {
             "type": "float",
             "low": 0.5,

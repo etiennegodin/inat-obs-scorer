@@ -56,7 +56,7 @@ def execute(
         use_gpu=use_gpu,
         version=deps.version,
         n_jobs=n_jobs,
-        # experiment_name= deps.git_branch
+        experiment_name="inat_obs_scorer_v0_2",
     )
 
     # ── 1. Data & Config setup ─────────────────────────────────────────────────

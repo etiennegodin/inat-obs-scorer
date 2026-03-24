@@ -13,7 +13,6 @@ SELECT
     b.has_description,
     b.has_tags,
     b.tag_count,
-    b.has_license,
     b.positional_accuracy_m,
     b.geoprivacy IS NOT NULL                AS geoprivacy_set,
     COALESCE(b.oauth_application_id,0)      AS oauth_application_id,
@@ -23,13 +22,9 @@ SELECT
     date_part('day',b.obs_to_submit_lag_days) AS obs_to_submit_lag_days,
     b.observed_week_sin,
     b.observed_week_cos,
-    b.observed_month_sin,
-    b.observed_month_cos,
 
     b.submitted_week_sin,
     b.submitted_week_cos,
-    b.submitted_month_sin,
-    b.submitted_month_cos,
 
      --Observer features (from observer_features, computed at observation time)
          --Temporal
@@ -92,7 +87,6 @@ SELECT
     COALESCE(t.genus_rg_rate,0)  AS tx_genus_rg_rate,
     COALESCE(t.family_rg_rate,0) AS tx_family_rg_rate,
     t.taxon_avg_ids_to_rg AS tx_avg_ids_to_rg,
-    t.taxon_id_source,
 
      --Fixed Taxon confusion stats
     IFNULL(c.has_similar_species, FALSE)    AS tx_conf_has_similar,
@@ -101,10 +95,8 @@ SELECT
 
     c.similar_species_count AS tx_conf_similar_species_count,
 
-    c.nbor_obs_count_sum AS tx_conf_nbrhd_obs_count_sum,
     c.nbor_obs_count_mean AS tx_conf_nbrhd_obs_count_mean,
     c.nbor_obs_count_std AS tx_conf_nbrhd_obs_count_std,
-    c.nbor_obs_count_max AS tx_conf_nbrhd_obs_count_max,
 
     c.nbor_rg_rate_mean AS tx_conf_nbrhd_rg_rate_mean,
     c.nbor_rg_rate_std AS tx_conf_nbrhd_rg_rate_std,
@@ -112,8 +104,6 @@ SELECT
     --c.weighted_mean_neighbor_rg_rate,
     c.nbor_rg_rate_inv_dist_weighted AS tx_conf_nbrhd_rg_rate_inv_dist_weighted,
 
-
-    c.nbor_dist_max AS tx_conf_nbrhd_dist_max,
     c.nbor_dist_mean AS tx_conf_nbrhd_dist_mean,
 
     c.rg_rate_vs_neighbors AS tx_conf_rate_vs_neighbors,
