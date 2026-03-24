@@ -21,6 +21,7 @@ class PipelineConfig:
     features: list = field(default_factory=list)
     numeric_features: list = field(default_factory=list)
     categorical_features: list = field(default_factory=list)
+    passthrough_features: list = field(default_factory=list)
     features_types: list = field(default_factory=lambda: ["numeric", "categorical"])
 
     # ── Module selection (keys into the registries above) ─────────────────────
@@ -62,6 +63,12 @@ class PipelineConfig:
         self.categorical_features = df.select_dtypes(include="object").columns.to_list()
         self.numeric_features = df.select_dtypes(include="number").columns.to_list()
 
+        try:
+            self._force_passthrough_features()
+        except Exception as e:
+            logger.error(e)
+            raise
+
     def set_git_hash(self, git_hash: str):
         self.git_hash = git_hash
 
@@ -82,3 +89,14 @@ class PipelineConfig:
     def to_dict(self) -> dict:
         """Serialize config for logging to MLflow."""
         return asdict(self)
+
+    def _force_passthrough_features(self):
+        """Force passthroughts features out of"
+        numerical and categorical features list"""
+        num_set = set(self.numeric_features)
+        cat_set = set(self.categorical_features)
+        pass_set = set(self.passthrough_features)
+
+        self.numeric_features = list(num_set - pass_set)
+        self.categorical_features = list(cat_set - pass_set)
+        self.passthrough_features = list(pass_set)
