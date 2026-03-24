@@ -1,7 +1,7 @@
 CREATE OR REPLACE TABLE features.taxon AS
 
 WITH config AS (
-    SELECT to_days(:gap_days) AS window_val
+    SELECT to_days(:label_window) AS window_val
 
 ),
 

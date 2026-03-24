@@ -12,7 +12,7 @@ SELECT
     i.category,
     l.label AS is_rg,
     -- outcome is only "known" if the obs was old enough when the ID was left
-    CASE WHEN i.created_at - o.created_at > to_days(:gap_days)
+    CASE WHEN i.created_at - o.created_at > to_days(:label_window)
          THEN 1 ELSE 0 END  AS outcome_settled
 
 FROM staged.identifications i
@@ -36,7 +36,7 @@ SELECT
     i.category,
     l.label AS is_rg,
     -- outcome is only "known" if the obs was old enough when the ID was left
-    CASE WHEN i.created_at - o.created_at > to_days(:gap_days)
+    CASE WHEN i.created_at - o.created_at > to_days(:label_window)
          THEN 1 ELSE 0 END  AS outcome_settled
 
 FROM staged.identifications i

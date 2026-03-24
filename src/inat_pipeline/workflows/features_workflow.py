@@ -23,7 +23,7 @@ def execute(deps: Dependencies):
             max_val_size=50000,
             val_window_days=250,
             max_test_size=90000,
-            gap_days=90,
+            label_window=90,
             score_window=14,
         )
 
