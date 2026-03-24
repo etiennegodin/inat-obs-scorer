@@ -1,0 +1,26 @@
+name: ml_datasci_env
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.12
+  - pandas
+  - numpy
+  - matplotlib
+  - scikit-learn
+  - jupyterlab
+  - seaborn
+  - plotly
+  - pip
+  - pip:
+    - lightgbm
+    - optuna
+    - mlflow
+    - tqdm
+    - shap
+    - sqlparams
+    - psutil
+    - requests
+    - aiohttp
+    - aiofiles
+    - aiolimiter
