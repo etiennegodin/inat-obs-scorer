@@ -32,12 +32,12 @@ SELECT
 
     -- verifiable label
     CASE
-        WHEN o.created_at IS NULL                  THEN FALSE
-        WHEN o.latitude IS NULL                    THEN FALSE
-        WHEN LENGTH(o.observation_photos) = 0      THEN FALSE
-        WHEN o.captive_cultivated 0                THEN FALSE
+        WHEN o.created_at IS NULL                  THEN TRUE
+        WHEN o.latitude IS NULL                    THEN TRUE
+        WHEN LENGTH(o.observation_photos) = 0      THEN TRUE
+        WHEN o.captive_cultivated IS TRUE          THEN TRUE
         -- Community taxon doesn't match submitted taxon
-        WHEN t.community_taxon != o.taxon_id       THEN FALSE
+        WHEN t.community_taxon != o.taxon_id       THEN TRUE
         ELSE TRUE
 
     END AS verifiable,

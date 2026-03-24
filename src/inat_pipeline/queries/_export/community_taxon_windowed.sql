@@ -1,0 +1,113 @@
+CREATE OR REPLACE MACRO community_taxon_windowed(eval_interval) AS TABLE
+
+WITH id_window AS (
+    SELECT
+        i.observation_id,
+        i.taxon_id      AS id_taxon_id,
+        i.user_id,
+        i.own_observation,
+
+        -- Full ancestor chain for each identification's taxon
+        t.species_id,
+        t.genus_id,
+        t.family_id,
+        t.order_id,
+        t.class_id,
+        t.phylum_id,
+        t.rank_level,  -- species=10, genus=20, family=30, etc
+
+    FROM staged.identifications i
+    JOIN staged.observations o ON i.observation_id = o.id
+    JOIN staged.taxa t           ON i.taxon_id = t.taxon_id
+
+    WHERE i."current" IS TRUE
+      AND i.created_at >= o.created_at
+      AND i.created_at <= o.created_at + eval_interval  -- <- window parameter
+),
+
+-- All candidate taxa to score = every taxon appearing in any ID,
+-- plus all their ancestors
+candidates AS(
+
+    SELECT DISTINCT observation_id, id_taxon_id AS candidate_taxon_id, rank_level
+    FROM id_window
+
+    UNION
+    SELECT DISTINCT observation_id, genus_id,   20 FROM id_window WHERE genus_id  IS NOT NULL
+    UNION
+    SELECT DISTINCT observation_id, family_id,  30 FROM id_window WHERE family_id IS NOT NULL
+    UNION
+    SELECT DISTINCT observation_id, order_id,   40 FROM id_window WHERE order_id  IS NOT NULL
+    UNION
+    SELECT DISTINCT observation_id, class_id,   50 FROM id_window WHERE class_id  IS NOT NULL
+
+
+),
+
+scored AS (
+
+    SELECT
+        c.observation_id,
+        c.candidate_taxon_id,
+        c.rank_level,
+
+        -- cumulative: IDs whose taxon IS the candidate or is BELOW it (more specific)
+        COUNT(*) FILTER (WHERE
+            iw.id_taxon_id = c.candidate_taxon_id
+            OR iw.species_id = c.candidate_taxon_id
+            OR iw.genus_id   = c.candidate_taxon_id
+            OR iw.family_id  = c.candidate_taxon_id
+            OR iw.order_id   = c.candidate_taxon_id
+            OR iw.class_id   = c.candidate_taxon_id
+        ) AS cumulative,
+
+        -- ancestor_disagreements: IDs ABOVE candidate (more conservative)
+        COUNT(*) FILTER (WHERE
+            iw.rank_level > c.rank_level  -- coarser rank = higher number
+            AND iw.id_taxon_id != c.candidate_taxon_id
+        ) AS ancestor_disagreements,
+
+        -- disagreements: IDs in a completely different branch
+        -- = total IDs - cumulative - ancestor_disagreements
+        COUNT(*) - cumulative - ancestor_disagreements AS disagreements,
+
+
+        cumulative::FLOAT / NULLIF(cumulative + disagreements + ancestor_disagreements, 0) AS score
+
+    FROM candidates c
+    JOIN id_window iw ON c.observation_id = iw.observation_id
+    GROUP BY c.observation_id, c.candidate_taxon_id, c.rank_level
+
+
+
+),
+
+-- Pick lowest ranked (most specific) taxon with score > 2/3 and cumulative >= 2
+community_taxon AS (
+    SELECT DISTINCT ON (observation_id)
+        observation_id,
+        candidate_taxon_id AS community_taxon,
+        rank_level,
+        score,
+        cumulative,
+        rank_level <= 10 AS consensus_level_rg,  -- species or below (subspecies = rank 5)
+
+    FROM scored
+    WHERE score > 2/3.0
+      AND cumulative >= 2
+    ORDER BY observation_id, rank_level ASC  -- ASC = most specific first
+)
+
+SELECT
+    o.id        AS observation_id,
+    o.taxon_id,
+    o.created_at,
+    ct.community_taxon,
+    ct.rank_level,
+    ct.score,
+    ct.cumulative AS n_ids_at_window,
+    COALESCE(ct.consensus_level_rg, FALSE) AS consensus_level_rg,
+    -- RG requires community taxon to match submitted taxon
+
+FROM staged.observations o
+LEFT JOIN community_taxon ct ON o.id = ct.observation_id;
