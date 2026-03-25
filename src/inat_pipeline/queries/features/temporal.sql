@@ -112,18 +112,34 @@ divergence AS (
     FROM observed_stats ot
     JOIN created_at_stats ct ON ot.taxon_id = ct.taxon_id
 
+),
+
+peaks_lag AS (
+
+    SELECT
+        ot.taxon_id,
+        (ct.peak_week - ot.peak_week) % 52 AS diff,
+        CASE
+            WHEN diff > 26 THEN -diff
+            ELSE diff
+        END AS peak_lag_weeks,
+
+    FROM observed_stats ot
+    JOIN created_at_stats ct ON ot.taxon_id = ct.taxon_id
 )
 
 SELECT
 
     o.id AS observation_id,
-    ot.active_weeks AS pheno_season_width,
-    ct.active_weeks AS upload_season_width,
+    o.created_at,
+    o.observed_on,
 
-    k.observed_kurtosis,
-    k.created_kurtosis,
+    -- Observation stats
+    ct.val_list[WEEK(o.created_at) - 1] / ct.max_val as submission_pressure,
+    ot.val_list[WEEK(o.observed_on) - 1] / ct.sum_val AS activity_sub_pmf,
+    ot.val_list[WEEK(o.observed_on) - 1] / ot.max_val as activity_at_pheno,
+    ot.val_list[WEEK(o.observed_on) - 1] / ot.sum_val AS activity_obs_pmf,
 
-    -- Distance from peaks
     least(
         ABS(MONTH(o.created_at) - ct.peak_month),
         12 - ABS(MONTH(o.created_at) - ct.peak_month)
@@ -134,18 +150,18 @@ SELECT
         12 - ABS(MONTH(o.observed_on) - ot.peak_month)
     ) AS months_from_peak_pheno,
 
-    -- Observation's relative place in histograms
-    -- Submission curve
-    ct.val_list[WEEK(o.created_at) - 1] / ct.max_val as submission_pressure,
-    ot.val_list[WEEK(o.observed_on) - 1] / ct.sum_val AS activity_sub_pmf,
+    -- Distribution stats
+    ot.active_weeks AS pheno_season_width,
+    ct.active_weeks AS upload_season_width,
 
-    -- Phenology curve
-    ot.val_list[WEEK(o.observed_on) - 1] / ot.max_val as activity_at_pheno,
-    ot.val_list[WEEK(o.observed_on) - 1] / ot.sum_val AS activity_obs_pmf,
+    -- Peaks lag
+    p.peak_lag_weeks,
 
-    -- Distributions differences
-    ct.peak_week - ot.peak_week AS peak_lag_weeks,
+    -- 'Sharpness' of curves
+    k.observed_kurtosis,
+    k.created_kurtosis,
 
+    -- Distributions divergence
     d.KL_divergence,
     d.cosine_sim,
     d.l2_distance
@@ -155,3 +171,4 @@ JOIN observed_stats ot ON o.taxon_id = ot.taxon_id
 JOIN created_at_stats ct ON o.taxon_id = ct.taxon_id
 JOIN divergence d ON o.taxon_id = d.taxon_id
 JOIN kurtosis k ON o.taxon_id = k.taxon_id
+JOIN peaks_lag p ON o.taxon_id = p.taxon_id

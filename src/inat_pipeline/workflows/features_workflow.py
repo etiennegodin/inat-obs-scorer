@@ -33,7 +33,6 @@ def execute(deps: Dependencies):
             "community_taxon_windowed",
             "research_grade_windowed",
         )
-        sql_features.execute("taxon", params=params)
 
         # Label
         sql_features.execute("label", params=params)
@@ -49,9 +48,7 @@ def execute(deps: Dependencies):
 
         # Bases and non paramterised queries
         sql_features.execute_many(
-            "network_events",
-            "user_role_timeline",
-            "base",
+            "network_events", "user_role_timeline", "base", "temporal"
         )
 
         # Time-windowed features :
