@@ -19,13 +19,13 @@ def execute(deps: Dependencies):
 
         # Train/Val/Test splits
         params = TrainingSplitParams(
-            cutoff_date=date(2024, 1, 1),
-            max_val_size=50000,
-            val_window_days=250,
-            max_test_size=90000,
+            cutoff_date=date(2023, 6, 1),
+            max_val_size=18000,
+            val_window_days=365,
+            max_test_size=100000,
             label_window_days=365,
             score_window_days=7,
-            gap_days=30,
+            gap_days=21,
         )
 
         # Macros registering
@@ -34,14 +34,17 @@ def execute(deps: Dependencies):
             "research_grade_windowed",
         )
 
+        # Defined score window cut-off
         sql_features.execute("identifications_at_window", params=params)
 
-        # Label
-        sql_features.execute("label", params=params)
+        # Define base observations for all features and separate population split
+        sql_features.execute_many("base", "model_population")
 
-        # Splits
+        # Splits from model_population
         sql_split.execute("split", params=params)
         splits_report(sql_split, params)
+
+        quit()
 
         # Static features
         sql_graph.execute("confusion_graph")
@@ -63,6 +66,9 @@ def execute(deps: Dependencies):
             "taxa_confusion",
             "observers_entropy",
         )
+
+        # Label at label_window_days
+        sql_features.execute("label", params=params)
 
         # Final merge
         sql_features.execute("training")
