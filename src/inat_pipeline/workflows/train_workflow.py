@@ -57,6 +57,7 @@ def execute(
         version=deps.version,
         n_jobs=n_jobs,
         experiment_name="inat_obs_scorer_v0_2",
+        passthrough_features=["time_to_first_id_days"],
     )
 
     # ── 1. Data & Config setup ─────────────────────────────────────────────────

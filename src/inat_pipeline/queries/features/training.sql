@@ -55,13 +55,8 @@ SELECT
     COALESCE(i.prior_ids_received, 0) AS id_prior_ids_received,
     COALESCE(i.prior_identifier_diversity, 0) AS id_prior_identifier_diversity,
     COALESCE(i.prior_observer_rg_rate, 0) AS id_prior_observer_rg_rate,
-    COALESCE(i.prior_ids_received_agree_rate, 0) AS id_prior_ids_received_agree_rate,
-    COALESCE(i.prior_ids_received_disagree_rate, 0) AS id_prior_ids_received_disagree_rate,
     COALESCE(i.prior_ids_given, 0) AS id_prior_ids_given,
     COALESCE(i.prior_taxa_identified, 0) AS id_prior_taxa_identified,
-    COALESCE(i.prior_ids_given_improving_rate, 0) AS id_prior_ids_given_improving_rate,
-    COALESCE(i.prior_ids_given_agree_rate, 0) AS id_prior_ids_given_agree_rate,
-    COALESCE(i.prior_ids_given_disagree_rate, 0) AS id_prior_ids_given_disagree_rate,
     COALESCE(i.prior_ids_vision_rate, 0) AS id_prior_ids_vision_rate,
     COALESCE(i.reciprocity_ratio, 0) AS id_reciprocity_ratio,
 
@@ -77,13 +72,10 @@ SELECT
 
     -- First-ID signals
     iw.has_any_id,
-    iw.first_id_agrees,
+    --iw.first_id_agrees, leak?
 
     -- Agreement dynamics
-    iw.pct_ids_agree_at_window,
-    iw.pct_ids_refining_at_window,
-    iw.id_maverick_count_at_window,
-    iw.pct_ids_maverick_at_window,
+    --iw.pct_ids_agree_at_window, leak?
 
     -- Community taxon state at score_window
     iw.has_community_taxon_at_window,
@@ -97,7 +89,7 @@ SELECT
     t.genus_popularity_rank AS tx_genus_popularity_rank,
     COALESCE(t.genus_rg_rate, 0) AS tx_genus_rg_rate,
     COALESCE(t.family_rg_rate, 0) AS tx_family_rg_rate,
-    t.taxon_avg_ids_to_rg AS tx_avg_ids_to_rg,
+    --t.taxon_avg_ids_to_rg AS tx_avg_ids_to_rg,
 
     -- Taxon confusion stats (static)
     IFNULL(c.has_similar_species, FALSE) AS tx_conf_has_similar,
@@ -142,5 +134,7 @@ LEFT JOIN features.taxa_confusion c ON b.taxon_id = c.taxon_id
 LEFT JOIN graph.clustering_coefficient cc ON b.taxon_id = cc.taxon_id
 LEFT JOIN graph.double_hop_stats dh ON b.taxon_id = dh.taxon_id
 
-WHERE l.label IS NOT NULL
+WHERE
+    l.label IS NOT NULL
+    AND has_any_id IS TRUE
 ORDER BY b.observation_id;
