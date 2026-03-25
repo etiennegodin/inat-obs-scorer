@@ -54,7 +54,7 @@ def train_cmd(args: Namespace, app: ApplicationService):
         return 1
 
     print("\n✓ Model run passed!")
-    print(f"  Val ROC-AUC: {result['test_metrics']['test/test_roc_auc']:.4f}")
+    print(f"  Val score: {result['test_metrics']['test/test_avg_precision']:.4f}")
 
 
 def test_cmd(args: Namespace, app: ApplicationService):
@@ -64,7 +64,7 @@ def test_cmd(args: Namespace, app: ApplicationService):
         print(f"[red]✗ {e}[/red]")
         return 1
 
-    print(f"  Test ROC-AUC: {result['test_metrics']['test/test_roc_auc']:.4f}")
+    print(f"  Test score: {result['test_metrics']['test/test_avg_precision']:.4f}")
 
 
 def create_parser() -> argparse.ArgumentParser:

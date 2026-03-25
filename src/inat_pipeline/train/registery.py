@@ -65,7 +65,7 @@ CLASSIFIER_REGISTRY = {
         {
             "verbose": -1,
             "n_estimators": 500,
-            "scale_pos_weight": 2.927611367127496,
+            "scale_pos_weight": 2.4926354868649367,
             "bagging_freq": 1,
         },
     ),
