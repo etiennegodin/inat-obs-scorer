@@ -160,7 +160,7 @@ def create_parser() -> argparse.ArgumentParser:
     train_parser.add_argument(
         "--cv_folds",
         "-cv",
-        default=3,
+        default=5,
         type=min_cv_folds,
         help="Number of cross validation folds",
     )

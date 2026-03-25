@@ -64,7 +64,7 @@ CLASSIFIER_REGISTRY = {
         "LGBMClassifier",
         {
             "verbose": -1,
-            "n_estimators": 500,
+            "n_estimators": 1000,
             "scale_pos_weight": 2.4926354868649367,
             "bagging_freq": 1,
         },
@@ -113,15 +113,15 @@ SEARCH_SPACES = {
         "classifier__num_leaves": {
             "type": "int",
             "low": 31,
-            "high": 255,
+            "high": 128,
             "log": True,
             # rule of thumb: never exceed 2^(max_depth)
             # for depth=7 that's 128 — 200 is already generous
         },
         "classifier__min_child_samples": {
             "type": "int",
-            "low": 20,
-            "high": 300,
+            "low": 25,
+            "high": 200,
             "log": True,
             # on imbalanced data (like iNat RG), push this higher
             # it prevents the model from memorizing rare patterns
@@ -129,8 +129,8 @@ SEARCH_SPACES = {
         # Learning rate
         "classifier__learning_rate": {
             "type": "float",
-            "low": 0.05,
-            "high": 0.1,
+            "low": 0.02,
+            "high": 0.05,
             "log": True,
             # log=True means Optuna samples 0.01, 0.012, 0.015...
             # rather than 0.01, 0.11, 0.21 — much smarter for rates
@@ -151,13 +151,13 @@ SEARCH_SPACES = {
         # Subsampling
         "classifier__subsample": {
             "type": "float",
-            "low": 0.5,
-            "high": 1.0,
+            "low": 0.7,
+            "high": 0.9,
         },
         "classifier__colsample_bytree": {
             "type": "float",
-            "low": 0.4,
-            "high": 1.0,
+            "low": 0.65,
+            "high": 0.9,
         },
     },
 }
