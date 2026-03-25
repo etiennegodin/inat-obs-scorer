@@ -6,6 +6,7 @@ CREATE OR REPLACE MACRO research_grade_windowed(eval_interval) AS TABLE
         o.taxon_id,
         t.consensus_level_rg,
         o.created_at,
+        o.observed_on,
 
         -- n identifiers
         COUNT(DISTINCT(i.user_id)) FILTER (
@@ -66,6 +67,7 @@ CREATE OR REPLACE MACRO research_grade_windowed(eval_interval) AS TABLE
         t.consensus_level_rg,
         o.taxon_id,
         o.created_at,
+        o.observed_on,
         o.latitude,
         o.observation_photos,
         o.captive_cultivated,

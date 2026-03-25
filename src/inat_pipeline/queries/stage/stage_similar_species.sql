@@ -14,10 +14,9 @@ WITH unpacked AS (
         from_json(
             raw_json,
             '{
-                "taxon":{
+                "week_of_year":{
                     "id":"BIGINT",
                 },
-                "count":"BIGINT",
             }'
             ) AS data
             FROM raw.api_similar_species

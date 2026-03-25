@@ -67,5 +67,5 @@ def execute(deps: Dependencies, rate: int, ignore_not_found: bool) -> None:
             logger.info("All items already requested")
 
         # 3 Stage collected data in db
-        # sql_stage = DuckDbSQL(con, deps.SQL_STAGE_PATH)
-        # sql_stage.execute("stage_similar_species")
+        sql_stage = DuckDbSQL(con, deps.SQL_STAGE_PATH)
+        sql_stage.execute("stage_histogram_observed")
