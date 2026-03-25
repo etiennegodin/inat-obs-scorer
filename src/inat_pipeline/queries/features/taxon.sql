@@ -8,6 +8,17 @@ WITH config AS (
 base AS (
     SELECT
         rg.observation_id,
+        rg.created_at,
+        rg.is_rg,
+        rg.n_ids_at_window,
+        t.genus_id,
+        t.family_id,
+        t.order_id,
+        t.rank_level,
+
+        -- submission - observation lag
+        rg.created_at - rg.observed_on AS obs_lag_days,
+
         -- use computed taxon_id first, if null fallback to observation_id
         CASE
             WHEN rg.community_taxon_id IS NULL THEN rg.taxon_id
@@ -17,13 +28,7 @@ base AS (
             WHEN rg.community_taxon_id IS NULL THEN 'taxon_id'
             ELSE 'community_taxon'
         END AS taxon_id_source,
-        rg.created_at,
-        rg.is_rg,
-        rg.n_ids_at_window,
-        t.genus_id,
-        t.family_id,
-        t.order_id,
-        t.rank_level,
+
     FROM research_grade_windowed((SELECT window_val FROM config)) rg
     LEFT JOIN staged.taxa t ON rg.taxon_id = t.taxon_id
 ),
@@ -40,6 +45,10 @@ aggregates AS(
         order_id,
         rank_level,
         is_rg,
+
+    -- Observation - submission lag
+
+    PERCENTILE_CONT(0.5) WITHIN obs_lag_days (ORDER BY column_name) OVER taxon_history AS taxon_median_lag,
 
     -- Species-level stats
     COALESCE(COUNT(*)                   OVER taxon_history, 0)  AS taxon_obs_count,
@@ -58,7 +67,6 @@ aggregates AS(
     COALESCE(SUM(is_rg::INT)            OVER order_history, 0)  AS order_rg_obs,
 
     -- ID convergence tendency
-
     COALESCE(
         AVG(n_ids_at_window) FILTER (WHERE is_rg) OVER taxon_history, 0
     ) AS taxon_avg_ids_to_rg,
