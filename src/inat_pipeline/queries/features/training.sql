@@ -97,7 +97,7 @@ SELECT
     c.rg_percentile_in_neighborhood AS tx_conf_rg_perc_in_nbrhd,
     c.rg_percentile_dist_weighted AS tx_conf_rg_perc_dist_weighted,
     c.neighbor_genus_diversity AS tx_conf_nbrhd_genus_div,
-    c.neighbor_rank_min AS tx_conf__rank_min,
+    c.neighbor_rank_min AS tx_conf_nbrhd_rank_min,
     c.magnet_score AS tx_confusion_magnet_score,
 
     --Confusion graph topology

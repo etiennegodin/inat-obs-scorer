@@ -22,7 +22,7 @@ class IngestCSVParams:
 @dataclass
 class TrainingSplitParams:
     cutoff_date: date
-    score_window_days: int = 14
+    score_window_days: int = 7
     label_window_days: int = 180
     gap_days: int = 30
     val_window_days: int = 270  # Custom to dataset
