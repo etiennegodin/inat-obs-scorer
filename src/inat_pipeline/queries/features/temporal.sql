@@ -42,6 +42,35 @@ created_at_stats AS(
         )
     ) as active_weeks
     FROM staged.histogram_created
+),
+
+divergence AS(
+
+-- probability distribution P
+-- reference distribution Q
+
+
+SELECT
+ot.taxon_id,
+list_transform(ot.val_list, x -> x / list_sum(ot.val_list)) AS P, -- normalized
+list_transform(ct.val_list, x -> x / list_sum(ct.val_list)) AS Q, -- normalized
+
+    -- KL divergence
+
+list_sum(
+    list_transform(
+        generate_series(1,len(P)),
+        i -> P[i] * ln(P[i] / (Q[i] + CAST('1.00E-010' AS FLOAT)) + 1 )
+    )
+) as KL_divergence,
+
+array_cosine_similarity(P::FLOAT[53], Q::FLOAT[53]) AS cosine_sim,
+array_distance(P::FLOAT[53], Q::FLOAT[53]) AS l2_distance
+
+FROM observed_stats                 ot
+JOIN created_at_stats               ct ON ot.taxon_id = ct.taxon_id
+
+
 )
 
 SELECT
@@ -72,17 +101,16 @@ SELECT
     -- Distributions differences
     ct.peak_week - ot.peak_week AS peak_lag_weeks,
 
-    -- KL divergence
-    /*
-    list_sum(
-        list_transform(
-            generate_series(1,len(ot.val_list)),
-            i -> ot.val_list[i] * ln(ot.val_list[i] / ct.val_list[i])
-        )
-    ) as KL_divergence,
-    */
+    d.KL_divergence,
+    d.cosine_sim,
+    d.l2_distance
+
+
+
+
 
 
 FROM staged.observations            o
 JOIN observed_stats                 ot ON o.taxon_id = ot.taxon_id
 JOIN created_at_stats               ct ON o.taxon_id = ct.taxon_id
+JOIN divergence                     d  ON o.taxon_id = d.taxon_id
