@@ -108,6 +108,24 @@ SELECT
     dh.genus_crossover_count AS tx_conf_genus_crossovers,
     dh.family_crossover_count AS tx_conf_family_crossover,
 
+    -- Taxon observation and submission distributions
+    tp.submission_pressure,
+    tp.submission_pressure,
+    tp.activity_sub_pmf,
+    tp.activity_at_pheno,
+    tp.activity_obs_pmf,
+    tp.months_from_peak_upload,
+    tp.months_from_peak_pheno,
+    tp.pheno_season_width,
+    tp.upload_season_width,
+    tp.peak_lag_weeks,
+    tp.observed_kurtosis,
+    tp.created_kurtosis,
+
+    tp.KL_divergence,
+    tp.cosine_sim,
+    tp.l2_distance,
+
 FROM features.base b
 JOIN features.splits s ON b.observation_id = s.observation_id
 LEFT JOIN features.observations ob ON b.observation_id = ob.observation_id
@@ -119,6 +137,7 @@ LEFT JOIN features.taxon t ON b.observation_id = t.observation_id
 LEFT JOIN features.taxa_confusion c ON b.taxon_id = c.taxon_id
 LEFT JOIN graph.clustering_coefficient cc ON b.taxon_id = cc.taxon_id
 LEFT JOIN graph.double_hop_stats dh ON b.taxon_id = dh.taxon_id
+LEFT JOIN features.temporal tp ON b.observation_id = tp.observation_id
 
 WHERE
     l.label IS NOT NULL
