@@ -105,11 +105,6 @@ SELECT
     d.cosine_sim,
     d.l2_distance
 
-
-
-
-
-
 FROM staged.observations            o
 JOIN observed_stats                 ot ON o.taxon_id = ot.taxon_id
 JOIN created_at_stats               ct ON o.taxon_id = ct.taxon_id
