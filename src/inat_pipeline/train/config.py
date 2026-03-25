@@ -3,7 +3,7 @@ from dataclasses import asdict, dataclass, field
 
 import pandas as pd
 
-from ..exceptions import IncompatiblePipelineModules
+from ..exceptions import IncompatiblePipelineModules, TrainPipelineConfigError
 
 logger = logging.getLogger(__name__)
 
@@ -50,6 +50,7 @@ class PipelineConfig:
                 "'use_gpu' is only supported with lightgbm classifier"
             )
 
+        # Dynamic name with classifier choice
         self.run_name = f"{self.classifier}_optuna"
 
     def set_features(self, df: pd.DataFrame) -> None:
@@ -64,7 +65,7 @@ class PipelineConfig:
         self.numeric_features = df.select_dtypes(include="number").columns.to_list()
 
         try:
-            self._force_passthrough_features()
+            self._passthrough_features()
         except Exception as e:
             logger.error(e)
             raise
@@ -90,12 +91,20 @@ class PipelineConfig:
         """Serialize config for logging to MLflow."""
         return asdict(self)
 
-    def _force_passthrough_features(self):
+    def _passthrough_features(self):
         """Force passthroughts features out of"
         numerical and categorical features list"""
         num_set = set(self.numeric_features)
         cat_set = set(self.categorical_features)
         pass_set = set(self.passthrough_features)
+        all_set = set(self.features)
+
+        # Assert passthrough are part of all features set
+        if not pass_set.issubset(all_set):
+            raise TrainPipelineConfigError(
+                "Provided passthrough features are not part of dataset\n",
+                details={"passthrough_feature": self.passthrough_features},
+            )
 
         self.numeric_features = list(num_set - pass_set)
         self.categorical_features = list(cat_set - pass_set)

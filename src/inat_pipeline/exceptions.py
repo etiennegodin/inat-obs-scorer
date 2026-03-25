@@ -108,6 +108,12 @@ class IncompatiblePipelineModules(TrainModelError):
     pass
 
 
+class TrainPipelineConfigError(TrainModelError):
+    """Errors related to PipelineConfig."""
+
+    pass
+
+
 __all__ = [
     "InatPipelineError",
     "WorkflowError",
