@@ -136,7 +136,7 @@ SELECT
 
     -- Observation stats
     ct.val_list[WEEK(o.created_at) - 1] / ct.max_val as submission_pressure,
-    ot.val_list[WEEK(o.observed_on) - 1] / ct.sum_val AS activity_sub_pmf,
+
     ot.val_list[WEEK(o.observed_on) - 1] / ot.max_val as activity_at_pheno,
     ot.val_list[WEEK(o.observed_on) - 1] / ot.sum_val AS activity_obs_pmf,
 

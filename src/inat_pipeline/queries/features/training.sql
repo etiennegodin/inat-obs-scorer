@@ -64,9 +64,6 @@ SELECT
     iw.has_any_id,
 
     -- Community taxon state at score_window
-    iw.has_community_taxon_at_window,
-    iw.community_consensus_at_window,
-    iw.community_matches_submitted_at_window,
 
     --Taxon features
     t.taxon_popularity_rank AS tx_popularity_rank,
@@ -75,6 +72,7 @@ SELECT
     t.genus_popularity_rank AS tx_genus_popularity_rank,
     COALESCE(t.genus_rg_rate, 0) AS tx_genus_rg_rate,
     COALESCE(t.family_rg_rate, 0) AS tx_family_rg_rate,
+    --t.taxon_median_submission_lag_days,
     --t.taxon_avg_ids_to_rg AS tx_avg_ids_to_rg,
 
     -- Taxon confusion stats (static)
@@ -110,8 +108,6 @@ SELECT
 
     -- Taxon observation and submission distributions
     tp.submission_pressure,
-    tp.submission_pressure,
-    tp.activity_sub_pmf,
     tp.activity_at_pheno,
     tp.activity_obs_pmf,
     tp.months_from_peak_upload,

@@ -45,10 +45,11 @@ aggregates AS (
         is_rg,
 
         -- Observation - submission lag median
-
+        /*
         PERCENTILE_CONT(0.5) WITHIN GROUP (
             ORDER BY DATEDIFF('day', observed_on, created_at)
         ) AS taxon_median_submission_lag_days,
+        */
 
         -- Species-level stats
         COALESCE(COUNT(*) OVER taxon_history, 0) AS taxon_obs_count,
