@@ -60,22 +60,8 @@ SELECT
     COALESCE(i.prior_ids_vision_rate, 0) AS id_prior_ids_vision_rate,
     COALESCE(i.reciprocity_ratio, 0) AS id_reciprocity_ratio,
 
-    -- Identification dynamics at score_window
-    -- Volume & velocity
-    iw.id_count_at_window,
-    iw.id_diversity_at_window,
-    iw.id_velocity,
-
-    -- Time-to-first-ID (NULL = no ID arrived; keep NULL, do not COALESCE to 0
-    -- — the model should distinguish "no ID" from "immediate ID")
-    iw.time_to_first_id_days,
-
     -- First-ID signals
     iw.has_any_id,
-    --iw.first_id_agrees, leak?
-
-    -- Agreement dynamics
-    --iw.pct_ids_agree_at_window, leak?
 
     -- Community taxon state at score_window
     iw.has_community_taxon_at_window,
@@ -136,5 +122,5 @@ LEFT JOIN graph.double_hop_stats dh ON b.taxon_id = dh.taxon_id
 
 WHERE
     l.label IS NOT NULL
-    AND has_any_id IS TRUE
+    AND has_any_id IS FALSE -- easy wins out
 ORDER BY b.observation_id;
