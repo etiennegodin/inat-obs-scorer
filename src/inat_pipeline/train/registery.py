@@ -62,7 +62,12 @@ CLASSIFIER_REGISTRY = {
     "lightgbm": (
         "lightgbm",
         "LGBMClassifier",
-        {"verbose": -1, "n_estimators": 500, "bagging_freq": 1},
+        {
+            "verbose": -1,
+            "n_estimators": 500,
+            "scale_pos_weight": 2.927611367127496,
+            "bagging_freq": 1,
+        },
     ),
 }
 
@@ -107,14 +112,15 @@ SEARCH_SPACES = {
         # Capacity
         "classifier__num_leaves": {
             "type": "int",
-            "low": 15,
-            "high": 128,
+            "low": 31,
+            "high": 255,
+            "log": True,
             # rule of thumb: never exceed 2^(max_depth)
             # for depth=7 that's 128 — 200 is already generous
         },
         "classifier__min_child_samples": {
             "type": "int",
-            "low": 150,
+            "low": 20,
             "high": 300,
             "log": True,
             # on imbalanced data (like iNat RG), push this higher
