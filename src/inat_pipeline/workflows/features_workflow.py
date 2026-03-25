@@ -33,6 +33,7 @@ def execute(deps: Dependencies):
             "community_taxon_windowed",
             "research_grade_windowed",
         )
+        sql_features.execute("taxon", params=params)
 
         # Label
         sql_features.execute("label", params=params)

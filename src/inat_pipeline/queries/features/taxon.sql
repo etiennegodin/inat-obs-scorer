@@ -9,15 +9,13 @@ base AS (
     SELECT
         rg.observation_id,
         rg.created_at,
+        rg.observed_on,
         rg.is_rg,
         rg.n_ids_at_window,
         t.genus_id,
         t.family_id,
         t.order_id,
         t.rank_level,
-
-        -- submission - observation lag
-        rg.created_at - rg.observed_on AS obs_lag_days,
 
         -- use computed taxon_id first, if null fallback to observation_id
         CASE
@@ -46,9 +44,11 @@ aggregates AS (
         rank_level,
         is_rg,
 
-        -- Observation - submission lag
+        -- Observation - submission lag median
 
-        --PERCENTILE_CONT(0.5) WITHIN obs_lag_days (ORDER BY column_name) OVER taxon_history AS taxon_median_lag,
+        PERCENTILE_CONT(0.5) WITHIN GROUP (
+            ORDER BY DATEDIFF('day', observed_on, created_at)
+        ) AS taxon_median_submission_lag_days,
 
         -- Species-level stats
         COALESCE(COUNT(*) OVER taxon_history, 0) AS taxon_obs_count,
