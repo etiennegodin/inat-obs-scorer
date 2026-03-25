@@ -48,15 +48,9 @@ first_id AS (
 
 SELECT
     o.id        AS observation_id,
-
-
     -- ── First-ID signals ─────────────────────────────────────────────────────
     f.first_id_at IS NOT NULL                               AS has_any_id,
 
-
-
 FROM staged.observations o
-LEFT JOIN aggregates    a  ON a.observation_id = o.id
 LEFT JOIN first_id      f  ON f.observation_id = o.id
-LEFT JOIN community_state cs ON cs.observation_id = o.id
 ;

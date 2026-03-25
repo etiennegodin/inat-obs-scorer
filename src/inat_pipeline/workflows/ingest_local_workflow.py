@@ -25,6 +25,15 @@ def execute(deps: Dependencies):
             columns="*",
         )
 
+        # Assert needed columns
+        sql.execute_many(
+            "stage_obs_observations",
+            "stage_obs_identifications",
+            "stage_obs_photos",
+            "stage_obs_places",
+            "stage_obs_users",
+        )
+
         # Ingest taxa
         source = "taxa"
         downloads_params = IngestCSVParams(source_dir=data_dir / source)

@@ -52,10 +52,10 @@ WITH unpacked AS (
             FROM raw.inat_api
         )
 )
-
-SELECT DISTINCT u.* EXCLUDE(u.'description',
-                            u.tags,
-                            u.taxon_geoprivacy),
+--sql-fluff:off
+SELECT DISTINCT u.* EXCLUDE(u.'description',     -- noqa
+                            u.tags,              -- noqa
+                            u.taxon_geoprivacy), -- noqa
 u.user.id AS user_id,
 d.observed_on,
 COALESCE(
@@ -103,7 +103,7 @@ JOIN staged.taxa t ON d.taxon_id = t.taxon_id
 -- Time filter for static set
 CREATE OR REPLACE TABLE staged.observations AS
 WITH max_date AS(
-    SELECT MAX(created_at) - INTERVAL '90 days' AS max_date
+    SELECT MAX(created_at) - INTERVAL '365 days' AS max_date
     FROM staged.observations
 )
 
