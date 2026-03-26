@@ -47,7 +47,6 @@ def execute(deps: Dependencies):
         sql_split.execute("split", params=params)
         splits_report(sql_split, params)
 
-        quit()
         # Static features
         sql_graph.execute("confusion_graph")
         sql_graph.execute("confusion_graph_metrics")
