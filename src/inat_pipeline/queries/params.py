@@ -1,5 +1,9 @@
-from dataclasses import dataclass, field
+import logging
+import pprint
+from dataclasses import asdict, dataclass, field
 from datetime import date, timedelta
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -50,3 +54,7 @@ class TrainingSplitParams:
 
         # Max created date filter
         self.max_created_date = self.scraped_at - timedelta(days=self.label_window_days)
+
+        # Log
+        s = pprint.pformat(asdict(self), indent=4)
+        logger.debug(s)

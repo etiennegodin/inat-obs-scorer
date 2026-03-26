@@ -30,10 +30,12 @@ def execute(deps: Dependencies):
         )
 
         # Macros registering
-        sql_features.execute_many(
-            "community_taxon_windowed",
-            "research_grade_windowed",
-        )
+        sql_features.execute("macro_blended_histogram")
+        sql_features.execute("macro_community_taxon_windowed")
+        sql_features.execute("macro_research_grade_windowed")
+
+        # Temporal features -- issue with macro if lower to-do
+        sql_features.execute("temporal")
 
         # Defined score window cut-off
         sql_features.execute("identifications_at_window", params=params)
@@ -56,7 +58,8 @@ def execute(deps: Dependencies):
 
         # Bases and non paramterised queries
         sql_features.execute_many(
-            "network_events", "user_role_timeline", "base", "temporal"
+            "network_events",
+            "user_role_timeline",
         )
 
         # Time-windowed features :
