@@ -13,7 +13,7 @@ SELECT
     c.taxon_id,
     c.full_year_vector AS week_map_created,
     c.total_obs AS total_obs_created,
-    o.full_year_vector AS week_map_created,
-    o.total_obs AS total_obs_created,
+    o.full_year_vector AS week_map_observed,
+    o.total_obs AS total_obs_observed,
 FROM created_hist c
 JOIN observed_hist o ON c.taxon_id = o.taxon_id;
