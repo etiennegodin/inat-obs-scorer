@@ -1,5 +1,8 @@
-CREATE OR REPLACE TABLE staged.histogram_created AS
+ALTER TABLE staged.histogram_scraped ADD COLUMN IF NOT EXISTS week_map_created MAP (INT, INT);
 
-SELECT raw_id AS taxon_id,
-(raw_json->'week_of_year')::MAP(INT, INT) AS week_map
-FROM raw.obs_histogram_na_created;
+
+UPDATE staged.histogram_scraped
+
+SET week_map_created = (s.raw_json -> 'week_of_year')::MAP (INT, INT)
+FROM raw.obs_histogram_na_created AS s
+WHERE staged.histogram_scraped.taxon_id = s.raw_id;
