@@ -19,13 +19,13 @@ def execute(deps: Dependencies):
 
         # Train/Val/Test splits
         params = TrainingSplitParams(
-            cutoff_date=date(2023, 6, 1),
-            max_val_size=18000,
-            val_window_days=365,
-            max_test_size=100000,
             label_window_days=365,
             score_window_days=7,
-            gap_days=21,
+            cutoff_date=date(2023, 1, 1),
+            max_val_size=30000,
+            val_window_days=410,
+            max_test_size=100000,
+            gap_days=14,
         )
 
         # Macros registering
@@ -47,6 +47,7 @@ def execute(deps: Dependencies):
         sql_split.execute("split", params=params)
         splits_report(sql_split, params)
 
+        quit()
         # Static features
         sql_graph.execute("confusion_graph")
         sql_graph.execute("confusion_graph_metrics")
