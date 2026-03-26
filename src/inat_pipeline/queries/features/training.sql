@@ -26,28 +26,28 @@ SELECT
 
     --Observer features
     --Temporal
-    date_part('day', om.observer_tenure) AS obv_tenure_days,
-    om.is_veteran AS obv_is_veteran,
-    date_part('day', om.lag_since_last_obs) AS obv_lag_days_since_last_post,
+    date_part('day', ob.observer_tenure) AS obv_tenure_days,
+    ob.is_veteran AS obv_is_veteran,
+    date_part('day', ob.lag_since_last_obs) AS obv_lag_days_since_last_post,
 
     -- Observations
-    LOG(om.observer_obs_count_at_t + 1) AS obv_obs_count_log,
-    om.observer_rg_rate_at_t AS obv_rg_rate_lifetime,
-    om.observer_reputation_diff AS obv_reputation_score,
-    om.observer_reputation_rank AS obv_reputation_rank,
-    om.rg_rate_is_reliable AS obv_rg_rate_is_reliable,
+    LOG(ob.observer_obs_count_at_t + 1) AS obv_obs_count_log,
+    ob.observer_rg_rate_at_t AS obv_rg_rate_lifetime,
+    ob.observer_reputation_diff AS obv_reputation_score,
+    ob.observer_reputation_rank AS obv_reputation_rank,
+    ob.rg_rate_is_reliable AS obv_rg_rate_is_reliable,
 
     --Taxonomic
     oe.observer_species_entropy_norm AS obv_tx_entropy,
-    om.observer_taxon_rg_rate_shrunk_at_t AS obv_tx_rg_rate,
-    om.observer_taxon_focus_rate AS obv_tx_focus_rate,
+    ob.observer_taxon_rg_rate_shrunk_at_t AS obv_tx_rg_rate,
+    ob.observer_taxon_focus_rate AS obv_tx_focus_rate,
 
     -- Documentation Metadata
-    om.avg_photo_count AS obv_avg_photo_count,
-    om.pct_obs_with_description AS obv_pct_obs_with_description,
-    om.pct_obs_with_license AS obv_pct_obs_with_license,
-    om.pct_obs_from_mobile AS obv_pct_obs_from_mobile,
-    om.has_orcid AS obv_has_orcid,
+    ob.avg_photo_count AS obv_avg_photo_count,
+    ob.pct_obs_with_description AS obv_pct_obs_with_description,
+    ob.pct_obs_with_license AS obv_pct_obs_with_license,
+    ob.pct_obs_from_mobile AS obv_pct_obs_from_mobile,
+    ob.has_orcid AS obv_has_orcid,
 
     -- Role stats from identifications history
     -- Observer as an identifier features
@@ -124,7 +124,7 @@ SELECT
 
 FROM features.model_population m
 JOIN features.splits s ON m.observation_id = s.observation_id
-LEFT JOIN features.observations ob ON m.observation_id = om.observation_id
+LEFT JOIN features.observations ob ON m.observation_id = ob.observation_id
 LEFT JOIN features.observers_entropy oe ON m.observation_id = oe.observation_id
 LEFT JOIN features.label l ON m.observation_id = l.observation_id
 JOIN features.identifications i ON m.observation_id = i.observation_id
