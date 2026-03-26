@@ -17,7 +17,7 @@ from sklearn.metrics import (
 
 from .. import train
 from ..app.container import Dependencies
-from ..train import explainability, ranking
+from ..train import explainability, metrics, ranking
 
 logger = logging.getLogger(__name__)
 
@@ -156,6 +156,9 @@ def execute(
         # ── 5. Evaluate on held-out test set ──────────────────────────────────
         y_pred = final_model.predict(X_val)
         y_pred_proba = final_model.predict_proba(X_val)[:, 1]
+
+        # Log plots
+        metrics.log_pr_auc_fig(final_model, X_val, y_val)
 
         test_metrics = {
             "test/test_roc_auc": roc_auc_score(y_val, y_pred_proba),
