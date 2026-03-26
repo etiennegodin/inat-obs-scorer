@@ -40,11 +40,12 @@ def execute(deps: Dependencies):
         # Define base observations for all features and separate population split
         sql_features.execute_many("base", "model_population")
 
+        # Label at label_window_days
+        sql_features.execute("label", params=params)
+
         # Splits from model_population
         sql_split.execute("split", params=params)
         splits_report(sql_split, params)
-
-        quit()
 
         # Static features
         sql_graph.execute("confusion_graph")
@@ -66,9 +67,6 @@ def execute(deps: Dependencies):
             "taxa_confusion",
             "observers_entropy",
         )
-
-        # Label at label_window_days
-        sql_features.execute("label", params=params)
 
         # Final merge
         sql_features.execute("training")
