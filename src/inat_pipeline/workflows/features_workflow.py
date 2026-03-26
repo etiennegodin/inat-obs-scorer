@@ -20,6 +20,7 @@ def execute(deps: Dependencies):
         # Train/Val/Test splits
         params = TrainingSplitParams(
             label_window_days=365,
+            scraped_at=date(2026, 3, 1),
             score_window_days=7,
             cutoff_date=date(2023, 1, 1),
             max_val_size=30000,
@@ -38,7 +39,8 @@ def execute(deps: Dependencies):
         sql_features.execute("identifications_at_window", params=params)
 
         # Define base observations for all features and separate population split
-        sql_features.execute_many("base", "model_population")
+        sql_features.execute("base", params=params)
+        sql_features.execute("model_population")
 
         # Label at label_window_days
         sql_features.execute("label", params=params)

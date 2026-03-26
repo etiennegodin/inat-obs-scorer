@@ -87,3 +87,4 @@ SELECT
 
 FROM staged.observations o
 LEFT JOIN raw.inat_api a ON o.uuid = a.raw_id
+WHERE o.created_at < :max_created_date

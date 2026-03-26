@@ -98,18 +98,3 @@ JOIN raw.downloads d ON u.id = d.id
 JOIN staged.taxa t ON d.taxon_id = t.taxon_id
 --LEFT JOIN raw.obs_sample s ON u.uuid = s.uuid
 ;
-
-
--- Time filter for static set
-CREATE OR REPLACE TABLE staged.observations AS
-WITH max_date AS(
-    SELECT MAX(created_at) - INTERVAL '365 days' AS max_date
-    FROM staged.observations
-)
-
-SELECT *
-FROM staged.observations
-CROSS JOIN max_date
-WHERE created_at <= max_date
-ORDER BY user_id, created_at;
-;

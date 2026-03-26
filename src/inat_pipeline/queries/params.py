@@ -22,12 +22,14 @@ class IngestCSVParams:
 @dataclass
 class TrainingSplitParams:
     cutoff_date: date
+    scraped_at: date
     score_window_days: int = 7
-    label_window_days: int = 180
+    label_window_days: int = 365
     gap_days: int = 30
     val_window_days: int = 270  # Custom to dataset
     max_val_size: int = 50000
     max_test_size: int = 80000
+    max_created_date: date = field(init=False)
 
     # Declared in post_init
     val_start: int = field(init=False)
@@ -45,3 +47,6 @@ class TrainingSplitParams:
         self.val_end = self.val_start + timedelta(days=self.val_window_days)
         self.test_start = self.val_end + timedelta(days=self.gap_days)
         self.prediction_horizon = self.label_window_days - self.score_window_days
+
+        # Max created date filter
+        self.max_created_date = self.scraped_at - timedelta(days=self.label_window_days)
