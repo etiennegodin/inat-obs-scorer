@@ -44,7 +44,9 @@ CREATE OR REPLACE MACRO blended_histogram(histo_col, alpha) AS TABLE
     blended_raw AS (
         SELECT
             taxon_id,
-
+            sum_val,
+            val_list,
+            local_histo,
             -- Element-wise: local + alpha * na_proportion
             list_transform(
                 list_zip(local_histo, pseudo_counts),

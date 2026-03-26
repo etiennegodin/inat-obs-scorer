@@ -98,3 +98,19 @@ JOIN raw.downloads d ON u.id = d.id
 JOIN staged.taxa t ON d.taxon_id = t.taxon_id
 --LEFT JOIN raw.obs_sample s ON u.uuid = s.uuid
 ;
+
+
+-- Manual cleanup
+
+
+-- inactive taxons:
+
+
+CREATE OR REPLACE TABLE staged.observations AS
+
+SELECT *
+
+
+FROM staged.observations
+WHERE taxon_id != 241449
+AND taxon_id != 157557
