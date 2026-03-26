@@ -13,7 +13,7 @@ CREATE OR REPLACE MACRO histogram_local(col) AS TABLE
     -- 1. Create a reference of all possible weeks (0-51)
     week_spine AS (
         SELECT range AS week_id
-        FROM range(1, 53)
+        FROM range(1, 54)
     ),
 
     -- 2. Create a unique list of taxons

@@ -27,11 +27,13 @@ def execute(deps: Dependencies):
 
         # Assert needed columns
         sql.execute_many(
+            "macro_histogram_local",
             "stage_obs_observations",
             "stage_obs_identifications",
             "stage_obs_photos",
             "stage_obs_places",
             "stage_obs_users",
+            "stage_histo_local",
         )
 
         # Ingest taxa
