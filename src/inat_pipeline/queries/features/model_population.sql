@@ -2,8 +2,18 @@
 
 CREATE OR REPLACE TABLE features.model_population AS
 
+WITH filtered AS (
+
+    SELECT
+        observation_id,
+        is_rg
+
+    FROM research_grade_windowed(to_days(:score_window_days))
+
+)
+
 SELECT b.*
 FROM features.base b
-JOIN features.identifications_at_window iw
-    ON b.observation_id = iw.observation_id
-WHERE iw.has_any_id = FALSE  -- no-ID population only
+JOIN filtered f
+    ON b.observation_id = f.observation_id
+WHERE f.is_rg = FALSE  -- no-ID population only

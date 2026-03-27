@@ -37,12 +37,11 @@ def execute(deps: Dependencies):
         # Temporal features -- issue with macro if lower to-do
         sql_features.execute("temporal")
 
-        # Defined score window cut-off
-        sql_features.execute("identifications_at_window", params=params)
-
-        # Define base observations for all features and separate population split
+        # Define base observations for all features
         sql_features.execute("base", params=params)
-        sql_features.execute("model_population")
+
+        # Defined model population
+        sql_features.execute("model_population", params=params)
 
         # Label at label_window_days
         sql_features.execute("label", params=params)
@@ -65,6 +64,7 @@ def execute(deps: Dependencies):
         # Time-windowed features :
         sql_features.execute("taxon", params=params)
         sql_features.execute("observations", params=params)
+        sql_features.execute("identifications_at_window", params=params)
 
         # With dependencies
         sql_features.execute_many(

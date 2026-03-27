@@ -61,7 +61,30 @@ SELECT
     COALESCE(i.reciprocity_ratio, 0) AS id_reciprocity_ratio,
 
     -- First-ID signals
+    -- Identification dynamics at score_window
+    -- Volume & velocity
+    iw.id_count_at_window,
+    iw.id_diversity_at_window,
+    iw.id_velocity,
+
+    -- Time-to-first-ID (NULL = no ID arrived; keep NULL, do not COALESCE to 0
+    -- — the model should distinguish "no ID" from "immediate ID")
+    iw.time_to_first_id_days,
+
+    -- First-ID signals
     iw.has_any_id,
+    iw.first_id_agrees,
+
+    -- Agreement dynamics
+    iw.pct_ids_agree_at_window,
+    iw.pct_ids_refining_at_window,
+    iw.id_maverick_count_at_window,
+    iw.pct_ids_maverick_at_window,
+
+    -- Community taxon state at score_window
+    iw.has_community_taxon_at_window,
+    iw.community_consensus_at_window,
+    iw.community_matches_submitted_at_window,
 
     -- Community taxon state at score_window
 
@@ -109,7 +132,6 @@ SELECT
     -- Taxon observation and submission distributions
     tp.submission_pressure,
     tp.activity_at_pheno,
-    tp.activity_obs_pmf,
     tp.months_from_peak_upload,
     tp.months_from_peak_pheno,
     tp.pheno_season_width,
