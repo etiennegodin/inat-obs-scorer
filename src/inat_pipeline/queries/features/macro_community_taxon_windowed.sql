@@ -5,7 +5,9 @@ CREATE OR REPLACE MACRO community_taxon_windowed(eval_interval) AS TABLE
             i.observation_id,
             i.taxon_id AS id_taxon_id,
             i.user_id,
+            i.id AS identification_id,
             i.own_observation,
+            i.created_at,
 
             -- Full ancestor chain for each identification's taxon
             t.species_id,
@@ -67,40 +69,60 @@ CREATE OR REPLACE MACRO community_taxon_windowed(eval_interval) AS TABLE
 
     ),
 
-    scored AS (
+    scored_timeline AS (
 
         SELECT
             c.observation_id,
             c.candidate_taxon_id,
             c.rank_level,
+            iw.identification_id,
+            iw.created_at,
+            iw.user_id,
 
-            -- cumulative: IDs whose taxon IS the candidate or is BELOW it (more specific)
+            -- 1. Running count of IDs supporting this candidate (Cumulative)
             COUNT(*) FILTER (
-                WHERE
-                iw.id_taxon_id = c.candidate_taxon_id
+                WHERE iw.id_taxon_id = c.candidate_taxon_id
                 OR iw.species_id = c.candidate_taxon_id
                 OR iw.genus_id = c.candidate_taxon_id
                 OR iw.family_id = c.candidate_taxon_id
                 OR iw.order_id = c.candidate_taxon_id
                 OR iw.class_id = c.candidate_taxon_id
-            ) AS cumulative,
+            ) OVER (
+                PARTITION BY c.observation_id, c.candidate_taxon_id
+                ORDER BY iw.created_at
+            ) AS running_cumulative,
 
-            -- ancestor_disagreements: IDs ABOVE candidate (more conservative)
+            -- 2. Running count of IDs ABOVE this candidate (Conservative/Ancestors)
             COUNT(*) FILTER (
-                WHERE
-                iw.rank_level > c.rank_level  -- coarser rank = higher number
+                WHERE iw.rank_level > c.rank_level
                 AND iw.id_taxon_id != c.candidate_taxon_id
-            ) AS ancestor_disagreements,
+            ) OVER (
+                PARTITION BY c.observation_id, c.candidate_taxon_id
+                ORDER BY iw.created_at
+            ) AS running_ancestor_disagreements,
 
-            -- disagreements: IDs in a completely different branch
-            -- = total IDs - cumulative - ancestor_disagreements
-            COUNT(*) - cumulative - ancestor_disagreements AS disagreements,
-
-            cumulative::FLOAT / NULLIF(cumulative + disagreements + ancestor_disagreements, 0) AS score
+            -- 3. Total IDs submitted for this observation up to this point in time
+            COUNT(*) OVER (
+                PARTITION BY c.observation_id, c.candidate_taxon_id
+                ORDER BY iw.created_at
+            ) AS running_total_ids
 
         FROM candidates c
         JOIN id_window iw ON c.observation_id = iw.observation_id
-        GROUP BY c.observation_id, c.candidate_taxon_id, c.rank_level
+
+    ),
+
+    calculated_score AS (
+        SELECT
+            *,
+            -- Disagreements = Total - (Supporters + Ancestor IDs)
+            (running_total_ids - running_cumulative - running_ancestor_disagreements) AS running_disagreements,
+
+            -- Score = Supporters / (Supporters + Disagreements + Ancestors)
+            -- Note: In iNaturalist logic, the denominator is effectively the total IDs
+            running_cumulative::FLOAT / NULLIF(running_cumulative + running_disagreements + running_ancestor_disagreements, 0) AS current_score
+
+        FROM scored_timeline
 
     ),
 
@@ -109,16 +131,18 @@ CREATE OR REPLACE MACRO community_taxon_windowed(eval_interval) AS TABLE
         SELECT DISTINCT ON (observation_id)
             observation_id,
             candidate_taxon_id AS community_taxon,
+            identification_id,
+            user_id,
             rank_level,
-            score,
-            cumulative,
+            current_score AS score,
+            running_cumulative AS cumulative,
             rank_level <= 10 AS consensus_level_rg,  -- species or below (subspecies = rank 5)
 
-        FROM scored
+        FROM calculated_score
         WHERE
-            score > 2 / 3.0
-            AND cumulative >= 2
-        ORDER BY observation_id, rank_level ASC  -- ASC = most specific first
+            current_score > 2 / 3.0
+            AND running_cumulative >= 2
+        ORDER BY observation_id, rank_level ASC, created_at ASC -- ASC = most specific first
     )
 
     SELECT
@@ -129,6 +153,8 @@ CREATE OR REPLACE MACRO community_taxon_windowed(eval_interval) AS TABLE
         ct.rank_level,
         ct.score,
         ct.cumulative AS n_ids_at_window,
+        ct.identification_id AS id_rg,
+        ct.user_id AS id_user,
         COALESCE(ct.consensus_level_rg, FALSE) AS consensus_level_rg,
     -- RG requires community taxon to match submitted taxon
 
