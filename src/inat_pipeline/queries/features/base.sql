@@ -26,8 +26,7 @@ SELECT
     -- Temporal (submission-time signals)
     o.observed_on,
     o.created_at,
-    o.created_at - o.observed_on AS obs_to_submit_lag_days,
-
+    date_part('day', o.created_at - o.observed_on)::INT AS obs_to_submit_lag_days,
     YEAR(o.created_at) AS submitted_year,
 
     SIN(2 * pi() * WEEK(o.observed_on) / 52) AS observed_week_sin,

@@ -16,6 +16,7 @@ base AS (
         t.family_id,
         t.order_id,
         t.rank_level,
+        date_part('day', rg.created_at - rg.observed_on)::INT AS lag_days,
 
         -- use computed taxon_id first, if null fallback to observation_id
         CASE
@@ -46,9 +47,17 @@ aggregates AS (
 
         -- Observation - submission lag median
 
-        PERCENTILE_CONT(0.5) WITHIN GROUP (
-            ORDER BY DATEDIFF('day', observed_on, created_at)
-        ) AS taxon_median_submission_lag_days,
+        quantile_cont(lag_days, 0.5) OVER taxon_history AS taxon_lag_days_median,
+        AVG(lag_days) OVER taxon_history AS taxon_lag_days_mean,
+        MAX(lag_days) OVER taxon_history AS taxon_lag_days_max,
+
+        quantile_cont(lag_days, 0.5) OVER genus_history AS genus_lag_days_median,
+        AVG(lag_days) OVER genus_history AS genus_lag_days_mean,
+        MAX(lag_days) OVER genus_history AS genus_lag_days_max,
+
+        quantile_cont(lag_days, 0.5) OVER family_history AS family_lag_days_median,
+        AVG(lag_days) OVER family_history AS family_lag_days_mean,
+        MAX(lag_days) OVER family_history AS family_lag_days_max,
 
         -- Species-level stats
         COALESCE(COUNT(*) OVER taxon_history, 0) AS taxon_obs_count,

@@ -114,8 +114,17 @@ SELECT
     --t.taxon_median_submission_lag_days,
     t.taxon_avg_ids_to_rg AS tx_avg_ids_to_rg,
     t.global_rg_rate,
+    t.taxon_lag_days_median,
+    t.taxon_lag_days_mean,
+    t.taxon_lag_days_max,
+    t.genus_lag_days_median,
+    t.genus_lag_days_mean,
+    t.genus_lag_days_max,
+    t.family_lag_days_median,
+    t.family_lag_days_mean,
+    t.family_lag_days_max,
 
-    m.obs_to_submit_lag_days - t.taxon_median_submission_lag_days AS tx_lag_deviation,
+    m.obs_to_submit_lag_days - t.taxon_lag_days_median AS tx_lag_deviation,
 
     -- Taxon confusion stats (static)
     IFNULL(c.has_similar_species, FALSE) AS tx_conf_has_similar,
