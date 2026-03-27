@@ -25,6 +25,7 @@ window_ids AS (
         i.user_id,
         i.created_at,
         i.category,
+        i.taxon_id,
 
         -- Sequence within window, oldest ID first — used to isolate first-ID signal
         ROW_NUMBER() OVER (
@@ -48,6 +49,7 @@ first_id AS (
     SELECT
         observation_id,
         created_at  AS first_id_at,
+        taxon_id AS first_id_taxon_id,
         category    AS first_id_category
     FROM window_ids
     WHERE id_seq = 1
@@ -102,6 +104,7 @@ SELECT
         COALESCE(a.id_count_at_window, 0)::FLOAT / :score_window_days,
     4)                                                      AS id_velocity,
 
+
     -- ── Time-to-first-ID ─────────────────────────────────────────────────────
     -- NULL when no external ID arrived within the window. The model should treat
     -- NULL (no ID) vs 0.0 (immediate) as distinct states — use a separate binary.
@@ -111,9 +114,14 @@ SELECT
         ELSE NULL
     END                                                     AS time_to_first_id_days,
 
+    CASE
+        WHEN f.first_id_at IS NOT NULL
+        THEN date_part('hour', f.first_id_at - o.created_at)
+        ELSE NULL
+    END                                                     AS time_to_first_id_hours,
+
     -- ── First-ID signals ─────────────────────────────────────────────────────
     f.first_id_at IS NOT NULL                               AS has_any_id,
-
     -- NULL when has_any_id is FALSE — model sees no-ID as its own state,
     -- not as disagreement
     CASE
@@ -122,7 +130,10 @@ SELECT
         ELSE NULL
     END                                                     AS first_id_agrees,
 
-    -- ── Agreement dynamics ───────────────────────────────────────────────────
+    f.first_id_taxon_id = o.taxon_id AS first_id_agree_taxon,
+
+
+       -- ── Agreement dynamics ───────────────────────────────────────────────────
     COALESCE(
         a.id_agree_count::FLOAT / NULLIF(a.id_count_at_window, 0), 0
     )                                                       AS pct_ids_agree_at_window,
@@ -138,6 +149,8 @@ SELECT
     COALESCE(
         a.id_maverick_count::FLOAT / NULLIF(a.id_count_at_window, 0), 0
     )                                                       AS pct_ids_maverick_at_window,
+
+
 
     -- ── Community taxon state ─────────────────────────────────────────────────
     -- These three capture where the community *is* at score_window.

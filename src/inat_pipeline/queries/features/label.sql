@@ -4,7 +4,7 @@ WITH reasearch_grade AS (
 
     SELECT
         observation_id,
-        is_rg AS 'label'
+        is_rg AS 'label',
     FROM research_grade_windowed(to_days(:label_window_days))
 
 )

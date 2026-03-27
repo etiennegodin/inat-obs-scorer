@@ -7,6 +7,18 @@ SELECT
     --Label
     l.label,
 
+    -- Initial submisison
+
+    m.init_taxon_id,
+    m.init_rank_level,
+    m.init_rank_level <= 10 AS obs_has_species_self_id,
+
+    -- Taxon comparion at window
+    m.community_taxon_id IS NOT NULL AS has_community_id,
+    m.consensus_level_rg,
+    m.init_taxon_id = m.community_taxon_id AS taxon_changed,
+    m.community_taxon_rank,
+
     --Documentation features (submission-time safe)
     m.photo_count,
     m.has_description,
@@ -18,11 +30,12 @@ SELECT
 
     --Temporal features
     m.created_at,
-    date_part('day', m.obs_to_submit_lag_days) AS obs_to_submit_lag_days,
-    m.observed_week_sin,
-    m.observed_week_cos,
-    m.submitted_week_sin,
-    m.submitted_week_cos,
+    m.obs_to_submit_lag_days,
+
+    --m.observed_week_sin,
+    --m.observed_week_cos,
+    --m.submitted_week_sin,
+    --m.submitted_week_cos,
 
     --Observer features
     --Temporal
@@ -63,7 +76,9 @@ SELECT
     -- First-ID signals
     -- Identification dynamics at score_window
     -- Volume & velocity
-    iw.id_count_at_window,
+
+    --iw.id_count_at_window,
+    iw.first_id_agrees,
     iw.id_diversity_at_window,
     iw.id_velocity,
 
@@ -73,7 +88,8 @@ SELECT
 
     -- First-ID signals
     iw.has_any_id,
-    iw.first_id_agrees,
+    iw.first_id_agree_taxon,
+    iw.time_to_first_id_hours,
 
     -- Agreement dynamics
     iw.pct_ids_agree_at_window,
@@ -82,8 +98,8 @@ SELECT
     iw.pct_ids_maverick_at_window,
 
     -- Community taxon state at score_window
-    iw.has_community_taxon_at_window,
-    iw.community_consensus_at_window,
+    --iw.has_community_taxon_at_window,
+    --iw.community_consensus_at_window,
     iw.community_matches_submitted_at_window,
 
     -- Community taxon state at score_window
@@ -93,15 +109,18 @@ SELECT
     t.rg_rate_prior_source AS tx_rg_rate_prior_source,
     t.taxon_cold_start AS tx_cold_start,
     t.genus_popularity_rank AS tx_genus_popularity_rank,
-    COALESCE(t.genus_rg_rate, 0) AS tx_genus_rg_rate,
-    COALESCE(t.family_rg_rate, 0) AS tx_family_rg_rate,
+    t.genus_rg_rate AS tx_genus_rg_rate,
+    t.family_rg_rate AS tx_family_rg_rate,
     --t.taxon_median_submission_lag_days,
-    --t.taxon_avg_ids_to_rg AS tx_avg_ids_to_rg,
+    t.taxon_avg_ids_to_rg AS tx_avg_ids_to_rg,
+    t.global_rg_rate,
+
+    m.obs_to_submit_lag_days - t.taxon_median_submission_lag_days AS tx_lag_deviation,
 
     -- Taxon confusion stats (static)
     IFNULL(c.has_similar_species, FALSE) AS tx_conf_has_similar,
-    COALESCE(c.neighborhood_difficulty_dist_weighted, 0) AS tx_conf_nbrhd_diff_dist_weighted,
-    COALESCE(c.neighborhood_difficulty_inv_dist, 0) AS tx_conf_nbrhd_diff_inv_dist,
+    c.neighborhood_difficulty_dist_weighted AS tx_conf_nbrhd_diff_dist_weighted,
+    c.neighborhood_difficulty_inv_dist AS tx_conf_nbrhd_diff_inv_dist,
     c.similar_species_count AS tx_conf_similar_species_count,
     c.nbor_obs_count_mean AS tx_conf_nbrhd_obs_count_mean,
     c.nbor_obs_count_std AS tx_conf_nbrhd_obs_count_std,
@@ -110,6 +129,7 @@ SELECT
     c.nbor_rg_rate_inv_dist_weighted AS tx_conf_nbrhd_rg_rate_inv_dist_weighted,
     c.nbor_dist_mean AS tx_conf_nbrhd_dist_mean,
     c.rg_rate_vs_neighbors AS tx_conf_rate_vs_neighbors,
+    c.rg_rate_vs_neighbors > 10 AS tx_conf_rate_vs_neighbors_thresh,
     c.nbor_count_same_genus AS tx_conf_nbrhd_same_genus,
     c.nbor_count_cross_genus AS tx_conf_nbrhd_cross_genus,
     c.nbor_count_cross_family AS tx_conf_nbrhd_cross_family,
@@ -119,6 +139,7 @@ SELECT
     c.rg_percentile_dist_weighted AS tx_conf_rg_perc_dist_weighted,
     c.neighbor_genus_diversity AS tx_conf_nbrhd_genus_div,
     c.neighbor_rank_min AS tx_conf_nbrhd_rank_min,
+    c.neighbor_rank_min > 10 AS tx_conf_nbrhd_rank_min_over_10,
     c.magnet_score AS tx_confusion_magnet_score,
 
     --Confusion graph topology
@@ -132,17 +153,12 @@ SELECT
     -- Taxon observation and submission distributions
     tp.submission_pressure,
     tp.activity_at_pheno,
-    tp.months_from_peak_upload,
     tp.months_from_peak_pheno,
     tp.pheno_season_width,
-    tp.upload_season_width,
-    tp.peak_lag_weeks,
     tp.observed_kurtosis,
-    tp.created_kurtosis,
 
-    tp.KL_divergence,
-    tp.cosine_sim,
-    tp.l2_distance,
+    th.confusion_nbrhd_pheno_activity,
+    th.focal_vs_nbrhd_pheno_ratio
 
 FROM features.model_population m
 JOIN features.splits s ON m.observation_id = s.observation_id
@@ -156,6 +172,7 @@ LEFT JOIN features.taxa_confusion c ON m.taxon_id = c.taxon_id
 LEFT JOIN graph.clustering_coefficient cc ON m.taxon_id = cc.taxon_id
 LEFT JOIN graph.double_hop_stats dh ON m.taxon_id = dh.taxon_id
 LEFT JOIN features.temporal tp ON m.observation_id = tp.observation_id
+LEFT JOIN features.taxon_histo_conf th ON m.observation_id = th.observation_id
 
 WHERE
     l.label IS NOT NULL

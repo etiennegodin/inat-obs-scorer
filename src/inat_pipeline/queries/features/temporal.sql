@@ -63,6 +63,8 @@ SELECT
     o.taxon_id,
     o.created_at,
     o.observed_on,
+    ct.blended_pmf as c_blended_pmf,
+    ot.blended_pmf as o_blended_pmf,
 
     -- Observation stats
     ct.blended_pmf[LEAST(WEEK(o.created_at), 52)] AS submission_pressure,

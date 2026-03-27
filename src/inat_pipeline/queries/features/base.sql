@@ -2,14 +2,26 @@ CREATE SCHEMA IF NOT EXISTS features;
 
 CREATE OR REPLACE TABLE features.base AS
 
+WITH first_taxon AS (
+
+    SELECT
+        o.id,
+        i.taxon_id
+
+    FROM staged.observations o
+    JOIN staged.identifications i ON o.id = i.observation_id
+    WHERE i.created_at = o.created_at
+
+)
+
 SELECT
 
 -- Primary keys & joins
     o.id AS observation_id,
     o.uuid,
     o.user.id AS user_id,
-
-    -- Label
+    f.taxon_id AS init_taxon_id,
+    t.rank_level AS init_rank_level,
 
     -- Temporal (submission-time signals)
     o.observed_on,
@@ -87,4 +99,8 @@ SELECT
 
 FROM staged.observations o
 LEFT JOIN raw.inat_api a ON o.uuid = a.raw_id
-WHERE o.created_at < :max_created_date
+JOIN first_taxon f ON o.id = f.id
+JOIN staged.taxa t ON t.taxon_id = f.taxon_id
+WHERE
+    o.created_at < :max_created_date
+    AND o.captive_cultivated IS FALSE
