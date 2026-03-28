@@ -91,6 +91,9 @@ SELECT
     tx.family_time_to_cm_median,
     tx.order_time_to_cm_median,
 
+    tx.specialist_identifer,
+    tx.specialist_observer,
+
     -- Taxon confusion stats (static)
     IFNULL(c.has_similar_species, FALSE) AS tx_conf_has_similar,
     c.neighborhood_difficulty_dist_weighted AS tx_conf_nbrhd_diff_dist_weighted,

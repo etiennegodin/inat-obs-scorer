@@ -41,6 +41,34 @@ base_obs AS (
     LEFT JOIN staged.taxa t ON r.taxon_id = t.taxon_id  -- ← correct key
 ),
 
+identifiers AS (
+
+    SELECT
+        taxon_id,
+
+        COUNT(DISTINCT(user_id)) / COUNT(user_id) AS specialist_identifer,
+
+    FROM staged.identifications
+    WHERE
+        own_observation IS FALSE
+        AND "current" IS TRUE
+
+    GROUP BY taxon_id
+
+),
+
+observers AS (
+
+    SELECT
+        taxon_id,
+
+        COUNT(DISTINCT(user_id)) / COUNT(user_id) AS specialist_observer,
+
+    FROM staged.observations
+    GROUP BY taxon_id
+
+),
+
 -- ── True medians: computed directly from base_obs so they're exact, not
 --    medians-of-medians. One CTE per level to avoid a giant GROUP BY CUBE.
 taxon_medians AS (
@@ -309,6 +337,9 @@ SELECT
     g.global_n_ids_median,
     g.global_score_median,
 
+    i.specialist_identifer,
+    ob.specialist_observer,
+
     -- Taxonomy labels
     t.phylum,
     t.class,
@@ -322,5 +353,8 @@ LEFT JOIN taxon_medians tm ON b.taxon_id = tm.taxon_id
 LEFT JOIN genus_medians gm ON b.genus_id = gm.genus_id
 LEFT JOIN family_medians fm ON b.family_id = fm.family_id
 LEFT JOIN order_medians om ON b.order_id = om.order_id
+LEFT JOIN identifiers i ON b.order_id = i.taxon_id
+LEFT JOIN observers ob ON b.order_id = ob.taxon_id
+
 CROSS JOIN global_stats g
 LEFT JOIN staged.taxa t ON b.taxon_id = t.taxon_id
