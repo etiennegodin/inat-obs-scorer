@@ -68,12 +68,10 @@ SELECT
 
     --Taxon features
 
-    tx.rank_level AS taxon_rank_level,
     tx.effective_rg_rate_shrunk AS taxon_rg_rate,        -- rank-corrected
     tx.effective_time_to_cm_mean AS taxon_time_to_cm_mean,
     tx.effective_time_to_cm_median AS taxon_time_to_cm_median,
     tx.effective_n_ids_mean AS taxon_n_ids_mean,
-    tx.effective_score_mean AS taxon_score_mean,
     tx.effective_prior_source AS taxon_prior_source,   -- useful feature
 
     tx.genus_rg_rate,
@@ -82,16 +80,7 @@ SELECT
     tx.genus_time_to_cm_mean,
     tx.family_time_to_cm_mean,
     tx.order_time_to_cm_mean,
-    tx.genus_n_ids_mean,
-    tx.family_n_ids_mean,
-    tx.order_n_ids_mean,
-    tx.genus_score_mean,
-    tx.family_score_mean,
-    tx.order_score_mean,
-    tx.global_rg_rate,
-    tx.global_time_to_cm_mean,
-    tx.global_n_ids_mean,
-    tx.global_score_mean,
+
     tx.rg_rate_prior_source,
     tx.taxon_popularity_log,
     tx.genus_popularity_log,
@@ -99,20 +88,9 @@ SELECT
     tx.order_popularity_log,
     tx.taxon_cold_start,
     tx.taxon_time_to_cm_median,
-    tx.taxon_n_ids_median,
-    tx.taxon_score_median,
     tx.genus_time_to_cm_median,
-    tx.genus_n_ids_median,
-    tx.genus_score_median,
     tx.family_time_to_cm_median,
-    tx.family_n_ids_median,
-    tx.family_score_median,
     tx.order_time_to_cm_median,
-    tx.order_n_ids_median,
-    tx.order_score_median,
-    tx.global_time_to_cm_median,
-    tx.global_n_ids_median,
-    tx.global_score_median,
 
     -- Taxon confusion stats (static)
     IFNULL(c.has_similar_species, FALSE) AS tx_conf_has_similar,
