@@ -38,7 +38,9 @@ Over half of all eventually-RG observations are confirmed within 24 hours. By da
 
 The **30% remainder at day 7** is the model's target: observations that have slipped through the first wave of community engagement. This population filter is applied at training time — the model is scoped exclusively to observations that are not Research Grade one week after submission, either because they received no identifications or because early identifications have not yet reached community consensus.
 
-**Why a 365-day label window?** The model predicts whether an observation will *eventually* reach RG, not whether it will do so quickly. Using a 365-day closed window captures 93.6% of eventual-RG observations. The extra 11% is meaningful label signal, particularly for structurally difficult taxa that require patient accumulation of specialist identifications. Observations must be at least 365 days old at scrape time to receive a label, ensuring the closed-window assumption holds.
+**Why a 365-day label window?** A common approach is to label an observation as RG or not based on its status at a fixed horizon — 90 days is a natural choice since most activity happens early. But the settlement curve shows that 90 days captures only 82% of observations that will eventually reach RG. The remaining 18% are disproportionately the hard cases: unusual taxa, observations that required a specialist to discover, or species where identifications trickle in slowly over months. Labelling them as negatives at 90 days would introduce systematic noise into exactly the population the model is trying to learn from.
+
+Extending the window to 365 days captures 93.6% of eventual-RG observations — recovering most of that signal — while keeping the dataset manageable. Observations must be at least 365 days old at scrape time to receive a label, ensuring the closed-window assumption holds and that no observation is labelled before its outcome is known.
 
 ---
 
@@ -62,9 +64,10 @@ Early identification dynamics carry real information even in the not-RG-at-day-7
 The model produces a P(Research Grade) score. Not all score ranges are equally useful for triage:
 
 ```
-P(RG) < 0.35    →  Low-signal observations: poor documentation, captive/cultivated,
-                    or structurally ineligible taxa. Community confirmation is unlikely
-                    regardless of expert attention. Deprioritised in the review queue.
+P(RG) < 0.35    →  Low-signal observations: poor documentation, structurally
+                    ineligible taxa, or species that consistently resist community
+                    confirmation. Expert attention is unlikely to change the outcome.
+                    Deprioritised in the review queue.
 
 P(RG) 0.35–0.70 →  ACTIONABLE ZONE: real potential but not self-resolving.
                     Expert identification or a confirming ID could tip these to RG.
@@ -328,7 +331,7 @@ The score command is designed for **periodic batch execution** — weekly or on-
 
 Selection happens at two levels:
 
-**Observation-level eligibility** — only verifiable observations: georeferenced, dated, with media, non-captive. Casual and ineligible observations are excluded from the training set but preserved as a separate class for potential future modelling.
+**Observation-level eligibility** — only verifiable observations: georeferenced, dated, with media. Casual and ineligible observations are excluded from the training set but preserved as a separate class for potential future modelling.
 
 **Observer-level coverage** — observers must meet both:
 - **Minimum activity**: ≥ 20 observations, ensuring a meaningful historical footprint for observer reputation features
