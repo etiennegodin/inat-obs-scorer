@@ -1,142 +1,235 @@
 CREATE OR REPLACE TABLE features.taxon AS
 
-WITH config AS (
-    SELECT to_days(:label_window_days) AS window_val
-
-),
-
-base AS (
+WITH base_obs AS (
     SELECT
-        rg.observation_id,
-        rg.created_at,
-        rg.observed_on,
-        rg.is_rg,
-        rg.n_ids_at_window,
+        cm.observation_id,
+        cm.created_at,
+        cm.observed_on,
+        cm.n_ids_at_window,
+        cm.score,
+        cm.consensus_level_rg,
         t.genus_id,
         t.family_id,
         t.order_id,
         t.rank_level,
-        date_part('day', rg.created_at - rg.observed_on)::INT AS lag_days,
-
-        -- use computed taxon_id first, if null fallback to observation_id
+        date_part('day', cm.created_at - cm.observed_on)::INT AS lag_days,
+        date_part('day', id_created_at - created_at)::INT AS time_to_cm_days,
         CASE
-            WHEN rg.community_taxon_id IS NULL THEN rg.taxon_id
-            ELSE rg.community_taxon_id
-        END AS taxon_id,
-        CASE
-            WHEN rg.community_taxon_id IS NULL THEN 'taxon_id'
-            ELSE 'community_taxon'
-        END AS taxon_id_source,
-
-    FROM research_grade_windowed((SELECT window_val FROM config)) rg
-    LEFT JOIN staged.taxa t ON rg.taxon_id = t.taxon_id
+            WHEN cm.community_taxon IS NULL THEN cm.taxon_id
+            ELSE cm.community_taxon
+        END AS taxon_id
+    FROM community_taxon_windowed(INTERVAL '999 years') cm
+    LEFT JOIN staged.taxa t ON cm.taxon_id = t.taxon_id
+    WHERE cm.created_at < :cutoff_date
 ),
 
-aggregates AS (
-
+-- ── True medians: computed directly from base_obs so they're exact, not
+--    medians-of-medians. One CTE per level to avoid a giant GROUP BY CUBE.
+taxon_medians AS (
     SELECT
-        observation_id,
         taxon_id,
-        taxon_id_source,
-        created_at,
+        MEDIAN(time_to_cm_days) AS taxon_time_to_cm_median,
+        MEDIAN(n_ids_at_window) AS taxon_n_ids_median,
+        MEDIAN(score) AS taxon_score_median
+    FROM base_obs
+    GROUP BY taxon_id
+),
+
+genus_medians AS (
+    SELECT
+        genus_id,
+        MEDIAN(time_to_cm_days) AS genus_time_to_cm_median,
+        MEDIAN(n_ids_at_window) AS genus_n_ids_median,
+        MEDIAN(score) AS genus_score_median
+    FROM base_obs
+    GROUP BY genus_id
+),
+
+family_medians AS (
+    SELECT
+        family_id,
+        MEDIAN(time_to_cm_days) AS family_time_to_cm_median,
+        MEDIAN(n_ids_at_window) AS family_n_ids_median,
+        MEDIAN(score) AS family_score_median
+    FROM base_obs
+    GROUP BY family_id
+),
+
+order_medians AS (
+    SELECT
+        order_id,
+        MEDIAN(time_to_cm_days) AS order_time_to_cm_median,
+        MEDIAN(n_ids_at_window) AS order_n_ids_median,
+        MEDIAN(score) AS order_score_median
+    FROM base_obs
+    GROUP BY order_id
+),
+
+global_stats AS (
+    SELECT
+        AVG(consensus_level_rg::FLOAT) AS global_rg_rate,
+        AVG(time_to_cm_days::FLOAT) AS global_time_to_cm_mean,
+        AVG(n_ids_at_window::FLOAT) AS global_n_ids_mean,
+        AVG(score) AS global_score_mean,
+        MEDIAN(time_to_cm_days) AS global_time_to_cm_median,
+        MEDIAN(n_ids_at_window) AS global_n_ids_median,
+        MEDIAN(score) AS global_score_median
+    FROM base_obs
+),
+
+-- ── Per-taxon aggregates (sums bubble up to higher levels via window functions)
+taxon_counts AS (
+    SELECT
+        taxon_id,
         genus_id,
         family_id,
         order_id,
-        rank_level,
-        is_rg,
+        COUNT(*) AS taxon_obs_count,
+        COUNT(*) FILTER (WHERE consensus_level_rg) AS taxon_rg_count,
 
-        -- Observation - submission lag median
+        -- Sums needed to compute exact means at genus/family/order
+        SUM(time_to_cm_days) AS taxon_time_to_cm_sum,
+        SUM(n_ids_at_window) AS taxon_n_ids_sum,
+        SUM(score) AS taxon_score_sum,
 
-        quantile_cont(lag_days, 0.5) OVER taxon_history AS taxon_lag_days_median,
-        AVG(lag_days) OVER taxon_history AS taxon_lag_days_mean,
-        MAX(lag_days) OVER taxon_history AS taxon_lag_days_max,
+        -- Taxon-level means
+        AVG(time_to_cm_days::FLOAT) AS taxon_time_to_cm_mean,
+        AVG(n_ids_at_window::FLOAT) AS taxon_n_ids_mean,
+        AVG(score) AS taxon_score_mean,
 
-        quantile_cont(lag_days, 0.5) OVER genus_history AS genus_lag_days_median,
-        AVG(lag_days) OVER genus_history AS genus_lag_days_mean,
-        MAX(lag_days) OVER genus_history AS genus_lag_days_max,
-
-        quantile_cont(lag_days, 0.5) OVER family_history AS family_lag_days_median,
-        AVG(lag_days) OVER family_history AS family_lag_days_mean,
-        MAX(lag_days) OVER family_history AS family_lag_days_max,
-
-        -- Species-level stats
-        COALESCE(COUNT(*) OVER taxon_history, 0) AS taxon_obs_count,
-        COALESCE(SUM(is_rg::INT) OVER taxon_history, 0) AS taxon_rg_obs,
-
-        -- Genus-level stats (partition by genus_id)
-        COALESCE(COUNT(*) OVER genus_history, 0) AS genus_obs_count,
-        COALESCE(SUM(is_rg::INT) OVER genus_history, 0) AS genus_rg_obs,
-
-        -- Family-level stats
-        COALESCE(COUNT(*) OVER family_history, 0) AS family_obs_count,
-        COALESCE(SUM(is_rg::INT) OVER family_history, 0) AS family_rg_obs,
-
-        -- Order-level stats (last resort)
-        COALESCE(COUNT(*) OVER order_history, 0) AS order_obs_count,
-        COALESCE(SUM(is_rg::INT) OVER order_history, 0) AS order_rg_obs,
-
-        -- ID convergence tendency
-        COALESCE(
-            AVG(n_ids_at_window) FILTER (WHERE is_rg) OVER taxon_history, 0
-        ) AS taxon_avg_ids_to_rg,
-
-        -- Global prior
-        AVG(is_rg::FLOAT) OVER (
-            ORDER BY created_at
-            ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING
-        ) AS global_rg_rate,
-
-    FROM base
-
-    WINDOW
-        taxon_history AS (PARTITION BY taxon_id ORDER BY created_at ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING),
-        genus_history AS (PARTITION BY genus_id ORDER BY created_at ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING),
-        family_history AS (PARTITION BY family_id ORDER BY created_at ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING),
-        order_history AS (PARTITION BY order_id ORDER BY created_at ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING)
+        taxon_rg_count::FLOAT / NULLIF(taxon_obs_count, 0) AS taxon_rg_rate_raw
+    FROM base_obs
+    GROUP BY taxon_id, genus_id, family_id, order_id
 ),
 
-rates AS (
-
+-- ── Roll sums up to each taxonomic level with window functions
+aggregates AS (
     SELECT
-        * EXCLUDE (global_rg_rate),
+        tc.*,
 
-        -- Raw rates at each level
-        taxon_rg_obs::FLOAT / NULLIF(taxon_obs_count, 0) AS taxon_rg_rate_raw,
-        genus_rg_obs::FLOAT / NULLIF(genus_obs_count, 0) AS genus_rg_rate,
-        family_rg_obs::FLOAT / NULLIF(family_obs_count, 0) AS family_rg_rate,
-        order_rg_obs::FLOAT / NULLIF(order_obs_count, 0) AS order_rg_rate,
+        -- Observation counts
+        SUM(taxon_obs_count) OVER (PARTITION BY genus_id) AS genus_obs_count,
+        SUM(taxon_obs_count) OVER (PARTITION BY family_id) AS family_obs_count,
+        SUM(taxon_obs_count) OVER (PARTITION BY order_id) AS order_obs_count,
 
-        -- Hierarchical prior for shrinkage
-        -- 0.5 cold start fallback
-        COALESCE(genus_rg_rate, family_rg_rate, order_rg_rate, global_rg_rate, 0.5) AS hierarchical_prior,
+        -- RG counts (for rate computation)
+        SUM(taxon_rg_count) OVER (PARTITION BY genus_id) AS genus_rg_count,
+        SUM(taxon_rg_count) OVER (PARTITION BY family_id) AS family_rg_count,
+        SUM(taxon_rg_count) OVER (PARTITION BY order_id) AS order_rg_count,
 
-        (10 * hierarchical_prior + taxon_rg_obs) / (10 + taxon_obs_count) AS taxon_rg_rate_shrunk,
-        global_rg_rate,
+        -- time_to_cm sums
+        SUM(taxon_time_to_cm_sum) OVER (PARTITION BY genus_id) AS genus_time_to_cm_sum,
+        SUM(taxon_time_to_cm_sum) OVER (PARTITION BY family_id) AS family_time_to_cm_sum,
+        SUM(taxon_time_to_cm_sum) OVER (PARTITION BY order_id) AS order_time_to_cm_sum,
 
-        -- Which level actually provided the prior
+        -- n_ids sums
+        SUM(taxon_n_ids_sum) OVER (PARTITION BY genus_id) AS genus_n_ids_sum,
+        SUM(taxon_n_ids_sum) OVER (PARTITION BY family_id) AS family_n_ids_sum,
+        SUM(taxon_n_ids_sum) OVER (PARTITION BY order_id) AS order_n_ids_sum,
+
+        -- score sums
+        SUM(taxon_score_sum) OVER (PARTITION BY genus_id) AS genus_score_sum,
+        SUM(taxon_score_sum) OVER (PARTITION BY family_id) AS family_score_sum,
+        SUM(taxon_score_sum) OVER (PARTITION BY order_id) AS order_score_sum
+    FROM taxon_counts tc
+),
+
+-- ── Derive rates from sums (no name collisions — rg / time_to_cm / n_ids / score
+--    are fully separate columns now)
+rates AS (
+    SELECT
+        a.*,
+
+        -- RG rates at each level
+        genus_rg_count::FLOAT / NULLIF(genus_obs_count, 0) AS genus_rg_rate,
+        family_rg_count::FLOAT / NULLIF(family_obs_count, 0) AS family_rg_rate,
+        order_rg_count::FLOAT / NULLIF(order_obs_count, 0) AS order_rg_rate,
+
+        -- time_to_cm means
+        genus_time_to_cm_sum::FLOAT / NULLIF(genus_obs_count, 0) AS genus_time_to_cm_mean,
+        family_time_to_cm_sum::FLOAT / NULLIF(family_obs_count, 0) AS family_time_to_cm_mean,
+        order_time_to_cm_sum::FLOAT / NULLIF(order_obs_count, 0) AS order_time_to_cm_mean,
+
+        -- n_ids means
+        genus_n_ids_sum::FLOAT / NULLIF(genus_obs_count, 0) AS genus_n_ids_mean,
+        family_n_ids_sum::FLOAT / NULLIF(family_obs_count, 0) AS family_n_ids_mean,
+        order_n_ids_sum::FLOAT / NULLIF(order_obs_count, 0) AS order_n_ids_mean,
+
+        -- score means (community taxon confidence, distinct from RG rate)
+        genus_score_sum::FLOAT / NULLIF(genus_obs_count, 0) AS genus_score_mean,
+        family_score_sum::FLOAT / NULLIF(family_obs_count, 0) AS family_score_mean,
+        order_score_sum::FLOAT / NULLIF(order_obs_count, 0) AS order_score_mean
+    FROM aggregates a
+),
+
+-- ── Bayesian shrinkage: prior is the lowest taxonomic level with enough observations.
+--    COALESCE on rates is wrong here — a genus with n=2 gives a real (noisy) rate,
+--    not NULL. Use a count threshold to decide when to trust each level.
+bayesian AS (
+    SELECT
+        r.*,
+        g.global_rg_rate,
+        g.global_time_to_cm_mean,
+        g.global_n_ids_mean,
+        g.global_score_mean,
+
+        -- Hierarchical prior: pick the lowest level with >= 10 obs
         CASE
-            WHEN genus_rg_rate > 0 THEN 1
-            WHEN family_rg_rate > 0 THEN 2
-            WHEN order_rg_rate > 0 THEN 3
-            WHEN global_rg_rate > 0 THEN 4
-            ELSE 5
+            WHEN r.genus_obs_count >= 10 THEN r.genus_rg_rate
+            WHEN r.family_obs_count >= 10 THEN r.family_rg_rate
+            WHEN r.order_obs_count >= 10 THEN r.order_rg_rate
+            ELSE g.global_rg_rate
+        END AS hierarchical_prior_rg,
+
+        CASE
+            WHEN r.genus_obs_count >= 10 THEN 1
+            WHEN r.family_obs_count >= 10 THEN 2
+            WHEN r.order_obs_count >= 10 THEN 3
+            ELSE 4
         END AS rg_rate_prior_source,
 
-        -- Flag cold start if few observations
-        CASE WHEN taxon_obs_count < 30 THEN TRUE ELSE FALSE END AS taxon_cold_start,
+        -- Beta-binomial shrinkage toward the hierarchical prior (alpha = 10 pseudo-obs)
+        -- DuckDB resolves the alias reference in the same SELECT — this is fine.
+        (10.0 * hierarchical_prior_rg + taxon_rg_count)
+        / (10.0 + taxon_obs_count) AS taxon_rg_rate_shrunk,
 
-        -- Popularity of taxon hierarchy at this time
-        LOG(taxon_obs_count + 1) AS taxon_popularity_rank,
-        LOG(genus_obs_count + 1) AS genus_popularity_rank,
-        LOG(family_obs_count + 1) AS family_popularity_rank,
-        LOG(order_obs_count + 1) AS order_popularity_rank,
+        -- Popularity (log-scale observation count)
+        LOG(taxon_obs_count + 1) AS taxon_popularity_log,
+        LOG(genus_obs_count + 1) AS genus_popularity_log,
+        LOG(family_obs_count + 1) AS family_popularity_log,
+        LOG(order_obs_count + 1) AS order_popularity_log,
 
-    FROM aggregates
-
+        taxon_obs_count < 30 AS taxon_cold_start
+    FROM rates r
+    CROSS JOIN global_stats g
 )
 
 SELECT
-    r.*,
+    b.*,
+
+    -- Medians (joined from dedicated per-group CTEs — true medians, not median-of-medians)
+    tm.taxon_time_to_cm_median,
+    tm.taxon_n_ids_median,
+    tm.taxon_score_median,
+
+    gm.genus_time_to_cm_median,
+    gm.genus_n_ids_median,
+    gm.genus_score_median,
+
+    fm.family_time_to_cm_median,
+    fm.family_n_ids_median,
+    fm.family_score_median,
+
+    om.order_time_to_cm_median,
+    om.order_n_ids_median,
+    om.order_score_median,
+
+    -- Global medians for fallback / normalisation
+    g.global_time_to_cm_median,
+    g.global_n_ids_median,
+    g.global_score_median,
+
+    -- Taxonomy labels
     t.phylum,
     t.class,
     t."order",
@@ -144,6 +237,10 @@ SELECT
     t.genus,
     t.species
 
-FROM rates r
-LEFT JOIN staged.taxa t ON r.taxon_id = t.taxon_id
-ORDER BY observation_id;
+FROM bayesian b
+LEFT JOIN taxon_medians tm ON b.taxon_id = tm.taxon_id
+LEFT JOIN genus_medians gm ON b.genus_id = gm.genus_id
+LEFT JOIN family_medians fm ON b.family_id = fm.family_id
+LEFT JOIN order_medians om ON b.order_id = om.order_id
+CROSS JOIN global_stats g
+LEFT JOIN staged.taxa t ON b.taxon_id = t.taxon_id

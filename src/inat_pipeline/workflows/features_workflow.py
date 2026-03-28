@@ -51,6 +51,7 @@ def execute(deps: Dependencies):
         splits_report(sql_split, params)
 
         # Static features
+        sql_features.execute("taxon", params=params)
         sql_graph.execute("confusion_graph")
         sql_graph.execute("confusion_graph_metrics")
         sql_features.execute("network_events_raw", params=params)
@@ -62,7 +63,6 @@ def execute(deps: Dependencies):
         )
 
         # Time-windowed features :
-        sql_features.execute("taxon", params=params)
         sql_features.execute("observations", params=params)
         sql_features.execute("identifications_at_window", params=params)
 

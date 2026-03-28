@@ -66,55 +66,45 @@ SELECT
     COALESCE(i.prior_ids_vision_rate, 0) AS id_prior_ids_vision_rate,
     COALESCE(i.reciprocity_ratio, 0) AS id_reciprocity_ratio,
 
-    -- First-ID signals
-    -- Identification dynamics at score_window
-    -- Volume & velocity
-
-    /*
-
-    --iw.id_count_at_window,
-    iw.first_id_agrees,
-    iw.id_diversity_at_window,
-    iw.id_velocity,
-
-    -- Time-to-first-ID (NULL = no ID arrived; keep NULL, do not COALESCE to 0
-    -- — the model should distinguish "no ID" from "immediate ID")
-    iw.time_to_first_id_days,
-
-    -- First-ID signals
-    iw.has_any_id,
-    iw.first_id_agree_taxon,
-    iw.time_to_first_id_hours,
-
-    -- Agreement dynamics
-    iw.pct_ids_agree_at_window,
-    iw.pct_ids_refining_at_window,
-    iw.id_maverick_count_at_window,
-    iw.pct_ids_maverick_at_window,
-
-    iw.community_matches_submitted_at_window,
-    */
-
     --Taxon features
-    t.taxon_popularity_rank AS tx_popularity_rank,
-    t.rg_rate_prior_source AS tx_rg_rate_prior_source,
-    t.taxon_cold_start AS tx_cold_start,
-    t.genus_popularity_rank AS tx_genus_popularity_rank,
-    t.genus_rg_rate AS tx_genus_rg_rate,
-    t.family_rg_rate AS tx_family_rg_rate,
-    t.taxon_avg_ids_to_rg AS tx_avg_ids_to_rg,
+    t.genus_rg_rate,
+    t.family_rg_rate,
+    t.order_rg_rate,
+    t.genus_time_to_cm_mean,
+    t.family_time_to_cm_mean,
+    t.order_time_to_cm_mean,
+    t.genus_n_ids_mean,
+    t.family_n_ids_mean,
+    t.order_n_ids_mean,
+    t.genus_score_mean,
+    t.family_score_mean,
+    t.order_score_mean,
     t.global_rg_rate,
-    t.taxon_lag_days_median,
-    t.taxon_lag_days_mean,
-    t.taxon_lag_days_max,
-    t.genus_lag_days_median,
-    t.genus_lag_days_mean,
-    t.genus_lag_days_max,
-    t.family_lag_days_median,
-    t.family_lag_days_mean,
-    t.family_lag_days_max,
-
-    m.obs_to_submit_lag_days - t.taxon_lag_days_median AS tx_lag_deviation,
+    t.global_time_to_cm_mean,
+    t.global_n_ids_mean,
+    t.global_score_mean,
+    t.rg_rate_prior_source,
+    t.taxon_rg_rate_shrunk,
+    t.taxon_popularity_log,
+    t.genus_popularity_log,
+    t.family_popularity_log,
+    t.order_popularity_log,
+    t.taxon_cold_start,
+    t.taxon_time_to_cm_median,
+    t.taxon_n_ids_median,
+    t.taxon_score_median,
+    t.genus_time_to_cm_median,
+    t.genus_n_ids_median,
+    t.genus_score_median,
+    t.family_time_to_cm_median,
+    t.family_n_ids_median,
+    t.family_score_median,
+    t.order_time_to_cm_median,
+    t.order_n_ids_median,
+    t.order_score_median,
+    t.global_time_to_cm_median,
+    t.global_n_ids_median,
+    t.global_score_median,
 
     -- Taxon confusion stats (static)
     IFNULL(c.has_similar_species, FALSE) AS tx_conf_has_similar,
@@ -158,38 +148,16 @@ SELECT
     th.confusion_nbrhd_pheno_activity,
     th.focal_vs_nbrhd_pheno_ratio,
 
-    -- Taxon diff
-
-    td.time_to_rg_mean,
-    td.time_to_rg_std,
-    td.time_to_rg_med,
-    td.ids_rg_mean,
-    td.ids_rg_std,
-    td.ids_rg_med,
-    td.score_mean,
-    td.score_std,
-    td.score_med,
-    td.genus_cm_rate,
-    td.family_cm_rate,
-    td.order_cm_rate,
-    td.taxon_cm_rate_shrunk,
-    td.specialist_identifer,
-    td.specialist_observer
-
 FROM features.model_population m
 JOIN features.splits s ON m.observation_id = s.observation_id
 LEFT JOIN features.observations ob ON m.observation_id = ob.observation_id
 LEFT JOIN features.observers_entropy oe ON m.observation_id = oe.observation_id
 LEFT JOIN features.label l ON m.observation_id = l.observation_id
 JOIN features.identifications i ON m.observation_id = i.observation_id
---LEFT JOIN features.identifications_at_window iw ON m.observation_id = iw.observation_id
-LEFT JOIN features.taxon t ON m.observation_id = t.observation_id
-LEFT JOIN features.taxon_diff td ON m.taxon_id = td.taxon_id
-
+LEFT JOIN features.taxon t ON m.taxon_id = t.taxon_id
 LEFT JOIN features.taxa_confusion c ON m.taxon_id = c.taxon_id
 LEFT JOIN graph.clustering_coefficient cc ON m.taxon_id = cc.taxon_id
 LEFT JOIN graph.double_hop_stats dh ON m.taxon_id = dh.taxon_id
-
 LEFT JOIN features.temporal tp ON m.observation_id = tp.observation_id
 LEFT JOIN features.taxon_histo_conf th ON m.observation_id = th.observation_id
 

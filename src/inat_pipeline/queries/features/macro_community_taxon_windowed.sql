@@ -150,6 +150,7 @@ CREATE OR REPLACE MACRO community_taxon_windowed(eval_interval) AS TABLE
         o.id AS observation_id,
         o.taxon_id,
         o.created_at,
+        o.observed_on,
         ct.community_taxon,
         ct.rank_level,
         ct.score,
