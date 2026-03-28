@@ -15,6 +15,7 @@ WITH base_obs_raw AS (
             ELSE cm.community_taxon
         END AS taxon_id   -- ← this is now the stable key for everything below
     FROM community_taxon_windowed(INTERVAL '999 years') cm
+    WHERE cm.created_at < :cutoff_date
 ),
 
 -- Step 2: join taxa metadata on the RESOLVED taxon_id, not cm.taxon_id
