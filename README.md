@@ -463,6 +463,13 @@ Planned work:
 - Geographic range signal (is this observation outside the taxon's typical range?)
 - AWS S3 ingestion source migration to facilitate scope expansion beyond Québec
 
+
+- **Two-model routing architecture**: route observations at inference time on
+  `has_any_id` — a discoverability model (no-ID population, current scope) and
+  a resolution model (has-ID population, disputed/specialist cases). The routing
+  gate is a single binary feature; both models share the same pipeline and
+  serving infrastructure. Requires ~10× current has-ID training volume to be
+  viable — addressable by expanding scope beyond Québec.
 ---
 
 ## Scope & Limitations
@@ -470,6 +477,27 @@ Planned work:
 - Currently scoped to **Plantae** observations in **Québec**
 - Observer cold-start (accounts with < 20 observations) handled via precomputed fallback stats in v0.3
 - Probability scores are uncalibrated pre-v0.3; ranking metrics are the primary evaluation signal in v0.2
+**Population scope — discovery vs. resolution**
+Open "Needs ID" observations that haven't reached Research Grade at day 7 fall
+into two structurally distinct sub-populations:
+
+| Sub-population | Definition | Train positives | Positive rate |
+|---|---|---|---|
+| **No-ID** | Zero external identifications at day 7 | ~23,000 | ~43% |
+| **Has-ID** | Identifications received but no consensus | ~1,500 | ~26% |
+
+The no-ID population represents a **discoverability problem** — quality
+observations that haven't gained community attention yet. The has-ID population
+represents a **resolution problem** — observations where early identifications
+exist but taxonomic consensus hasn't formed.
+
+This model is scoped exclusively to the no-ID population. The has-ID population
+has a lower and more stable positive rate (~20% across val/test) consistent with
+structural difficulty rather than neglect, and its training set size (~1,500
+positives) is insufficient for a reliable separate model at the current data
+volume. It is documented here as a distinct problem class for future work.
+
+
 
 ---
 
