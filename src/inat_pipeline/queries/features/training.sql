@@ -68,34 +68,35 @@ SELECT
 
     --Taxon features
 
-    tx.effective_rg_rate_shrunk AS taxon_rg_rate,        -- rank-corrected
+    tx.effective_rg_rate_shrunk AS taxon_cm_rate,        -- rank-corrected
     tx.effective_time_to_cm_mean AS taxon_time_to_cm_mean,
     tx.effective_time_to_cm_median AS taxon_time_to_cm_median,
     tx.effective_n_ids_mean AS taxon_n_ids_mean,
+    tx.effective_score_mean AS taxon_score_mean,
     tx.effective_lag_days_mean AS taxon_lag_days_mean,
     tx.effective_prior_source AS taxon_prior_source,   -- useful feature
 
-    tx.genus_rg_rate,
-    tx.family_rg_rate,
-    tx.order_rg_rate,
+    tx.genus_rg_rate AS taxon_genus_rg_rate,
+    tx.family_rg_rate AS taxon_family_cm_rate,
+    tx.order_rg_rate AS taxon_order_cm_rate,
 
-    tx.taxon_time_to_cm_mean,
+    tx.taxon_time_to_cm_mean AS taxon_time_to_cm_mean_raw,
     tx.genus_time_to_cm_mean,
     tx.family_time_to_cm_mean,
     tx.order_time_to_cm_mean,
 
-    tx.taxon_n_ids_mean,
+    tx.taxon_n_ids_mean AS taxon_n_ids_mean_raw,
 
     tx.genus_n_ids_mean,
     tx.family_n_ids_mean,
     tx.order_n_ids_mean,
 
-    tx.taxon_score_mean,
+    tx.taxon_score_mean AS taxon_score_mean_raw,
     tx.genus_score_mean,
     tx.family_score_mean,
     tx.order_score_mean,
 
-    tx.taxon_lag_days_mean,
+    tx.taxon_lag_days_mean AS taxon_lag_days_mean_raw,
     genus_lag_days_mean,
     family_lag_days_mean,
     order_lag_days_mean,
@@ -110,7 +111,7 @@ SELECT
     tx.specialist_identifer,
     tx.specialist_observer,
 
-    tx.taxon_time_to_cm_median,
+    tx.taxon_time_to_cm_median AS taxon_time_to_cm_median_raw,
     tx.taxon_n_ids_median,
     tx.taxon_score_median,
     tx.taxon_lag_days_median,
