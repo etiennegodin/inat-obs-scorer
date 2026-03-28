@@ -118,7 +118,6 @@ rates AS (
 
 SELECT
     r.*,
-    r.taxon_cm_rate_shrunk / r.global_cm_rate AS taxon_rate_global,
     i.specialist_identifer,
     ob.specialist_observer,
 
