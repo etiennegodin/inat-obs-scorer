@@ -184,14 +184,10 @@ The `research_grade_windowed()` wrapper enforces all eligibility conditions — 
 
 Rare taxa have too few observations to compute reliable difficulty estimates. A layered approach handles the full spectrum from common to rare:
 
-**Static taxon difficulty aggregates:** Structural taxon properties computed once
-on the training partition (bounded by `train_cutoff_date`) and applied as a static
-lookup to val and test — no recomputation on held-out data. Includes average and
-standard deviation of time-to-RG, lag distributions across the taxonomic hierarchy,
-average identifications required to reach RG, and `tx_lag_deviation`.
+**Static taxon difficulty aggregates:** Structural taxon properties computed once and applied as a static lookup. Includes average and standard deviation of time-to-RG, lag distributions across the taxonomic hierarchy, average identifications required to reach RG, and `tx_lag_deviation`.
 
 Taxon RG rates are computed with Bayesian
-shrinkage (α = 10) blending the taxon-specific rate toward the global prior. Hierarchical fallback — species → genus → family → order → global mean — activates
+shrinkage (α = 3) blending the taxon-specific rate toward the global prior. Hierarchical fallback — species → genus → family → order → global mean — activates
 when sample counts are insufficient.
 
 These aggregates try to specifically capture structurally difficult groups where community expertise is sparse and resolution timelines are long regardless of individual observation quality.

@@ -2,9 +2,11 @@ CREATE OR REPLACE MACRO research_grade_windowed(eval_interval) AS TABLE
 
     SELECT
         o.id AS observation_id,
-        t.community_taxon AS community_taxon_id,
+        t.community_taxon,
         o.taxon_id,
         t.consensus_level_rg,
+        t.score,
+        t.n_ids_at_window,
         o.created_at,
         o.observed_on,
         t.id_rg,
@@ -21,18 +23,6 @@ CREATE OR REPLACE MACRO research_grade_windowed(eval_interval) AS TABLE
             AND i.own_observation IS FALSE
             AND i.category = 'supporting'
         ) AS n_identifiers_agree_at_window,
-
-        -- n ids
-        COUNT(i.id) FILTER (
-            WHERE i.created_at BETWEEN o.created_at AND o.created_at + eval_interval
-            AND i.own_observation IS FALSE
-        ) AS n_ids_at_window,
-
-        COUNT(i.id) FILTER (
-            WHERE i.created_at BETWEEN o.created_at AND o.created_at + eval_interval
-            AND i.own_observation IS FALSE
-            AND i.category = 'supporting'
-        ) AS n_ids_agree_at_window,
 
         -- verifiable label
         CASE
@@ -64,7 +54,8 @@ CREATE OR REPLACE MACRO research_grade_windowed(eval_interval) AS TABLE
     GROUP BY
         o.id,
         t.community_taxon,
-        n_ids_at_window,
+        t.n_ids_at_window,
+        t.score,
         t.consensus_level_rg,
         o.taxon_id,
         o.created_at,

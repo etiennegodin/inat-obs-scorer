@@ -15,8 +15,8 @@ SELECT
     --Documentation features (submission-time safe)
     m.photo_count,
     m.has_description,
-    m.has_tags,
-    m.tag_count,
+    --m.has_tags,
+    --m.tag_count,
     m.positional_accuracy_m,
     m.geoprivacy IS NOT NULL AS geoprivacy_set,
     COALESCE(m.oauth_application_id, 0) AS oauth_application_id,
@@ -34,7 +34,7 @@ SELECT
     --Temporal
     date_part('day', ob.observer_tenure) AS obv_tenure_days,
     ob.is_veteran AS obv_is_veteran,
-    date_part('day', ob.lag_since_last_obs) AS obv_lag_days_since_last_post,
+    --date_part('day', ob.lag_since_last_obs) AS obv_lag_days_since_last_post,
 
     -- Observations
     LOG(ob.observer_obs_count_at_t + 1) AS obv_obs_count_log,
@@ -45,7 +45,7 @@ SELECT
 
     --Taxonomic
     oe.observer_species_entropy_norm AS obv_tx_entropy,
-    ob.observer_taxon_rg_rate_shrunk_at_t AS obv_tx_rg_rate,
+    --ob.observer_taxon_rg_rate_shrunk_at_t AS obv_tx_rg_rate,
     ob.observer_taxon_focus_rate AS obv_tx_focus_rate,
 
     -- Documentation Metadata
@@ -63,73 +63,50 @@ SELECT
     COALESCE(i.prior_observer_rg_rate, 0) AS id_prior_observer_rg_rate,
     COALESCE(i.prior_ids_given, 0) AS id_prior_ids_given,
     COALESCE(i.prior_taxa_identified, 0) AS id_prior_taxa_identified,
-    COALESCE(i.prior_ids_vision_rate, 0) AS id_prior_ids_vision_rate,
+    --COALESCE(i.prior_ids_vision_rate, 0) AS id_prior_ids_vision_rate,
     COALESCE(i.reciprocity_ratio, 0) AS id_reciprocity_ratio,
 
     --Taxon features
 
-    tx.effective_rg_rate_shrunk AS taxon_cm_rate,        -- rank-corrected
-    tx.effective_time_to_cm_mean AS taxon_time_to_cm_mean,
-    tx.effective_time_to_cm_median AS taxon_time_to_cm_median,
+    tx.effective_rg_rate_shrunk AS taxon_rg_rate,        -- rank-corrected
+    tx.effective_time_to_rg_mean AS taxon_time_to_rg_mean,
+    tx.effective_time_to_rg_median AS taxon_time_to_rg_median,
     tx.effective_n_ids_mean AS taxon_n_ids_mean,
-    tx.effective_score_mean AS taxon_score_mean,
     tx.effective_lag_days_mean AS taxon_lag_days_mean,
-    tx.effective_prior_source AS taxon_prior_source,   -- useful feature
+
+    date_part('day', ob.lag_since_last_obs) - taxon_lag_days_mean AS lag_diff,
 
     tx.genus_rg_rate AS taxon_genus_rg_rate,
-    tx.family_rg_rate AS taxon_family_cm_rate,
-    tx.order_rg_rate AS taxon_order_cm_rate,
+    tx.family_rg_rate AS taxon_family_rg_rate,
 
-    tx.taxon_time_to_cm_mean AS taxon_time_to_cm_mean_raw,
-    tx.genus_time_to_cm_mean,
-    tx.family_time_to_cm_mean,
-    tx.order_time_to_cm_mean,
-
-    tx.taxon_n_ids_mean AS taxon_n_ids_mean_raw,
+    tx.genus_time_to_rg_mean,
+    tx.family_time_to_rg_mean,
 
     tx.genus_n_ids_mean,
     tx.family_n_ids_mean,
-    tx.order_n_ids_mean,
 
-    tx.taxon_score_mean AS taxon_score_mean_raw,
-    tx.genus_score_mean,
-    tx.family_score_mean,
-    tx.order_score_mean,
-
-    tx.taxon_lag_days_mean AS taxon_lag_days_mean_raw,
-    genus_lag_days_mean,
-    family_lag_days_mean,
-    order_lag_days_mean,
+    tx.genus_lag_days_mean,
+    tx.family_lag_days_mean,
 
     tx.taxon_popularity_log,
     tx.genus_popularity_log,
     tx.family_popularity_log,
-    tx.order_popularity_log,
 
     tx.taxon_cold_start,
 
     tx.specialist_identifer,
     tx.specialist_observer,
 
-    tx.taxon_time_to_cm_median AS taxon_time_to_cm_median_raw,
     tx.taxon_n_ids_median,
-    tx.taxon_score_median,
     tx.taxon_lag_days_median,
-    tx.genus_time_to_cm_median,
+    tx.genus_time_to_rg_median,
     tx.genus_n_ids_median,
-    tx.genus_score_median,
     tx.genus_lag_days_median,
-    tx.family_time_to_cm_median,
+    tx.family_time_to_rg_median,
     tx.family_n_ids_median,
-    tx.family_score_median,
     tx.family_lag_days_median,
-    tx.order_time_to_cm_median,
-    tx.order_n_ids_median,
-    tx.order_score_median,
-    tx.order_lag_days_median,
-    tx.global_time_to_cm_median,
+    tx.global_time_to_rg_median,
     tx.global_n_ids_median,
-    tx.global_score_median,
 
     -- Taxon confusion stats (static)
     IFNULL(c.has_similar_species, FALSE) AS tx_conf_has_similar,
