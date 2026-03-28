@@ -9,6 +9,7 @@ CREATE OR REPLACE MACRO research_grade_windowed(eval_interval) AS TABLE
         o.observed_on,
         t.id_rg,
         t.id_user,
+        t.id_created_at,
 
         -- n identifiers
         COUNT(DISTINCT(i.user_id)) FILTER (
@@ -73,5 +74,5 @@ CREATE OR REPLACE MACRO research_grade_windowed(eval_interval) AS TABLE
         o.captive_cultivated,
         t.id_rg,
         t.id_user,
-
+        t.id_created_at,
 ;

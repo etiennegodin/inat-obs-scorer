@@ -132,6 +132,7 @@ CREATE OR REPLACE MACRO community_taxon_windowed(eval_interval) AS TABLE
             observation_id,
             candidate_taxon_id AS community_taxon,
             identification_id,
+            created_at,
             user_id,
             rank_level,
             current_score AS score,
@@ -154,6 +155,7 @@ CREATE OR REPLACE MACRO community_taxon_windowed(eval_interval) AS TABLE
         ct.score,
         ct.cumulative AS n_ids_at_window,
         ct.identification_id AS id_rg,
+        ct.created_at as id_created_at,
         ct.user_id AS id_user,
         COALESCE(ct.consensus_level_rg, FALSE) AS consensus_level_rg,
     -- RG requires community taxon to match submitted taxon

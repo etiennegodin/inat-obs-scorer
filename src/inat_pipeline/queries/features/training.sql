@@ -9,7 +9,6 @@ SELECT
 
     -- Initial submisison
 
-    m.init_taxon_id,
     m.init_rank_level,
     m.init_rank_level <= 10 AS obs_has_species_self_id,
 
@@ -32,10 +31,10 @@ SELECT
     m.created_at,
     m.obs_to_submit_lag_days,
 
-    --m.observed_week_sin,
-    --m.observed_week_cos,
-    --m.submitted_week_sin,
-    --m.submitted_week_cos,
+    m.observed_week_sin,
+    m.observed_week_cos,
+    m.submitted_week_sin,
+    m.submitted_week_cos,
 
     --Observer features
     --Temporal
@@ -97,12 +96,7 @@ SELECT
     iw.id_maverick_count_at_window,
     iw.pct_ids_maverick_at_window,
 
-    -- Community taxon state at score_window
-    --iw.has_community_taxon_at_window,
-    --iw.community_consensus_at_window,
     iw.community_matches_submitted_at_window,
-
-    -- Community taxon state at score_window
 
     --Taxon features
     t.taxon_popularity_rank AS tx_popularity_rank,
@@ -111,7 +105,6 @@ SELECT
     t.genus_popularity_rank AS tx_genus_popularity_rank,
     t.genus_rg_rate AS tx_genus_rg_rate,
     t.family_rg_rate AS tx_family_rg_rate,
-    --t.taxon_median_submission_lag_days,
     t.taxon_avg_ids_to_rg AS tx_avg_ids_to_rg,
     t.global_rg_rate,
     t.taxon_lag_days_median,
@@ -167,7 +160,26 @@ SELECT
     tp.observed_kurtosis,
 
     th.confusion_nbrhd_pheno_activity,
-    th.focal_vs_nbrhd_pheno_ratio
+    th.focal_vs_nbrhd_pheno_ratio,
+
+    -- Taxon diff
+
+    td.time_to_rg_mean,
+    td.time_to_rg_std,
+    td.time_to_rg_med,
+    td.ids_rg_mean,
+    td.ids_rg_std,
+    td.ids_rg_med,
+    td.score_mean,
+    td.score_std,
+    td.score_med,
+    td.taxon_rate_global,
+    td.genus_cm_rate,
+    td.family_cm_rate,
+    td.order_cm_rate,
+    td.taxon_cm_rate_shrunk,
+    td.specialist_identifer,
+    td.specialist_observer
 
 FROM features.model_population m
 JOIN features.splits s ON m.observation_id = s.observation_id
@@ -177,9 +189,12 @@ LEFT JOIN features.label l ON m.observation_id = l.observation_id
 JOIN features.identifications i ON m.observation_id = i.observation_id
 LEFT JOIN features.identifications_at_window iw ON m.observation_id = iw.observation_id
 LEFT JOIN features.taxon t ON m.observation_id = t.observation_id
+LEFT JOIN features.taxon_diff td ON m.taxon_id = td.taxon_id
+
 LEFT JOIN features.taxa_confusion c ON m.taxon_id = c.taxon_id
 LEFT JOIN graph.clustering_coefficient cc ON m.taxon_id = cc.taxon_id
 LEFT JOIN graph.double_hop_stats dh ON m.taxon_id = dh.taxon_id
+
 LEFT JOIN features.temporal tp ON m.observation_id = tp.observation_id
 LEFT JOIN features.taxon_histo_conf th ON m.observation_id = th.observation_id
 
