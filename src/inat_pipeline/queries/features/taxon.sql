@@ -15,7 +15,7 @@ WITH base_obs_raw AS (
             ELSE cm.community_taxon
         END AS taxon_id   -- ← this is now the stable key for everything below
     FROM community_taxon_windowed(INTERVAL '999 years') cm
-    WHERE cm.created_at < :cutoff_date
+    --WHERE cm.created_at < :cutoff_date
 ),
 
 -- Step 2: join taxa metadata on the RESOLVED taxon_id, not cm.taxon_id
@@ -76,7 +76,8 @@ taxon_medians AS (
         taxon_id,
         MEDIAN(time_to_cm_days) AS taxon_time_to_cm_median,
         MEDIAN(n_ids_at_window) AS taxon_n_ids_median,
-        MEDIAN(score) AS taxon_score_median
+        MEDIAN(score) AS taxon_score_median,
+        MEDIAN(lag_days) AS taxon_lag_days_median,
     FROM base_obs
     GROUP BY taxon_id
 ),
@@ -86,7 +87,9 @@ genus_medians AS (
         genus_id,
         MEDIAN(time_to_cm_days) AS genus_time_to_cm_median,
         MEDIAN(n_ids_at_window) AS genus_n_ids_median,
-        MEDIAN(score) AS genus_score_median
+        MEDIAN(score) AS genus_score_median,
+        MEDIAN(lag_days) AS genus_lag_days_median,
+
     FROM base_obs
     GROUP BY genus_id
 ),
@@ -96,7 +99,8 @@ family_medians AS (
         family_id,
         MEDIAN(time_to_cm_days) AS family_time_to_cm_median,
         MEDIAN(n_ids_at_window) AS family_n_ids_median,
-        MEDIAN(score) AS family_score_median
+        MEDIAN(score) AS family_score_median,
+        MEDIAN(lag_days) AS family_lag_days_median,
     FROM base_obs
     GROUP BY family_id
 ),
@@ -106,7 +110,9 @@ order_medians AS (
         order_id,
         MEDIAN(time_to_cm_days) AS order_time_to_cm_median,
         MEDIAN(n_ids_at_window) AS order_n_ids_median,
-        MEDIAN(score) AS order_score_median
+        MEDIAN(score) AS order_score_median,
+        MEDIAN(lag_days) AS order_lag_days_median,
+
     FROM base_obs
     GROUP BY order_id
 ),
@@ -138,11 +144,13 @@ taxon_counts AS (
         SUM(time_to_cm_days) AS taxon_time_to_cm_sum,
         SUM(n_ids_at_window) AS taxon_n_ids_sum,
         SUM(score) AS taxon_score_sum,
+        SUM(lag_days) AS taxon_lag_days_sum,
 
         -- Taxon-level means
         AVG(time_to_cm_days::FLOAT) AS taxon_time_to_cm_mean,
         AVG(n_ids_at_window::FLOAT) AS taxon_n_ids_mean,
         AVG(score) AS taxon_score_mean,
+        AVG(score) AS taxon_lag_days_mean,
 
         taxon_rg_count::FLOAT / NULLIF(taxon_obs_count, 0) AS taxon_rg_rate_raw
     FROM base_obs
@@ -178,7 +186,12 @@ aggregates AS (
         -- score sums
         SUM(taxon_score_sum) OVER (PARTITION BY genus_id) AS genus_score_sum,
         SUM(taxon_score_sum) OVER (PARTITION BY family_id) AS family_score_sum,
-        SUM(taxon_score_sum) OVER (PARTITION BY order_id) AS order_score_sum
+        SUM(taxon_score_sum) OVER (PARTITION BY order_id) AS order_score_sum,
+
+        -- lag_days sums
+        SUM(taxon_lag_days_sum) OVER (PARTITION BY genus_id) AS genus_lag_days_sum,
+        SUM(taxon_lag_days_sum) OVER (PARTITION BY family_id) AS family_lag_days_sum,
+        SUM(taxon_lag_days_sum) OVER (PARTITION BY order_id) AS order_lag_days_sum
     FROM taxon_counts tc
 ),
 
@@ -206,7 +219,13 @@ rates AS (
         -- score means (community taxon confidence, distinct from RG rate)
         genus_score_sum::FLOAT / NULLIF(genus_obs_count, 0) AS genus_score_mean,
         family_score_sum::FLOAT / NULLIF(family_obs_count, 0) AS family_score_mean,
-        order_score_sum::FLOAT / NULLIF(order_obs_count, 0) AS order_score_mean
+        order_score_sum::FLOAT / NULLIF(order_obs_count, 0) AS order_score_mean,
+
+        -- lag_days means
+        genus_lag_days_sum::FLOAT / NULLIF(genus_obs_count, 0) AS genus_lag_days_mean,
+        family_lag_days_sum::FLOAT / NULLIF(family_obs_count, 0) AS family_lag_days_mean,
+        order_lag_days_sum::FLOAT / NULLIF(order_obs_count, 0) AS order_lag_days_mean
+
     FROM aggregates a
 ),
 
@@ -271,21 +290,31 @@ bayesian AS (
         -- Same pattern for time_to_cm and n_ids means
         CASE
             WHEN r.rank_level <= 10 THEN r.taxon_time_to_cm_mean
-            WHEN r.rank_level = 20 THEN r.family_time_to_cm_mean
+            WHEN r.rank_level = 20 THEN r.genus_time_to_cm_mean
+            WHEN r.rank_level = 30 THEN r.family_time_to_cm_mean
             ELSE r.order_time_to_cm_mean
         END AS effective_time_to_cm_mean,
 
         CASE
             WHEN r.rank_level <= 10 THEN r.taxon_n_ids_mean
-            WHEN r.rank_level = 20 THEN r.family_n_ids_mean
+            WHEN r.rank_level = 20 THEN r.genus_n_ids_mean
+            WHEN r.rank_level = 30 THEN r.family_n_ids_mean
             ELSE r.order_n_ids_mean
         END AS effective_n_ids_mean,
 
         CASE
             WHEN r.rank_level <= 10 THEN r.taxon_score_mean
-            WHEN r.rank_level = 20 THEN r.family_score_mean
+            WHEN r.rank_level = 20 THEN r.genus_score_mean
+            WHEN r.rank_level = 30 THEN r.family_score_mean
             ELSE r.order_score_mean
         END AS effective_score_mean,
+
+        CASE
+            WHEN r.rank_level <= 10 THEN r.taxon_lag_days_mean
+            WHEN r.rank_level = 20 THEN r.genus_lag_days_mean
+            WHEN r.rank_level = 30 THEN r.family_lag_days_mean
+            ELSE r.order_lag_days_mean
+        END AS effective_lag_days_mean,
 
         -- Popularity (log-scale observation count)
         LOG(taxon_obs_count + 1) AS taxon_popularity_log,
@@ -319,18 +348,22 @@ SELECT
     tm.taxon_time_to_cm_median,
     tm.taxon_n_ids_median,
     tm.taxon_score_median,
+    tm.taxon_lag_days_median,
 
     gm.genus_time_to_cm_median,
     gm.genus_n_ids_median,
     gm.genus_score_median,
+    gm.genus_lag_days_median,
 
     fm.family_time_to_cm_median,
     fm.family_n_ids_median,
     fm.family_score_median,
+    fm.family_lag_days_median,
 
     om.order_time_to_cm_median,
     om.order_n_ids_median,
     om.order_score_median,
+    om.order_lag_days_median,
 
     -- Global medians for fallback / normalisation
     g.global_time_to_cm_median,
