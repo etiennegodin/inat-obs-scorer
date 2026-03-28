@@ -20,7 +20,7 @@ WITH base_obs AS (
         END AS taxon_id
     FROM community_taxon_windowed(INTERVAL '999 years') cm
     LEFT JOIN staged.taxa t ON cm.taxon_id = t.taxon_id
-    WHERE cm.created_at < :cutoff_date
+    --WHERE cm.created_at < :cutoff_date
 ),
 
 -- ── True medians: computed directly from base_obs so they're exact, not
@@ -84,6 +84,7 @@ taxon_counts AS (
         genus_id,
         family_id,
         order_id,
+        rank_level,
         COUNT(*) AS taxon_obs_count,
         COUNT(*) FILTER (WHERE consensus_level_rg) AS taxon_rg_count,
 
@@ -99,7 +100,8 @@ taxon_counts AS (
 
         taxon_rg_count::FLOAT / NULLIF(taxon_obs_count, 0) AS taxon_rg_rate_raw
     FROM base_obs
-    GROUP BY taxon_id, genus_id, family_id, order_id
+    GROUP BY taxon_id, genus_id, family_id, order_id, rank_level
+
 ),
 
 -- ── Roll sums up to each taxonomic level with window functions
@@ -188,10 +190,56 @@ bayesian AS (
             ELSE 4
         END AS rg_rate_prior_source,
 
-        -- Beta-binomial shrinkage toward the hierarchical prior (alpha = 10 pseudo-obs)
-        -- DuckDB resolves the alias reference in the same SELECT — this is fine.
-        (10.0 * hierarchical_prior_rg + taxon_rg_count)
-        / (10.0 + taxon_obs_count) AS taxon_rg_rate_shrunk,
+        CASE
+            WHEN r.rank_level <= 10
+                THEN  -- species or below
+                    (10.0 * hierarchical_prior_rg + taxon_rg_count)
+                    / (10.0 + taxon_obs_count)
+            WHEN r.rank_level = 20
+                THEN   -- genus-level observation
+                    CASE
+                        WHEN r.family_obs_count >= 10
+                            THEN
+                                (10.0 * r.family_rg_rate + taxon_rg_count)
+                                / (10.0 + taxon_obs_count)
+                        WHEN r.order_obs_count >= 10
+                            THEN
+                                (10.0 * r.order_rg_rate + taxon_rg_count)
+                                / (10.0 + taxon_obs_count)
+                        ELSE
+                            (10.0 * g.global_rg_rate + taxon_rg_count)
+                            / (10.0 + taxon_obs_count)
+                    END
+            ELSE  -- family or above: shrink toward order
+                CASE
+                    WHEN r.order_obs_count >= 10
+                        THEN
+                            (10.0 * r.order_rg_rate + taxon_rg_count)
+                            / (10.0 + taxon_obs_count)
+                    ELSE
+                        (10.0 * g.global_rg_rate + taxon_rg_count)
+                        / (10.0 + taxon_obs_count)
+                END
+        END AS effective_rg_rate_shrunk,
+
+        -- Same pattern for time_to_cm and n_ids means
+        CASE
+            WHEN r.rank_level <= 10 THEN r.taxon_time_to_cm_mean
+            WHEN r.rank_level = 20 THEN r.family_time_to_cm_mean
+            ELSE r.order_time_to_cm_mean
+        END AS effective_time_to_cm_mean,
+
+        CASE
+            WHEN r.rank_level <= 10 THEN r.taxon_n_ids_mean
+            WHEN r.rank_level = 20 THEN r.family_n_ids_mean
+            ELSE r.order_n_ids_mean
+        END AS effective_n_ids_mean,
+
+        CASE
+            WHEN r.rank_level <= 10 THEN r.taxon_score_mean
+            WHEN r.rank_level = 20 THEN r.family_score_mean
+            ELSE r.order_score_mean
+        END AS effective_score_mean,
 
         -- Popularity (log-scale observation count)
         LOG(taxon_obs_count + 1) AS taxon_popularity_log,
@@ -208,6 +256,20 @@ SELECT
     b.*,
 
     -- Medians (joined from dedicated per-group CTEs — true medians, not median-of-medians)
+
+    CASE
+        WHEN b.rank_level <= 10 THEN tm.taxon_time_to_cm_median
+        WHEN b.rank_level = 20 THEN gm.genus_time_to_cm_median
+        WHEN b.rank_level = 20 THEN fm.family_time_to_cm_median
+        ELSE om.order_time_to_cm_median
+    END AS effective_time_to_cm_median,
+
+    CASE
+        WHEN b.rank_level <= 10 THEN rg_rate_prior_source
+        WHEN b.rank_level = 20 THEN rg_rate_prior_source + 1  -- one level up
+        ELSE rg_rate_prior_source + 2
+    END AS effective_prior_source,
+
     tm.taxon_time_to_cm_median,
     tm.taxon_n_ids_median,
     tm.taxon_score_median,

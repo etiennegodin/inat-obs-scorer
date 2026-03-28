@@ -29,7 +29,7 @@ base_obs AS (
     FROM staged.observations o
     JOIN staged.users u
         ON o.user_id = u.user_id
-    JOIN features.taxon t
+    LEFT JOIN features.taxon t
         ON t.taxon_id = o.taxon_id
     -- All identifications within score window
     LEFT JOIN research_grade_windowed((SELECT window_val FROM config)) rg
