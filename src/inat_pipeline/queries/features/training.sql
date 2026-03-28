@@ -87,7 +87,6 @@ SELECT
     tx.family_popularity_log,
     tx.order_popularity_log,
     tx.taxon_cold_start,
-    tx.taxon_time_to_cm_median,
     tx.genus_time_to_cm_median,
     tx.family_time_to_cm_median,
     tx.order_time_to_cm_median,
