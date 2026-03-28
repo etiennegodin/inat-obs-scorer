@@ -1,37 +1,113 @@
 # inat-obs-scorer
 
 > **Expert Review Prioritization Engine for iNaturalist**
-> *Which "Needs ID" observations are most uncertain and should be reviewed first?*
+> *Resurface valuable "Needs ID" observations before they go unnoticed*
 
 [![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/)
 [![LightGBM](https://img.shields.io/badge/model-LightGBM-brightgreen)](https://lightgbm.readthedocs.io/)
 [![MLflow](https://img.shields.io/badge/tracking-MLflow-orange)](https://mlflow.org/)
 [![DuckDB](https://img.shields.io/badge/storage-DuckDB-yellow)](https://duckdb.org/)
+[![DVC](https://img.shields.io/badge/data-DVC-purple)](https://dvc.org/)
 
 ---
 
-## Overview
+## The Problem
 
-iNaturalist accumulates millions of wildlife observations submitted by citizen scientists. A subset of these earn **Research Grade (RG)** status — a quality threshold that makes observations useful for biodiversity science. Getting there requires community taxon agreement from knowledgeable identifiers, but expert attention is a scarce resource.
+iNaturalist accumulates millions of wildlife observations from citizen scientists. A subset earn **Research Grade (RG)** status — a quality threshold that makes observations scientifically usable for biodiversity research. Getting there requires community agreement from knowledgeable identifiers, but expert attention is a scarce resource.
 
-This project builds a **binary classifier** that scores each open "Needs ID" observation on its probability of reaching Research Grade, enabling triage of expert review queues. It is currently scoped to the plant kingdom (*Plantae*) in Québec and is designed as a production-style ML system.
+The challenge is that **most observations resolve on their own**. The community finds and confirms high-quality observations of well-documented species within days. What gets lost are observations that slip through unnoticed — unusual taxa, ambiguous photos, submissions from regions with few active identifiers, or species that require specialist knowledge to confirm.
 
-**Highlights:** temporal-safe label re-derivation from iNaturalist's identification
-algorithm · Bayesian-shrunk taxon difficulty features · Protocol-based async enrichment
-pipeline
+This project builds a **probabilistic ranking system** that scores each open "Needs ID" observation on its likelihood of reaching Research Grade, enabling triage of expert review queues toward observations with real potential that the community has not yet engaged with.
 
-### Problem framing
+---
+
+## Why Triage? — The Settlement Curve
+
+RG label resolution is strongly front-loaded. Of all observations that will eventually reach Research Grade in the dataset:
 
 ```
-Observer quality      → How reliable is this observer's documentation?
-Identifier quality    → How knowledgeable are the identifiers involved?
-Taxon difficulty      → How much community attention does this species require?
-Community consensus   → What has the community already signalled?
-                                        ↓
-                           P(Research Grade) score
+Day   1  ██████████████████████████░░░░░░░░░░░░░░░░░░  56%
+Day   7  █████████████████████████████████░░░░░░░░░░░  70%
+Day  30  ████████████████████████████████████░░░░░░░░  76%
+Day  90  ██████████████████████████████████████░░░░░░  82%
+Day 365  █████████████████████████████████████████░░░  94%
+Day 730  ████████████████████████████████████████████  97%
 ```
 
-The core modelling challenge is **temporal**: all features must be reconstructed at the exact moment of each observation, and the label itself must be derived from a point-in-time simulation of iNaturalist's identification algorithm — not the current scraped state.
+Over half of all eventually-RG observations are confirmed within 24 hours. By day 7, nearly 70% have resolved without any intervention — found and confirmed through normal community activity.
+
+The **30% remainder at day 7** is the model's target: observations that have slipped through the first wave of community engagement. This population filter is applied at training time — the model is scoped exclusively to observations that are not Research Grade one week after submission, either because they received no identifications or because early identifications have not yet reached community consensus.
+
+**Why a 365-day label window?** A common approach is to label an observation as RG or not based on its status at a fixed horizon — 90 days is a natural choice since most activity happens early. But the settlement curve shows that 90 days captures only 82% of observations that will eventually reach RG. The remaining 18% are disproportionately the hard cases: unusual taxa, observations that required a specialist to discover, or species where identifications trickle in slowly over months. Labelling them as negatives at 90 days would introduce systematic noise into exactly the population the model is trying to learn from.
+
+Extending the window to 365 days captures 93.6% of eventual-RG observations — recovering most of that signal — while keeping the dataset manageable. Observations must be at least 365 days old at scrape time to receive a label, ensuring the closed-window assumption holds and that no observation is labelled before its outcome is known.
+
+---
+
+## What the Model Actually Learns
+
+The model's predictive signal decomposes into three independently meaningful dimensions, confirmed by SHAP importance analysis:
+
+**1 — Who observed it**
+Observer reputation is the single strongest signal. An observer's historical Research Grade rate for a given taxon (`obv_tx_rg_rate`, SHAP rank #1), their lifetime RG rate, tenure, and account-level behavioural signals (photo count habits, description rate, use of mobile vs. desktop) all encode whether this observer reliably produces confirmable observations.
+
+**2 — What was observed**
+Taxon identifiability drives the second cluster of signal. The confusion graph neighbourhood rank (`tx_conf_nbrhd_rank_min`, SHAP rank #2) captures how distinguishable this species is within its cluster of visually similar taxa. Static taxon difficulty aggregates — how long this family historically takes to reach RG, how many identifications are typically required, how much the lag varies — capture structurally difficult groups like *Carex* or *Asteraceae* that resist rapid community confirmation regardless of observation quality.
+
+**3 — What the community has already signalled**
+Early identification dynamics carry real information even in the not-RG-at-day-7 population. The taxon confusion rate relative to neighbourhood peers (`tx_conf_rate_vs_neighbors`), identification reciprocity, and whether the first identifier agreed with the submitted taxon all encode the community's implicit confidence in the observation.
+
+---
+
+## The Actionable Zone
+
+The model produces a P(Research Grade) score. Not all score ranges are equally useful for triage:
+
+```
+P(RG) < 0.35    →  Low-signal observations: poor documentation, structurally
+                    ineligible taxa, or species that consistently resist community
+                    confirmation. Expert attention is unlikely to change the outcome.
+                    Deprioritised in the review queue.
+
+P(RG) 0.35–0.70 →  ACTIONABLE ZONE: real potential but not self-resolving.
+                    Expert identification or a confirming ID could tip these to RG.
+                    Primary routing target.
+
+P(RG) > 0.70    →  High-confidence candidates: likely to receive community confirmation
+                    through normal activity. Included in the queue but lower priority.
+```
+
+The model ranks all open observations and outputs a priority score. Threshold boundaries are configurable deployment parameters — the model scores the full population; the actionable zone is a queue management decision, not a hard filter.
+
+### Operating Point (v0.2 — uncalibrated, val set)
+
+The triage threshold is selected to prioritise recall — missing a recoverable observation is costlier than occasionally surfacing a borderline case. The current operating point targets:
+
+- **Recall**: ~90% of eventual-RG observations in the not-RG-at-day-7 population surfaced
+- **Precision**: ~60% of routed observations are confirmed RG within the label window
+
+> ⚠️ *LightGBM's raw probabilities are systematically underconfident — the model's predicted 0.5 corresponds to a true positive rate closer to 0.44. Probability calibration (Platt scaling) is part of the v0.3 serving layer. Until then, threshold values should not be interpreted as literal probabilities. Ranking metrics (PR-AUC, Lift@K) are calibration-independent and are the primary evaluation signal in v0.2.*
+
+---
+
+## Model Performance
+
+*Final HP-tuned results on held-out test set: **TBD** — pending Optuna search completion.*
+
+**Ranking metrics — held-out test set (overall RG rate: TBD)**
+
+| Top K% reviewed | Recall@K | Precision@K | Lift@K |
+|---|---|---|---|
+| 1% | TBD | TBD | TBD |
+| 5% | TBD | TBD | TBD |
+| 10% | TBD | TBD | TBD |
+| 20% | TBD | TBD | TBD |
+| 50% | TBD | TBD | TBD |
+
+| Metric | Value |
+|---|---|
+| PR-AUC (Average Precision) | TBD |
+| Baseline (positive rate) | TBD |
 
 ---
 
@@ -39,7 +115,7 @@ The core modelling challenge is **temporal**: all features must be reconstructed
 
 ```
 [Raw Source]
-    iNaturalist open data export (CSV) + targeted API scraping
+    iNaturalist open data export (CSV)
           ↓
 [Ingestion Layer]
     Async API client — rate-limited, fault-tolerant, Protocol-based
@@ -48,24 +124,28 @@ The core modelling challenge is **temporal**: all features must be reconstructed
 [Feature Engineering Layer]
     SQL-heavy transforms in DuckDB
     Point-in-time windowed features — no temporal leakage
+    Static taxon difficulty aggregates — Bayesian-shrunk at species/genus/family
           ↓
 [Label Engineering]
     Community taxon re-derived via DuckDB table macro
     Research Grade label computed from windowed identification history
+    Population filter: observations not RG at day 7
+    Closed-window label: RG status at obs_date + 365 days
           ↓
 [Training Dataset]
     Hard temporal split with gap buffers (train / val / test)
-    Closed-window binary label: RG status at obs_date + 90 days
           ↓
 [Model Training]
     Modular scikit-learn Pipeline with registry-pattern components
-    LightGBM + Optuna hyperparameter search + MLflow tracking
+    LightGBM + Optuna  + MLflow tracking
           ↓
 [Explainability]
-    SHAP value analysis logged as MLflow artifacts
+    SHAP value analysis — global importance + error-bucket delta analysis
           ↓
 [Serving Layer]  ← (v0.3)
-    FastAPI  POST /score → { observation_id, rg_probability, rank }
+    FastAPI  POST /score/batch → ranked observation list with rg_probability
+    Probability calibration (Platt scaling)
+    Configurable triage threshold with precision floor
 ```
 
 ---
@@ -81,15 +161,15 @@ Most ML pipelines guard against one form of leakage. This project explicitly ide
 | **Label leakage** | Scraped `quality_grade` reflects current state, not state at prediction time | RG label re-derived from windowed identification history via DuckDB table macro |
 | **Feature leakage** | Aggregating observer/taxon stats across the full dataset contaminates past observations with future signal | All window functions bounded to `created_at` |
 | **Split leakage** | Shuffling within temporal partitions destroys gap buffer integrity | Hard date-range boundaries from `SplitConfig`; val/test rows ordered by `created_at`, never shuffled |
-| **CV split leakage** | Standard K-fold with shuffling violates temporal structure, producing optimistically biased estimates | Custom `ExpandingWindowCvSplit(BaseCrossValidator)` — equal-chunk expanding window, sklearn-compatible, with a `gap_size` hook designed in
+| **CV split leakage** | Standard K-fold with shuffling violates temporal structure, producing optimistically biased estimates | Custom `ExpandingWindowCvSplit(BaseCrossValidator)` — equal-chunk expanding window, sklearn-compatible, with `gap_size` hook |
 
-### 2. Research Grade — a two-stage label
+### 2. Research Grade — a two-stage label re-derivation
 
-Research Grade is not simply a community consensus signal. It is a compound label with two distinct requirements, both re-derived here from windowed identification history:
+Research Grade is a compound label with two requirements, both re-derived from windowed identification history rather than the scraped current state:
 
 **Stage 1 — Community taxon** ([iNaturalist docs](https://help.inaturalist.org/en/support/solutions/articles/151000173076))
 
-The community taxon is computed via a taxonomic tree traversal. At each node, the algorithm scores cumulative agreement against disagreement including ancestor disagreements, and requires a 2/3 supermajority with at least 2 identifications. This project re-implements the algorithm as a **DuckDB table macro** (`community_taxon_windowed(eval_interval)`) parameterized by evaluation timestamp:
+The community taxon algorithm performs a taxonomic tree traversal, scoring cumulative agreement against disagreement (including ancestor disagreements), requiring a 2/3 supermajority with a minimum of 2 identifications. This project re-implements the algorithm as a **DuckDB table macro** (`community_taxon_windowed(eval_interval)`) parameterised by evaluation timestamp:
 
 ```sql
 -- cumulative_agreement / (agreements + disagreements + ancestor_disagreements) ≥ 2/3
@@ -98,34 +178,41 @@ The community taxon is computed via a taxonomic tree traversal. At each node, th
 
 **Stage 2 — Research Grade eligibility** ([iNaturalist docs](https://help.inaturalist.org/en/support/solutions/articles/151000169936))
 
-Community taxon is necessary but not sufficient. An observation also requires a verifiable media record (photo or sound), geolocation, a date, and must not be captive or cultivated. The community taxon must additionally reach species level or lower, and the observation taxon must agree. The `research_grade_windowed()` wrapper enforces all conditions and surfaces `is_rg` as the training label — replacing the scraped `quality_grade` column entirely.
+The `research_grade_windowed()` wrapper enforces all eligibility conditions — verifiable media, geolocation, date, non-captive, species-level community taxon — and surfaces `is_rg` as the training label, replacing the scraped `quality_grade` column entirely and eliminating current-state label leakage.
 
-### 3. Taxon difficulty with Bayesian shrinkage and hierarchical fallback
+### 3. Taxon difficulty — Bayesian shrinkage, hierarchical fallback, and static aggregates
 
-Rare taxa have too few observations to compute a reliable RG rate. A naive approach either drops them or overfits to small samples. This project uses:
+Rare taxa have too few observations to compute reliable difficulty estimates. A layered approach handles the full spectrum from common to rare:
 
-- **Bayesian shrinkage** (α = 10) to blend the taxon-specific rate toward the global prior
-- **Hierarchical fallback**: species → genus → family → order → global mean, applied when the shrunk estimate is still unreliable
-- All rates computed **point-in-time** on the training partition only, then applied to val/test — never recomputed on the full dataset
+**Dynamic features (point-in-time):** Taxon RG rates are computed with Bayesian shrinkage (α = 10) blending the taxon-specific rate toward the global prior. Hierarchical fallback — species → genus → family → order → global mean — activates when sample counts are insufficient. All rates are computed on the training partition only and applied to val/test without recomputation.
+
+**Static taxon difficulty aggregates:** Historical patterns encoded at species, genus, and family level:
+- Average and standard deviation of time-to-RG (how long does this taxon typically take to resolve?)
+- Lag distributions across the taxonomic hierarchy (how long before identifications arrive?)
+- Average number of identifications required to reach RG
+- `tx_lag_deviation`: how much this observation's age deviates from the taxon's typical resolution timeline
+
+These aggregates specifically capture structurally difficult groups — genera like *Carex* or *Asteraceae* — where community expertise is sparse and resolution timelines are long regardless of individual observation quality.
 
 ### 4. Species confusion graph features
 
 Visually similar species create systematic misidentification patterns. The confusion graph, built with DuckPGQ, encodes:
 
-- **Neighborhood difficulty**: how hard is the local species cluster to disambiguate?
+- **Neighbourhood difficulty**: how hard is the local species cluster to disambiguate?
 - **Asymmetric sink flag**: is this taxon disproportionately the *recipient* of misidentifications from visually similar species?
-- **Focal taxon rank within neighborhood**: where does this species sit in terms of identifier confidence?
+- **Focal taxon rank within neighbourhood**: where does this species sit in terms of identifier confidence relative to its confusion cluster?
+- **2-hop graph metrics**: clustering coefficient and graph size capturing the broader confusion neighbourhood
 
 ### 5. Protocol-based async API client
 
-The enrichment layer uses a fully async client designed around Python `Protocol` interfaces rather than inheritance, keeping fetchers and writers decoupled and independently testable.
+The enrichment layer uses a fully async client built around Python `Protocol` interfaces rather than inheritance, keeping fetchers and writers decoupled and independently testable:
 
 ```
 BatchEndpointClient        — fixed-set ID requests, bulk pagination
 ParametrizedEndpointClient — flexible endpoint/param formatting per call
 
 asyncio.Queue              — bridges fetch workers and the write thread
-ThreadPoolExecutor(max_workers=1) — serializes DuckDB writes from async context
+ThreadPoolExecutor(max_workers=1) — serialises DuckDB writes from async context
 Exponential backoff + jitter — handles iNaturalist rate limiting gracefully
 _resolve_id cascade        — flexible ID field mapping across endpoint shapes
 ```
@@ -145,18 +232,24 @@ inat_pipe train \
   --cv_folds 5
 ```
 
+### 7. SQL-first feature engineering with params CTE injection
+
+All feature transforms are expressed as `.sql` files using DuckDB window functions. Point-in-time constraints are injected via a single `WITH params AS (SELECT ...)` CTE block — keeping SQL files valid and readable as standalone queries while Python controls evaluation timestamps without scattered `str.format()` placeholders.
+
 ---
 
 ## Feature Groups
 
-| Group | Features |
+| Group | Key Features |
 |---|---|
-| **Observer history** | Historical RG rate (actual vs. expected), total obs count, account tenure, taxon diversity |
-| **Observation documentation** | Photo count, presence of notes, coordinate uncertainty |
-| **Taxon context** | Taxon rank, RG rate with Bayesian shrinkage, hierarchical fallback chain |
-| **Identification dynamics** | Number of IDs received, agreement rate |
-| **Confusion graph** | Neighborhood difficulty, sink-species flag, focal taxon rank in cluster |
-| **Temporal** | Day of year, hour of submission, time elapsed since submission |
+| **Observer history** | Historical RG rate (actual vs. expected), obs count, account tenure, taxon diversity, observer reputation rank |
+| **Observation documentation** | Photo count, average photo count, presence of notes, coordinate uncertainty, submission lag (observed → created) |
+| **Taxon context** | Taxon rank, RG rate with Bayesian shrinkage and hierarchical fallback, taxon popularity rank |
+| **Static taxon difficulty** | Time-to-RG mean/std, lag distributions at species/genus/family, IDs required for RG, lag deviation from taxon norm |
+| **Identification dynamics** | IDs received, agreement rate, identifier diversity, ID velocity, reciprocity ratio, maverick count |
+| **Confusion graph** | Neighbourhood difficulty, sink-species flag, focal taxon rank in cluster, 2-hop clustering coefficient |
+| **Temporal / phenological** | Submitted week (sin/cos), observed week (sin/cos), submission pressure, activity at phenological peak, months from peak phenology |
+| **Community consensus** | Community taxon rank, first-ID agreement, pct IDs refining at window, pct IDs agreeing at window |
 
 ---
 
@@ -167,12 +260,15 @@ inat_pipe train \
 | Storage & transforms | DuckDB (SQL-first, no ORM) + DuckPGQ |
 | Pipeline composition | scikit-learn `Pipeline` |
 | Model | LightGBM |
-| Hyperparameter search | Optuna (fANOVA importance logged to MLflow) |
+| Hyperparameter search | Optuna (TPE sampler, MedianPruner, fANOVA importance logged to MLflow) |
 | Experiment tracking | MLflow (params, metrics, artifacts, model registry) |
-| Explainability | SHAP (feature importance, beeswarm plots) |
+| Explainability | SHAP (global importance, beeswarm plots, error-bucket delta analysis) |
 | Data versioning | DVC |
+| Calibration *(v0.3)* | Platt scaling on top of LightGBM raw probabilities |
 | Validation *(v0.3)* | Pydantic models for config and schema enforcement |
 | Serving *(v0.3)* | FastAPI |
+
+---
 
 ## Data Pipeline CLI
 
@@ -215,25 +311,33 @@ inat_pipe train \
 inat_pipe test
 ```
 
-Reserved for a single terminal evaluation run. Outputs ROC-AUC and classification report against the held-out test partition — never used during model selection or feature iteration.
+Reserved for a single terminal evaluation run against the held-out test partition — never used during model selection or feature iteration.
 
-### Inference *(v0.3)*
+### Score *(v0.3)*
 
 ```bash
-inat_pipe inference --obs_id <id>
+# Score all open observations submitted in the past N days
+inat_pipe score --since_days 7 --output priority_queue.csv
+
+# Score a specific taxon group or region
+inat_pipe score --taxon_id 47126 --region QC
 ```
+
+The score command is designed for **periodic batch execution** — weekly or on-demand — rather than per-observation inference. It queries open "Needs ID" observations not yet RG at the 7-day mark, applies the trained pipeline, and outputs a ranked list for expert review queue consumption.
 
 ---
 
 ## Data Selection
 
-Not all records in the raw iNaturalist export are suitable for training. Selection happens at two levels:
+Selection happens at two levels:
 
-**Observation-level eligibility** — only verifiable observations are retained: georeferenced, dated, with media, non-captive. Casual and ineligible observations are excluded from the training set but preserved as a separate class for potential future modelling.
+**Observation-level eligibility** — only verifiable observations: georeferenced, dated, with media. Casual and ineligible observations are excluded from the training set but preserved as a separate class for potential future modelling.
 
 **Observer-level coverage** — observers must meet both:
 - **Minimum activity**: ≥ 20 observations, ensuring a meaningful historical footprint for observer reputation features
 - **Time coverage**: oldest observation before 2020 and newest after 2024, ensuring the observer's history spans the label window cleanly
+
+**Population filter** — the model is trained exclusively on observations that are not Research Grade at day 7 after submission.
 
 ---
 
@@ -243,10 +347,12 @@ Splits use hard date-range boundaries derived from a `SplitConfig` dataclass anc
 
 ```
 [──── Train ────][gap][── Val ──][gap][─── Test ───]
-  ~60%                  ~16%            ~24%
+  ~55%                  ~17%            ~27%
 ```
 
-A natural positive-rate drift (57% → 52%) from train to val/test is expected and is not a sign of overfitting — it reflects the evolving composition of the iNaturalist community over time.
+Positive rate drifts across splits (train ~41% → val ~32% → test ~28%), reflecting the evolving composition of the iNaturalist community over time. This is expected and is not a sign of overfitting.
+
+Cross-validation during HP search uses a custom `ExpandingWindowCvSplit` (`BaseCrossValidator` subclass) with equal-chunk expanding windows.
 
 ---
 
@@ -302,7 +408,7 @@ inat_pipeline/
 │   ├── test_workflow.py
 │   └── train_workflow.py
 ├── exceptions.py            # Custom exceptions hierarchy
-└── cli.py                   # Entrypoints: ingest / features / train / test / inference
+└── cli.py                   # Entrypoints: ingest / features / train / test / score
 ```
 
 ---
@@ -314,33 +420,56 @@ inat_pipeline/
 - Basic feature engineering
 - Logistic regression baseline
 
-### ✅ v0.2 — Extended features and real model
+### ✅ v0.2 — Extended features and production model
 - scikit-learn Pipeline with registry pattern
-- LightGBM + Optuna + MLflow
-- SHAP explainability
-- Windowed community taxon and RG label re-derivation
-- Bayesian shrinkage for taxon RG rates
+- LightGBM + Optuna (TPE + MedianPruner) + MLflow experiment tracking
+- SHAP explainability — global importance and beeswarm plots
+- Windowed community taxon and RG label re-derivation (DuckDB table macro)
+- Bayesian shrinkage for taxon RG rates with hierarchical fallback
+- Species confusion graph features via DuckPGQ
+- Static taxon difficulty aggregates (time-to-RG, lag distributions, IDs to RG)
+- Temporal and phenological features
+- Custom `ExpandingWindowCvSplit` for temporally-safe cross-validation
+- Population filter: model scoped to observations not-RG at day 7
+- Primary metric: Average Precision (PR-AUC) — calibration-independent, directly reflects ranking quality at low recall thresholds
 - DVC for data versioning
 
-### 🔲 v0.3 — System design and serving
-- FastAPI inference endpoint (`POST /score`)
-- Cold-start fallback paths via precomputed inference cache
-- Triage queue filtering
+### 🔲 v0.3 — Serving, calibration, and system integrity
+- FastAPI batch scoring endpoint (`POST /score/batch → ranked priority list`)
+- **Probability calibration** (Platt scaling) — corrects LightGBM's systematic underconfidence and enables threshold values to be interpreted as literal probabilities
+- **Triage threshold correction** — configurable precision floor with recall-maximising threshold selection post-calibration; designed for weekly re-scoring of open observations
+- Cold-start fallback paths via precomputed inference cache (observer and taxon summary stats for new accounts and rare taxa)
 - Schema drift assertions + lightweight feature versioning tied to MLflow runs
 - Pydantic models for config and schema enforcement
-- Run manifest and pipeline lineage table (idempotent retries)
+- Run manifest and pipeline lineage table (idempotent retries, auditability)
 
-### 🔲 v0.4 — Additionnal features and routing
-- AWS S3 ingestion source migration to facilitate scope expansion
-- Additional feature directions:
-  - Phenology alignment indicators
-  - Observer × top-identifier expertise interaction term
-  - Geographic range signal
+### 🔲 v0.4 — Targeted model improvement via error diagnostics
+The v0.2 model's SHAP values reveal meaningful signal concentration in a small number of features — primarily observer-taxon history and confusion graph neighbourhood rank. The open question is whether errors in the uncertain zone (P(RG) ≈ 0.35–0.70) are driven by **missing signal** (cold-start, sparse taxon history, undocumented observations) or by the **model misfiring on well-documented cases**.
+
+v0.4 applies a structured SHAP delta analysis across error buckets:
+
+| Bucket | Definition |
+|---|---|
+| Correct / certain | Model is confident and right — baseline for what good signal looks like |
+| Incorrect / certain | Model is confident and wrong — the most actionable failures |
+| Correct / uncertain | Model hedges but is right — which features help resolve ambiguity? |
+| Incorrect / uncertain | Model hedges and is wrong — where is signal absent or misleading? |
+
+Comparing mean absolute SHAP values **and feature value distributions** across these buckets distinguishes absence (feature is missing or near-zero) from misfiring (feature is present but pushes the wrong direction). Preliminary analysis suggests that uncertain-zone errors correlate with thin community consensus signals (`pct_ids_agree_at_window`, `community_taxon_rank`) — pointing toward cold-start uncertainty as the primary failure driver.
+
+Planned work:
+- Complete EDA by feature × error bucket — feature value distributions per bucket, not just SHAP deltas
+- Observer × top-identifier expertise interaction term (does this observer's history include this taxon's family?)
+- Geographic range signal (is this observation outside the taxon's typical range?)
+- AWS S3 ingestion source migration to facilitate scope expansion beyond Québec
+
 ---
 
 ## Scope & Limitations
 
 - Currently scoped to **Plantae** observations in **Québec**
+- Observer cold-start (accounts with < 20 observations) handled via precomputed fallback stats in v0.3
+- Probability scores are uncalibrated pre-v0.3; ranking metrics are the primary evaluation signal in v0.2
 
 ---
 

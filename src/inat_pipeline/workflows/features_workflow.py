@@ -19,30 +19,55 @@ def execute(deps: Dependencies):
 
         # Train/Val/Test splits
         params = TrainingSplitParams(
-            cutoff_date=date(2024, 1, 1),
-            max_val_size=50000,
-            val_window_days=250,
-            max_test_size=90000,
-            gap_days=90,
+            label_window_days=365,
+            scraped_at=date(2026, 3, 1),
+            score_window_days=7,
+            cutoff_date=date(2023, 1, 1),
+            max_val_size=30000,
+            val_window_days=410,
+            max_test_size=100000,
+            gap_days=14,
         )
+
+        # Macros registering
+        sql_features.execute("macro_blended_histogram")
+        sql_features.execute("macro_community_taxon_windowed")
+        sql_features.execute("macro_research_grade_windowed")
+
+        # Temporal features -- issue with macro if lower to-do
+        sql_features.execute("temporal")
+
+        # Define base observations for all features
+        sql_features.execute("base", params=params)
+
+        # Defined model population
+        sql_features.execute("model_population", params=params)
+
+        # Label at label_window_days
+        sql_features.execute("label", params=params)
+
+        # Splits from model_population
         sql_split.execute("split", params=params)
         splits_report(sql_split, params)
 
+        # Static features
         sql_graph.execute("confusion_graph")
         sql_graph.execute("confusion_graph_metrics")
+        sql_features.execute("network_events_raw", params=params)
 
-        # features with gap days :
-        sql_features.execute("label", params=params)
-        sql_features.execute("network_events", params=params)
-
+        # Bases and non paramterised queries
         sql_features.execute_many(
-            "community_taxon_windowed",
-            "research_grade_windowed",
-            "network_events_stats",
+            "network_events",
             "user_role_timeline",
-            "base",
-            "taxon",
-            "observations",
+        )
+
+        # Time-windowed features :
+        sql_features.execute("taxon", params=params)
+        sql_features.execute("observations", params=params)
+        sql_features.execute("identifications_at_window", params=params)
+
+        # With dependencies
+        sql_features.execute_many(
             "identifications",
             "taxa_confusion",
             "observers_entropy",

@@ -88,8 +88,8 @@ def plot_ranking_curves(
             baseline=np.full(len(k_pct), rg_rate * 100),
             ylabel="Precision@K (%)",
             title="Precision@K",
-            subtitle=("Of the top K% reviewed,\n" "% that actually became RG"),
-            baseline_label=f"Random ({rg_rate*100:.1f}% overall RG rate)",
+            subtitle=("Of the top K% reviewed,\n% that actually became RG"),
+            baseline_label=f"Random ({rg_rate * 100:.1f}% overall RG rate)",
             fmt="{:.1f}%",
             ylim=(0, 105),
         ),
@@ -100,8 +100,7 @@ def plot_ranking_curves(
             ylabel="Lift@K",
             title="Lift@K",
             subtitle=(
-                "How many × more RG per review slot\n"
-                "vs random sampling (1.0 = random)"
+                "How many × more RG per review slot\nvs random sampling (1.0 = random)"
             ),
             baseline_label="Random (1.0)",
             fmt="{:.2f}×",
@@ -183,7 +182,7 @@ def log_ranking_plot(
     Convenience wrapper: renders and optionally saves both figures.
     """
     rg_rate = curves["baseline_precision"].iloc[0]
-    suffix = f"  ·  overall RG rate {rg_rate*100:.1f}%"
+    suffix = f"  ·  overall RG rate {rg_rate * 100:.1f}%"
 
     title = f"{model_name} — ranking metrics{suffix}"
     plot_ranking_curves(

@@ -9,6 +9,7 @@ from typing import Any
 import pandas as pd
 import sqlparams
 
+from ..exceptions import DBError
 from .adapters import DuckDBAdapter
 from .protocols import DBConnection
 
@@ -63,6 +64,9 @@ class SQLEngine(ABC):
             raise FileNotFoundError(f"SQL script not found: {path}")
         query = path.read_text()
 
+        # Strip comments for sensitive parsers
+        stripped = self._strip_comments(query)
+
         # Format params to dict
         params = self._prep_params(params)
 
@@ -70,14 +74,11 @@ class SQLEngine(ABC):
         if self.ignore_params:
             values = {}
         else:
-            query, values = self._parametrise_query(query, params)
+            query, values = self._parametrise_query(stripped, params)
         # Inject identitifers
         identified = self._identifiers(query, **identifiers)
 
-        # Strip comments for sensitive parsers
-        stripped = self._strip_comments(identified)
-
-        return stripped, values
+        return identified, values
 
     def execute(self, script_name: str, params: Any = None, **identifiers) -> None:
         """Run a mutation — CREATE, INSERT, UPDATE. Returns nothing."""
@@ -87,8 +88,7 @@ class SQLEngine(ABC):
         self.con.execute(query, values, script=script_name)
 
         logger.info(
-            f"Executed {script_name}.sql, "
-            f"took {round((time.monotonic() - start), 3)}s"
+            f"Executed {script_name}.sql, took {round((time.monotonic() - start), 3)}s"
         )
 
     def fetch(
@@ -127,8 +127,13 @@ class DuckDbSQL(SQLEngine):
 
     def _parametrise_query(self, query: str, params: dict) -> tuple[str, list]:
         """Change for sql flavor"""
-        # logger.debug(query)
-        # logger.debug(params)
-        query_tool = sqlparams.SQLParams("named", "qmark")
-        sql, values = query_tool.format(query, params)
-        return sql, values
+        try:
+            # logger.debug(query)
+            # logger.debug(params)
+            query_tool = sqlparams.SQLParams("named", "qmark")
+            sql, values = query_tool.format(query, params)
+            return sql, values
+
+        except Exception as e:
+            logger.exception(e)
+            raise DBError(str(e), details={"params": params}) from e

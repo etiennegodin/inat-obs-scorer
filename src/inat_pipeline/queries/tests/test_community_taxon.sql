@@ -23,7 +23,6 @@ SELECT
     c.rank_level <= o.rank_level AS correct_taxon_level,
     c.community_taxon = o.taxon_id AS correct_taxon
 
-
 FROM tests.community_taxon c
 LEFT JOIN staged.observations o ON o.id = c.observation_id
 LEFT JOIN research_grade_windowed(INTERVAL '999 years') rg ON c.observation_id = rg.observation_id;
@@ -50,14 +49,16 @@ CREATE OR REPLACE TABLE tests.community_taxon_wrong_rg AS
 SELECT *
 
 FROM tests.community_taxon_comparison
-WHERE o_rg
-AND NOT correct_taxon_level
+WHERE
+    o_rg
+    AND NOT correct_taxon_level
 ;
 
 CREATE OR REPLACE TABLE tests.community_taxon_wrong_rg_2 AS
 SELECT *
 
 FROM tests.community_taxon_comparison
-WHERE NOT o_rg
-AND NOT correct_taxon_level
+WHERE
+    NOT o_rg
+    AND NOT correct_taxon_level
 ;

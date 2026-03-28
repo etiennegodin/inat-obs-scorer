@@ -1,2 +1,2 @@
-SELECT DISTINCT(taxonRank)
+SELECT DISTINCT (taxonRank)
 FROM staged.taxa_raw

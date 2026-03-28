@@ -8,7 +8,8 @@ SELECT
 FROM staged.observations o;
 
 CREATE OR REPLACE TABLE staged.identifications AS
-SELECT i.*,
+SELECT
+    i.*,
     t.phylum,
     t.class,
     t."order",

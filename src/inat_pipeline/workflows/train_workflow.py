@@ -9,17 +9,15 @@ import optuna
 from mlflow.models.signature import infer_signature
 from sklearn.metrics import (
     accuracy_score,
-    auc,
     average_precision_score,
     classification_report,
     f1_score,
-    precision_recall_curve,
     roc_auc_score,
 )
 
 from .. import train
 from ..app.container import Dependencies
-from ..train import explainability, ranking
+from ..train import explainability, metrics, ranking
 
 logger = logging.getLogger(__name__)
 
@@ -56,7 +54,8 @@ def execute(
         use_gpu=use_gpu,
         version=deps.version,
         n_jobs=n_jobs,
-        # experiment_name= deps.git_branch
+        experiment_name="inat_obs_scorer_v0_2",
+        passthrough_features=["time_to_first_id_days", "first_id_agrees"],
     )
 
     # ── 1. Data & Config setup ─────────────────────────────────────────────────
@@ -139,17 +138,17 @@ def execute(
         explainability.log_hyperparam_importance(study)
 
         best_params = study.best_params
-        best_cv_score = study.best_value
+        best_pr_score = study.best_value
 
         logger.info(
-            f"\n✓ Optuna finished. Best CV {config.scoring_metric}: {best_cv_score:.4f}"
+            f"\n✓ Optuna finished. Best PR {config.scoring_metric}: {best_pr_score:.4f}"
         )
         logger.info(f"  Best params: {best_params}\n")
 
         # Log best params and best CV score to the parent run
         mlflow.log_params({f"best_{k}": v for k, v in best_params.items()})
         mlflow.log_dict(best_params, "best_params.json")
-        mlflow.log_metric(f"cv/best_cv_{config.scoring_metric}", best_cv_score)
+        mlflow.log_metric(f"cv/best_pr_{config.scoring_metric}", best_pr_score)
 
         # ── 4. Final model training ────────────────────────────────────────────
         logger.info("Training final model on full training set...")
@@ -159,12 +158,11 @@ def execute(
         y_pred = final_model.predict(X_val)
         y_pred_proba = final_model.predict_proba(X_val)[:, 1]
 
-        precision, recall, thresholds = precision_recall_curve(y_val, y_pred_proba)
-        pr_auc = auc(recall, precision)
+        # Log plots
+        metrics.log_pr_auc_fig(final_model, X_val, y_val)
 
         test_metrics = {
             "test/test_roc_auc": roc_auc_score(y_val, y_pred_proba),
-            "test/test_pr_auc": pr_auc,
             "test/test_avg_precision": average_precision_score(y_val, y_pred_proba),
             "test/test_f1": f1_score(y_val, y_pred),
             "test/test_accuracy": accuracy_score(y_val, y_pred),
@@ -187,25 +185,26 @@ def execute(
 
         # Ranking metrics
         try:
-            ranking_curves_large = ranking.compute_ranking_curves(y_val, y_pred_proba)
-            ranking_curves_low = ranking.ranking_summary(
+            rank_curv = ranking.compute_ranking_curves(y_val, y_pred_proba)
+            rank_sum = ranking.ranking_summary(
                 y_val,
                 y_pred_proba,
                 k_values=[0.001, 0.005, 0.01, 0.02, 0.05, 0.1, 0.2, 0.5],
             )
-            mlflow.log_metric(
-                "lift_at_k5_per", ranking_curves_low["lift_at_k"].to_list()[-1]
+            # to-do log all ranking to compare
+            mlflow.log_metric("lift_at_k5_per", rank_sum["lift_at_k"].to_list()[-1])
+            ranking.plots.log_ranking_plot(
+                rank_curv, highlight_k=[0.01, 0.05, 0.1, 0.2, 0.5]
             )
-            ranking.plots.log_ranking_plot(ranking_curves_large)
             ranking.plots.log_score_distribution_plot(y_pred_proba, y_val)
-            mlflow.log_table(data=ranking_curves_low, artifact_file="ranking_low.json")
+            mlflow.log_table(data=rank_sum, artifact_file="ranking.json")
 
         except Exception as e:
             logger.error(e)
 
         # ── 6. Features explainability ─────────────────────────────────────────────
         # Saves features explainability artifacts to mlflow
-        explainability.log_feature_importance_report(final_model, X_train, config)
+        explainability.log_feature_importance_report(final_model, X_val, config)
 
         # ── 7. Log the final model ─────────────────────────────────────────────
         # This saves the *entire pipeline* (preprocessor + reducer + classifier)
@@ -240,7 +239,7 @@ def execute(
         return {
             "run_id": parent_run_id,
             "best_params": best_params,
-            "best_cv_score": best_cv_score,
+            "best_pr_score": best_pr_score,
             "test_metrics": test_metrics,
             "model": final_model,
         }

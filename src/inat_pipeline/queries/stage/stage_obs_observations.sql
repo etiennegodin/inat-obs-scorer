@@ -52,10 +52,10 @@ WITH unpacked AS (
             FROM raw.inat_api
         )
 )
-
-SELECT DISTINCT u.* EXCLUDE(u.'description',
-                            u.tags,
-                            u.taxon_geoprivacy),
+--sql-fluff:off
+SELECT DISTINCT u.* EXCLUDE(u.'description',     -- noqa
+                            u.tags,              -- noqa
+                            u.taxon_geoprivacy), -- noqa
 u.user.id AS user_id,
 d.observed_on,
 COALESCE(
@@ -100,16 +100,17 @@ JOIN staged.taxa t ON d.taxon_id = t.taxon_id
 ;
 
 
--- Time filter for static set
+-- Manual cleanup
+
+
+-- inactive taxons:
+
+
 CREATE OR REPLACE TABLE staged.observations AS
-WITH max_date AS(
-    SELECT MAX(created_at) - INTERVAL '90 days' AS max_date
-    FROM staged.observations
-)
 
 SELECT *
+
+
 FROM staged.observations
-CROSS JOIN max_date
-WHERE created_at <= max_date
-ORDER BY user_id, created_at;
-;
+WHERE taxon_id != 241449
+AND taxon_id != 157557

@@ -131,14 +131,30 @@ def _build_numeric_transformer(config: PipelineConfig) -> Pipeline:
     return Pipeline(steps)
 
 
+def _build_null_transformer(config: PipelineConfig) -> Pipeline:
+    steps = []
+
+    scaler = _instantiate(SCALER_REGISTRY, "robust")  # force scaler for Nans
+    if scaler is not None:  # scaler = "none" skips this step
+        steps.append(("scaler", scaler))
+        # If no scaler is provided, we return "passthrough"
+        # as a string instead of an empty Pipeline
+        if not steps:
+            return "passthrough"
+
+    return Pipeline(steps)
+
+
 def build_preprocessor(config: PipelineConfig) -> ColumnTransformer:
     numeric_transformer = _build_numeric_transformer(config)
     categorical_transformer = _build_categorical_transformer(config)
+    null_transformer = _build_null_transformer(config)
 
     preprocessor = ColumnTransformer(
         transformers=[
             ("num", numeric_transformer, config.numeric_features),
             ("cat", categorical_transformer, config.categorical_features),
+            ("pass", null_transformer, config.passthrough_features),  # Add this line
         ],
         remainder="drop",  # drop any unlisted columns
         verbose_feature_names_out=config.ct_verbose_feature_names_out,

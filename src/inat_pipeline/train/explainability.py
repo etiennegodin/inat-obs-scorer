@@ -118,7 +118,7 @@ def log_pca_loadings(pipeline, config, top_n: int = 8, n_components: int = 8):
 
     loadings_df = pd.DataFrame(
         components[:, top_feature_idx],
-        index=[f"PC{i+1} ({v:.1%})" for i, v in enumerate(explained_var)],
+        index=[f"PC{i + 1} ({v:.1%})" for i, v in enumerate(explained_var)],
         columns=[feature_names[i] for i in top_feature_idx],
     )
     fig, ax = plt.subplots(figsize=(max(12, top_n * 1.5), n_components * 0.9 + 2))
@@ -152,7 +152,7 @@ def log_pca_loadings(pipeline, config, top_n: int = 8, n_components: int = 8):
 
 
 def log_shap_summary(
-    pipeline, X_train: pd.DataFrame, config, max_rows: int = 200, top_n: int = 30
+    pipeline, X_val: pd.DataFrame, config, max_rows: int = 200, top_n: int = 30
 ):
     """
     Logs a SHAP summary plot — the gold standard for model explainability.
@@ -164,7 +164,7 @@ def log_shap_summary(
     classifier = pipeline.named_steps["classifier"]
 
     # SHAP on a sample — full dataset can be slow
-    X_sample = X_train.sample(min(max_rows, len(X_train)), random_state=42)
+    X_sample = X_val.sample(min(max_rows, len(X_val)), random_state=42)
     X_transformed = transformer.transform(X_sample)
 
     # Recover feature names (lost after PCA, available otherwise)
@@ -174,7 +174,7 @@ def log_shap_summary(
         )
     else:
         n_components = X_transformed.shape[1]
-        feature_names = [f"PC{i+1}" for i in range(n_components)]
+        feature_names = [f"PC{i + 1}" for i in range(n_components)]
 
     X_transformed_df = pd.DataFrame(X_transformed, columns=feature_names)
 
@@ -237,7 +237,7 @@ def log_shap_summary(
 
 
 def log_feature_importance_report(
-    pipeline: Pipeline, X_train: pd.DataFrame, config: PipelineConfig
+    pipeline: Pipeline, X_val: pd.DataFrame, config: PipelineConfig
 ) -> None:
     """
     Call this inside an active MLflow run after training.
@@ -247,7 +247,7 @@ def log_feature_importance_report(
         logger.info("\nLogging explainability artifacts...")
         log_feature_importance(pipeline, config)
         log_pca_loadings(pipeline, config)
-        log_shap_summary(pipeline, X_train, config)
+        log_shap_summary(pipeline, X_val, config)
     except Exception as e:
         logger.error(f"Error creating explainability report: {e}")
         return

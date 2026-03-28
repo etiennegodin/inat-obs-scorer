@@ -6,7 +6,7 @@ import mlflow
 import numpy as np
 import optuna
 import pandas as pd
-from sklearn.metrics import auc, precision_recall_curve, roc_auc_score
+from sklearn.metrics import average_precision_score, precision_score, roc_auc_score
 
 from .config import PipelineConfig
 from .core import ExpandingWindowCvSplit, build_pipeline
@@ -19,6 +19,12 @@ optuna.logging.set_verbosity(optuna.logging.WARNING)
 logger = logging.getLogger(__name__)
 
 # ── OPTUNA OBJECTIVE FUNCTION ──────────────────────────────────────────────────
+
+
+def precision_at_k(y_true, y_score, k=0.05):
+    n = int(len(y_true) * k)
+    top_k_idx = np.argsort(y_score)[::-1][:n]
+    return precision_score(y_true[top_k_idx], np.ones(n))
 
 
 def make_objective(
@@ -117,15 +123,12 @@ def make_objective(
 
                 # --- Metrics ---
                 roc_auc = roc_auc_score(y_val_fold, y_pred)
-                precision, recall, thresholds = precision_recall_curve(
-                    y_val_fold, y_pred
-                )
-                pr_auc = auc(recall, precision)
+                pr_auc = average_precision_score(y_val_fold, y_pred)
 
                 roc_aucs.append(roc_auc)
                 pr_aucs.append(pr_auc)
 
-                logger.debug(f"Fold {fold_idx +1} / {config.cv_folds} done ")
+                logger.debug(f"Fold {fold_idx + 1} / {config.cv_folds} done ")
 
             elapsed = time.time() - start
             logger.debug(f"End cv {elapsed}")
@@ -161,7 +164,7 @@ def make_objective(
                 f" ±{pr_auc_std:.4f} [{elapsed:.1f}s]"
             )
 
-            return roc_auc_mean  # Optuna maximizes this
+            return pr_auc_mean  # Optuna maximizes this
         except Exception as e:
             logger.error(f"Error on trial #{trial.number}: {e}")
             raise
