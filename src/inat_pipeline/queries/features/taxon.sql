@@ -1,6 +1,6 @@
 CREATE OR REPLACE TABLE features.taxon AS
 
-WITH base_obs AS (
+WITH base_obs_raw AS (
     SELECT
         cm.observation_id,
         cm.created_at,
@@ -8,19 +8,36 @@ WITH base_obs AS (
         cm.n_ids_at_window,
         cm.score,
         cm.consensus_level_rg,
-        t.genus_id,
-        t.family_id,
-        t.order_id,
-        t.rank_level,
         date_part('day', cm.created_at - cm.observed_on)::INT AS lag_days,
         date_part('day', id_created_at - created_at)::INT AS time_to_cm_days,
         CASE
             WHEN cm.community_taxon IS NULL THEN cm.taxon_id
             ELSE cm.community_taxon
-        END AS taxon_id
+        END AS taxon_id   -- ← this is now the stable key for everything below
     FROM community_taxon_windowed(INTERVAL '999 years') cm
-    LEFT JOIN staged.taxa t ON cm.taxon_id = t.taxon_id
-    --WHERE cm.created_at < :cutoff_date
+),
+
+-- Step 2: join taxa metadata on the RESOLVED taxon_id, not cm.taxon_id
+base_obs AS (
+    SELECT
+        r.*,
+        -- Self-referential fix: a genus row has no genus_id parent in staged.taxa,
+        -- so coalesce it to itself so window partitions don't silently go to NULL
+        COALESCE(
+            t.genus_id,
+            CASE WHEN t.rank_level = 20 THEN r.taxon_id END
+        ) AS genus_id,
+        COALESCE(
+            t.family_id,
+            CASE WHEN t.rank_level = 30 THEN r.taxon_id END
+        ) AS family_id,
+        COALESCE(
+            t.order_id,
+            CASE WHEN t.rank_level = 40 THEN r.taxon_id END
+        ) AS order_id,
+        t.rank_level
+    FROM base_obs_raw r
+    LEFT JOIN staged.taxa t ON r.taxon_id = t.taxon_id  -- ← correct key
 ),
 
 -- ── True medians: computed directly from base_obs so they're exact, not

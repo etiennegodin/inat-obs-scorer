@@ -20,7 +20,7 @@ base_obs AS (
         o.species,
         u.created_at AS user_created_at,
         u.orcid,
-        t.taxon_rg_rate_shrunk AS expected_rg_rate,
+        t.effective_rg_rate_shrunk AS expected_rg_rate,
         rg.n_identifiers_at_window,
         rg.n_identifiers_agree_at_window,
         -- Honest RG label from macro (no leakage)
