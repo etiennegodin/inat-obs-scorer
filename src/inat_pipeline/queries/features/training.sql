@@ -12,12 +12,6 @@ SELECT
     m.init_rank_level,
     m.init_rank_level <= 10 AS obs_has_species_self_id,
 
-    -- Taxon comparion at window
-    m.community_taxon_id IS NOT NULL AS has_community_id,
-    m.consensus_level_rg,
-    m.init_taxon_id = m.community_taxon_id AS taxon_changed,
-    m.community_taxon_rank,
-
     --Documentation features (submission-time safe)
     m.photo_count,
     m.has_description,
@@ -76,6 +70,8 @@ SELECT
     -- Identification dynamics at score_window
     -- Volume & velocity
 
+    /*
+
     --iw.id_count_at_window,
     iw.first_id_agrees,
     iw.id_diversity_at_window,
@@ -97,6 +93,7 @@ SELECT
     iw.pct_ids_maverick_at_window,
 
     iw.community_matches_submitted_at_window,
+    */
 
     --Taxon features
     t.taxon_popularity_rank AS tx_popularity_rank,
@@ -185,7 +182,7 @@ LEFT JOIN features.observations ob ON m.observation_id = ob.observation_id
 LEFT JOIN features.observers_entropy oe ON m.observation_id = oe.observation_id
 LEFT JOIN features.label l ON m.observation_id = l.observation_id
 JOIN features.identifications i ON m.observation_id = i.observation_id
-LEFT JOIN features.identifications_at_window iw ON m.observation_id = iw.observation_id
+--LEFT JOIN features.identifications_at_window iw ON m.observation_id = iw.observation_id
 LEFT JOIN features.taxon t ON m.observation_id = t.observation_id
 LEFT JOIN features.taxon_diff td ON m.taxon_id = td.taxon_id
 

@@ -2,23 +2,9 @@
 
 CREATE OR REPLACE TABLE features.model_population AS
 
-WITH score AS (
+SELECT b.*
 
-    SELECT *
-
-    FROM research_grade_windowed(to_days(:score_window_days))
-
-)
-
-SELECT
-    b.*,
-    s.community_taxon_id,
-    s.consensus_level_rg,
-    t.rank_level AS community_taxon_rank
 FROM features.base b
-JOIN score s
-    ON b.observation_id = s.observation_id
-LEFT JOIN staged.taxa t ON s.community_taxon_id = t.taxon_id
+JOIN features.identifications_at_window iw ON b.observation_id = iw.observation_id
 WHERE
-    s.is_rg = FALSE
-    AND verifiable = TRUE  -- no-ID population only
+    iw.has_any_id = FALSE
