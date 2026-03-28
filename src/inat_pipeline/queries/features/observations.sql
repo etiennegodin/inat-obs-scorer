@@ -30,7 +30,7 @@ base_obs AS (
     JOIN staged.users u
         ON o.user_id = u.user_id
     JOIN features.taxon t
-        ON t.observation_id = o.id
+        ON t.taxon_id = o.taxon_id
     -- All identifications within score window
     LEFT JOIN research_grade_windowed((SELECT window_val FROM config)) rg
         ON rg.observation_id = o.id
