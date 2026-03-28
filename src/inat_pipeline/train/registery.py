@@ -65,7 +65,7 @@ CLASSIFIER_REGISTRY = {
         {
             "verbose": -1,
             "n_estimators": 1000,
-            "is_unbalance": True,
+            "scale_pos_weight": 1,
             "bagging_freq": 1,
         },
     ),
@@ -112,25 +112,23 @@ SEARCH_SPACES = {
         # Capacity
         "classifier__num_leaves": {
             "type": "int",
-            "low": 31,
-            "high": 50,
+            "low": 15,
+            "high": 127,
             "log": True,
             # rule of thumb: never exceed 2^(max_depth)
             # for depth=7 that's 128 — 200 is already generous
         },
         "classifier__min_child_samples": {
             "type": "int",
-            "low": 30,
-            "high": 150,
+            "low": 5,
+            "high": 300,
             "log": True,
-            # on imbalanced data (like iNat RG), push this higher
-            # it prevents the model from memorizing rare patterns
         },
         # Learning rate
         "classifier__learning_rate": {
             "type": "float",
-            "low": 0.01,
-            "high": 0.02,
+            "low": 0.03,
+            "high": 0.1,
             "log": True,
             # log=True means Optuna samples 0.01, 0.012, 0.015...
             # rather than 0.01, 0.11, 0.21 — much smarter for rates
@@ -144,20 +142,20 @@ SEARCH_SPACES = {
         },
         "classifier__reg_lambda": {
             "type": "float",
-            "low": 0.02,
-            "high": 0.05,
+            "low": 1e-4,
+            "high": 10.0,
             "log": True,
         },
         # Subsampling
         "classifier__subsample": {
             "type": "float",
-            "low": 0.75,
-            "high": 0.85,
+            "low": 0.6,
+            "high": 1.0,
         },
         "classifier__colsample_bytree": {
             "type": "float",
-            "low": 0.65,
-            "high": 0.8,
+            "low": 0.4,
+            "high": 1.0,
         },
     },
 }
