@@ -1,7 +1,15 @@
 CREATE OR REPLACE TABLE features.identifications AS
 
 -- Observer features: history of IDs RECEIVED by this observation's author
-WITH observer_features AS (
+
+WITH g_rate AS (
+
+    SELECT ANY_VALUE(global_rg_rate) AS global_rg_rate
+    FROM features.taxon
+
+),
+
+observer_features AS (
     SELECT
         obs.observation_id,
         obs.user_id,
@@ -49,11 +57,11 @@ identifier_features AS (
         --When identifying for others, what's the RG rate of obs they chose to engage with? Selectivity signal |
 
         -- lower a as smaller partition of settled vs
-        (COALESCE(t.cumulative_settled_rg, 0) + 7 * tx.global_rg_rate)
+        (COALESCE(t.cumulative_settled_rg, 0) + 7 * g.global_rg_rate)
         / NULLIF(COALESCE(t.cumulative_settled_events, 0) + 7, 0)
             AS prior_identifier_rg_rate,
     FROM features.observations obs
-    JOIN features.taxon tx ON obs.observation_id = tx.observation_id
+    CROSS JOIN g_rate g
     ASOF JOIN graph.user_role_timeline t
         ON
             t.user_id = obs.user_id
