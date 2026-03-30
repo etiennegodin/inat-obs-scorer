@@ -69,9 +69,10 @@ CLASSIFIER_REGISTRY = {
             "bagging_freq": 1,
             "reg_lambda": 0.019650407042576614,
             "reg_alpha": 0.08116473252241806,
-            "subsmaple": 0.525,
-            "num_leaves": 5,
+            "subsample": 0.525,
             "learning_rate": 0.025,
+            "min_child_sample": 12,
+            "num_leaves": 4,
         },
     ),
 }
@@ -118,20 +119,20 @@ SEARCH_SPACES = {
         "classifier__min_child_samples": {
             "type": "int",
             "low": 5,
-            "high": 20,
+            "high": 40,
             "log": True,
         },
         # Regularisation
         "classifier__reg_alpha": {
             "type": "float",
-            "low": 1e-3,
-            "high": 0.5,
+            "low": 1e-4,
+            "high": 0.25,
             "log": True,
         },
         "classifier__colsample_bytree": {
             "type": "float",
-            "low": 0.55,
-            "high": 0.7,
+            "low": 0.4,
+            "high": 0.8,
         },
     },
 }
