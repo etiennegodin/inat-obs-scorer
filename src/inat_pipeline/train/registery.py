@@ -64,9 +64,10 @@ CLASSIFIER_REGISTRY = {
         "LGBMClassifier",
         {
             "verbose": -1,
-            "n_estimators": 1000,
+            "n_estimators": 2000,
             "scale_pos_weight": 1,
             "bagging_freq": 1,
+            "force_col_wise": True,
         },
     ),
 }
@@ -149,7 +150,7 @@ SEARCH_SPACES = {
         # Subsampling
         "classifier__subsample": {
             "type": "float",
-            "low": 0.6,
+            "low": 0.4,
             "high": 1.0,
         },
         "classifier__colsample_bytree": {

@@ -12,7 +12,6 @@
 
 * Notes
 
-| Held-out taxa (unseen species, n=564) | 0.56 | 0.24 | 2.3× |
 
 
 ---

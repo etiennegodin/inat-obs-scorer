@@ -2,6 +2,7 @@ import logging
 import time
 import warnings
 
+import lightgbm as lgb
 import mlflow
 import numpy as np
 import optuna
@@ -117,13 +118,42 @@ def make_objective(
                 X_val_fold = X_train.iloc[val_idx]
                 y_val_fold = y_train.iloc[val_idx]
 
-                pipeline.fit(X_train_fold, y_train_fold)
+                # Pre-transform the validation data using the pipeline's earlier steps
+                # This ensures X_val_fold matches the format the classifier expects
 
-                y_pred = pipeline.predict_proba(X_val_fold)[:, 1]
+                X_train_transformed = pipeline[:-1].fit_transform(
+                    X_train_fold, y_train_fold
+                )
+                X_val_transformed = pipeline[:-1].transform(X_val_fold)
+
+                # Fit the classifier (the last step) with early stopping
+                model = pipeline.named_steps["classifier"]
+
+                model.fit(
+                    X_train_transformed,
+                    y_train_fold,
+                    eval_set=[(X_val_transformed, y_val_fold)],
+                    eval_metric="auc",  # or 'binary_logloss'
+                    callbacks=[
+                        # LightGBM native early stopping callback
+                        # 'early_stopping_rounds' is now a callback in newer versions
+                        lgb.early_stopping(stopping_rounds=50),
+                        lgb.log_evaluation(period=0),  # keep logs clean
+                    ],
+                )
+
+                y_pred = pipeline.predict_proba(X_val_transformed)[:, 1]
 
                 # --- Metrics ---
-                roc_auc = roc_auc_score(y_val_fold, y_pred)
                 pr_auc = average_precision_score(y_val_fold, y_pred)
+                trial.report(pr_auc, fold_idx)
+
+                # --- OPTUNA PRUNING ---
+                # report the result of the current fold to the pruner
+                if trial.should_prune():
+                    raise optuna.exceptions.TrialPruned()
+
+                roc_auc = roc_auc_score(y_val_fold, y_pred)
 
                 roc_aucs.append(roc_auc)
                 pr_aucs.append(pr_auc)
