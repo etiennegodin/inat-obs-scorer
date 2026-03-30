@@ -119,20 +119,20 @@ SEARCH_SPACES = {
         "classifier__min_child_samples": {
             "type": "int",
             "low": 5,
-            "high": 40,
+            "high": 100,
             "log": True,
         },
         # Regularisation
         "classifier__reg_alpha": {
             "type": "float",
             "low": 1e-4,
-            "high": 0.25,
+            "high": 0.01,
             "log": True,
         },
         "classifier__colsample_bytree": {
             "type": "float",
-            "low": 0.4,
-            "high": 0.8,
+            "low": 0.6,
+            "high": 1.0,
         },
     },
 }

@@ -103,13 +103,12 @@ def make_objective(
 
             # ── Step 2: Build pipeline with suggested params ──────────────────────
             pipeline = build_pipeline(config, classifier_params=trial_params)
-
+            logger.debug(f"Trial {trial.number:3d}")
             logger.debug(pipeline.named_steps["classifier"])
 
             # ── Step 3: Cross-validate ────────────────────────────────────────────
 
             start = time.time()
-            logger.debug("Start cv")
 
             roc_aucs = []
             pr_aucs = []
