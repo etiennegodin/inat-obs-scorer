@@ -69,7 +69,6 @@ CLASSIFIER_REGISTRY = {
             "bagging_freq": 1,
             "force_col_wise": True,
             "reg_lambda": 0.019650407042576614,
-            "reg_alpha": 0.07346357719250234,
         },
     ),
 }
@@ -116,7 +115,7 @@ SEARCH_SPACES = {
         "classifier__num_leaves": {
             "type": "int",
             "low": 5,
-            "high": 20,
+            "high": 15,
             "log": True,
             # rule of thumb: never exceed 2^(max_depth)
             # for depth=7 that's 128 — 200 is already generous
@@ -131,19 +130,26 @@ SEARCH_SPACES = {
         "classifier__learning_rate": {
             "type": "float",
             "low": 0.02,
-            "high": 0.05,
+            "high": 0.035,
+            "log": True,
+        },
+        # Regularisation
+        "classifier__reg_alpha": {
+            "type": "float",
+            "low": 1e-4,
+            "high": 1,
             "log": True,
         },
         # Subsampling
         "classifier__subsample": {
             "type": "float",
-            "low": 0.4,
-            "high": 0.65,
+            "low": 0.5,
+            "high": 0.6,
         },
         "classifier__colsample_bytree": {
             "type": "float",
-            "low": 0.7,
-            "high": 0.9,
+            "low": 0.75,
+            "high": 0.85,
         },
     },
 }
