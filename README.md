@@ -9,6 +9,12 @@
 [![DuckDB](https://img.shields.io/badge/storage-DuckDB-yellow)](https://duckdb.org/)
 [![DVC](https://img.shields.io/badge/data-DVC-purple)](https://dvc.org/)
 
+
+* Notes
+
+| Held-out taxa (unseen species, n=564) | 0.56 | 0.24 | 2.3× |
+
+
 ---
 
 ## The Problem
@@ -184,13 +190,17 @@ The `research_grade_windowed()` wrapper enforces all eligibility conditions — 
 
 Rare taxa have too few observations to compute reliable difficulty estimates. A layered approach handles the full spectrum from common to rare:
 
-**Static taxon difficulty aggregates:** Structural taxon properties computed once and applied as a static lookup. Includes average and standard deviation of time-to-RG, lag distributions across the taxonomic hierarchy, average identifications required to reach RG, and `tx_lag_deviation`.
+**Dynamic features (point-in-time):** Taxon RG rates are computed with Bayesian shrinkage (α = 5) blending the taxon-specific rate toward the global prior. Hierarchical fallback — species → genus → family → order → global mean — activates when sample counts are insufficient. All rates are computed on the training partition only and applied to val/test without recomputation.
 
-Taxon RG rates are computed with Bayesian
-shrinkage (α = 3) blending the taxon-specific rate toward the global prior. Hierarchical fallback — species → genus → family → order → global mean — activates
-when sample counts are insufficient.
+**Taxon difficulty aggregates:** Historical patterns encoded at species, genus, and family level:
+- Average and standard deviation of time-to-RG (how long does this taxon typically take to resolve?)
+- Lag distributions across the taxonomic hierarchy (how long before identifications arrive?)
+- Average number of identifications required to reach RG
+- Average time required to reach RG
+- Identifier specialist, calculates per-family identifier entropy and calculates rate of `specialist` (near 0), `near_specialist` (<0.5) and `generalist` (<2.0) for users that have more than 5 ids and taxa with at least 6 identifications.
 
-These aggregates try to specifically capture structurally difficult groups where community expertise is sparse and resolution timelines are long regardless of individual observation quality.
+
+These aggregates specifically capture structurally difficult groups where community expertise is sparse and resolution timelines are long regardless of individual observation quality.
 
 ### 4. Species confusion graph features
 
@@ -350,7 +360,6 @@ Splits use hard date-range boundaries derived from a `SplitConfig` dataclass anc
 
 Positive rate drifts across splits (train ~41% → val ~32% → test ~28%), reflecting the evolving composition of the iNaturalist community over time. This is expected and is not a sign of overfitting.
 
-Cross-validation during HP search uses a custom `ExpandingWindowCvSplit` (`BaseCrossValidator` subclass) with equal-chunk expanding windows.
 
 ---
 
@@ -460,8 +469,6 @@ Planned work:
 - Observer × top-identifier expertise interaction term (does this observer's history include this taxon's family?)
 - Geographic range signal (is this observation outside the taxon's typical range?)
 - AWS S3 ingestion source migration to facilitate scope expansion beyond Québec
-
-
 - **Two-model routing architecture**: route observations at inference time on
   `has_any_id` — a discoverability model (no-ID population, current scope) and
   a resolution model (has-ID population, disputed/specialist cases). The routing
@@ -494,8 +501,6 @@ has a lower and more stable positive rate (~20% across val/test) consistent with
 structural difficulty rather than neglect, and its training set size (~1,500
 positives) is insufficient for a reliable separate model at the current data
 volume. It is documented here as a distinct problem class for future work.
-
-
 
 ---
 
