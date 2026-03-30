@@ -64,10 +64,12 @@ CLASSIFIER_REGISTRY = {
         "LGBMClassifier",
         {
             "verbose": -1,
-            "n_estimators": 1000,
+            "n_estimators": 5000,
             "scale_pos_weight": 1,
             "bagging_freq": 1,
             "force_col_wise": True,
+            "reg_lambda": 0.019650407042576614,
+            "reg_alpha": 0.07346357719250234,
         },
     ),
 }
@@ -113,8 +115,8 @@ SEARCH_SPACES = {
         # Capacity
         "classifier__num_leaves": {
             "type": "int",
-            "low": 15,
-            "high": 127,
+            "low": 5,
+            "high": 20,
             "log": True,
             # rule of thumb: never exceed 2^(max_depth)
             # for depth=7 that's 128 — 200 is already generous
@@ -122,41 +124,26 @@ SEARCH_SPACES = {
         "classifier__min_child_samples": {
             "type": "int",
             "low": 5,
-            "high": 300,
+            "high": 100,
             "log": True,
         },
         # Learning rate
         "classifier__learning_rate": {
             "type": "float",
-            "low": 0.05,
-            "high": 0.1,
-            "log": True,
-            # log=True means Optuna samples 0.01, 0.012, 0.015...
-            # rather than 0.01, 0.11, 0.21 — much smarter for rates
-        },
-        # Regularisation
-        "classifier__reg_alpha": {
-            "type": "float",
-            "low": 1e-4,
-            "high": 10.0,
-            "log": True,
-        },
-        "classifier__reg_lambda": {
-            "type": "float",
-            "low": 1e-4,
-            "high": 10.0,
+            "low": 0.02,
+            "high": 0.05,
             "log": True,
         },
         # Subsampling
         "classifier__subsample": {
             "type": "float",
             "low": 0.4,
-            "high": 1.0,
+            "high": 0.65,
         },
         "classifier__colsample_bytree": {
             "type": "float",
-            "low": 0.4,
-            "high": 1.0,
+            "low": 0.7,
+            "high": 0.9,
         },
     },
 }

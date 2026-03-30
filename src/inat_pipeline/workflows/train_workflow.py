@@ -136,7 +136,7 @@ def execute(
             show_progress_bar=False,
         )
 
-        explainability.log_hyperparam_importance(study)
+        explainability.log_hyperparam_importance(study, config)
 
         best_params = study.best_params
         best_pr_score = study.best_value

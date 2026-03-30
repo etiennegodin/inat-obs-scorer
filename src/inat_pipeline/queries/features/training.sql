@@ -7,6 +7,7 @@ SELECT
     --Label
     l.label,
 
+    -- for cv splits
     m.created_at, -- for cv splits
 
     -- Initial submisison
@@ -24,7 +25,6 @@ SELECT
     COALESCE(m.oauth_application_id, 0) AS oauth_application_id,
 
     --Temporal features
-    m.created_at,
     m.obs_to_submit_lag_days,
 
     m.observed_week_sin,

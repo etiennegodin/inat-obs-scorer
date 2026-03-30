@@ -56,7 +56,7 @@ class ExpandingWindowCvSplit(BaseCrossValidator):
                 continue
 
             logger.debug(
-                f"Removed {len(start_train_idx) - len(train_idx)}rows on fold {i + 1}"
+                f"Removed {len(start_train_idx) - len(train_idx)} rows on fold {i + 1}"
             )
             yield train_idx, val_idx
 

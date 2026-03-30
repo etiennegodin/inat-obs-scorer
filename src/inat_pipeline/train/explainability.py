@@ -17,6 +17,7 @@ from sklearn.pipeline import Pipeline
 
 # from .core import get_transformer
 from .config import PipelineConfig
+from .registery import SEARCH_SPACES
 
 logger = logging.getLogger(__name__)
 
@@ -253,7 +254,7 @@ def log_feature_importance_report(
         return
 
 
-def log_hyperparam_importance(study: optuna.Study) -> None:
+def log_hyperparam_importance(study: optuna.Study, config: PipelineConfig) -> None:
     importances = get_param_importances(study)
     logger.info("\nHyperparameter importances (fANOVA):")
     for param, score in importances.items():
@@ -269,12 +270,10 @@ def log_hyperparam_importance(study: optuna.Study) -> None:
     mlflow.log_figure(fig, "hyperparameter_importance.png")
     plt.close(fig)
 
+    # Get params from search space keys
+    params = list(SEARCH_SPACES[config.classifier].keys())
     fig = optuna.visualization.plot_slice(
         study,
-        params=[
-            "classifier__learning_rate",
-            "classifier__num_leaves",
-            "classifier__min_child_samples",
-        ],
+        params=params,
     )
     mlflow.log_figure(fig, "hyperparameter_slice.png")
