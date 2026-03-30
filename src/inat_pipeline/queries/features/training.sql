@@ -8,7 +8,7 @@ SELECT
     l.label,
 
     -- Initial submisison
-
+    m.taxon_id,
     m.init_rank_level,
     m.init_rank_level <= 10 AS obs_has_species_self_id,
 
@@ -39,13 +39,13 @@ SELECT
     -- Observations
     LOG(ob.observer_obs_count_at_t + 1) AS obv_obs_count_log,
     ob.observer_rg_rate_at_t AS obv_rg_rate_lifetime,
-    ob.observer_reputation_diff AS obv_reputation_score,
+    ob.observer_reputation_diff AS obv_reputation_diff,
     ob.observer_reputation_rank AS obv_reputation_rank,
     ob.rg_rate_is_reliable AS obv_rg_rate_is_reliable,
 
     --Taxonomic
     oe.observer_species_entropy_norm AS obv_tx_entropy,
-    --ob.observer_taxon_rg_rate_shrunk_at_t AS obv_tx_rg_rate,
+    ob.observer_taxon_rg_rate_shrunk_at_t AS obv_tx_rg_rate,
     ob.observer_taxon_focus_rate AS obv_tx_focus_rate,
 
     -- Documentation Metadata
@@ -66,47 +66,46 @@ SELECT
     --COALESCE(i.prior_ids_vision_rate, 0) AS id_prior_ids_vision_rate,
     COALESCE(i.reciprocity_ratio, 0) AS id_reciprocity_ratio,
 
-    --Taxon features
+    --Taxon time windowed features
+    t.taxon_popularity_rank AS tx_popularity_rank,
+    t.rg_rate_prior_source AS tx_rg_rate_prior_source,
+    t.taxon_cold_start AS tx_cold_start,
+    t.genus_popularity_rank AS tx_genus_popularity_rank,
+    t.taxon_rg_rate_shrunk AS tx_taxon_rg_rate,
+    t.genus_rg_rate AS tx_genus_rg_rate,
+    t.family_rg_rate AS tx_family_rg_rate,
+    t.order_rg_rate AS order_rg_rate,
 
-    tx.effective_rg_rate_shrunk AS taxon_rg_rate,        -- rank-corrected
-    tx.effective_time_to_rg_mean AS taxon_time_to_rg_mean,
-    tx.effective_time_to_rg_median AS taxon_time_to_rg_median,
-    tx.effective_n_ids_mean AS taxon_n_ids_mean,
-    tx.effective_lag_days_mean AS taxon_lag_days_mean,
+    -- time
+    t.effective_time_to_rg_mean, --fallback
+    t.effective_time_to_rg_std,  --fallback
+    t.taxon_time_to_rg_mean,
+    t.genus_time_to_rg_mean,
+    t.family_time_to_rg_mean,
+    t.taxon_time_to_rg_std,
+    t.genus_time_to_rg_std,
+    t.family_time_to_rg_std,
 
-    date_part('day', ob.lag_since_last_obs) - taxon_lag_days_mean AS lag_diff,
+    t.taxon_avg_ids_to_rg AS tx_avg_ids_to_rg,
+    date_part('day', ob.lag_since_last_obs) - t.taxon_lag_days_median AS lag_diff,
+    t.taxon_lag_days_median,
+    t.taxon_lag_days_mean,
+    t.taxon_lag_days_max,
+    t.genus_lag_days_median,
+    t.genus_lag_days_mean,
+    t.genus_lag_days_max,
+    t.family_lag_days_median,
+    t.family_lag_days_mean,
+    t.family_lag_days_max,
 
-    tx.genus_rg_rate AS taxon_genus_rg_rate,
-    tx.family_rg_rate AS taxon_family_rg_rate,
+    -- Taxon specialist
 
-    tx.genus_time_to_rg_mean,
-    tx.family_time_to_rg_mean,
-
-    tx.genus_n_ids_mean,
-    tx.family_n_ids_mean,
-
-    tx.genus_lag_days_mean,
-    tx.family_lag_days_mean,
-
-    tx.taxon_popularity_log,
-    tx.genus_popularity_log,
-    tx.family_popularity_log,
-
-    tx.taxon_cold_start,
-
-    tx.specialist_identifer,
-    tx.specialist_observer,
-
-    tx.taxon_n_ids_median,
-    tx.taxon_lag_days_median,
-    tx.genus_time_to_rg_median,
-    tx.genus_n_ids_median,
-    tx.genus_lag_days_median,
-    tx.family_time_to_rg_median,
-    tx.family_n_ids_median,
-    tx.family_lag_days_median,
-    tx.global_time_to_rg_median,
-    tx.global_n_ids_median,
+    ts.mean_identifier_entropy,
+    ts.pct_pure_specialists,
+    ts.pct_specialists,
+    ts.pct_generalist,
+    ts.total_taxon_identifications,
+    ts.identifier_count,
 
     -- Taxon confusion stats (static)
     IFNULL(c.has_similar_species, FALSE) AS tx_conf_has_similar,
@@ -127,7 +126,9 @@ SELECT
     c.max_confusion_boundary_crossed AS tx_conf_max_conf_boundary_crossed,
     c.rg_percentile_in_neighborhood AS tx_conf_rg_perc_in_nbrhd,
     c.rg_percentile_dist_weighted AS tx_conf_rg_perc_dist_weighted,
+    c.neighborhood_pool_size,
     c.neighbor_genus_diversity AS tx_conf_nbrhd_genus_div,
+    c.neighbor_family_diversity AS tx_conf_nbrhd_family_div,
     c.neighbor_rank_min AS tx_conf_nbrhd_rank_min,
     c.neighbor_rank_min > 10 AS tx_conf_nbrhd_rank_min_over_10,
     c.magnet_score AS tx_confusion_magnet_score,
@@ -156,7 +157,8 @@ LEFT JOIN features.observations ob ON m.observation_id = ob.observation_id
 LEFT JOIN features.observers_entropy oe ON m.observation_id = oe.observation_id
 LEFT JOIN features.label l ON m.observation_id = l.observation_id
 JOIN features.identifications i ON m.observation_id = i.observation_id
-LEFT JOIN features.taxon tx ON m.taxon_id = tx.taxon_id
+LEFT JOIN features.taxon t ON m.observation_id = t.observation_id
+LEFT JOIN features.taxon_specialist ts ON m.taxon_id = ts.taxon_id
 LEFT JOIN features.taxa_confusion c ON m.taxon_id = c.taxon_id
 LEFT JOIN graph.clustering_coefficient cc ON m.taxon_id = cc.taxon_id
 LEFT JOIN graph.double_hop_stats dh ON m.taxon_id = dh.taxon_id

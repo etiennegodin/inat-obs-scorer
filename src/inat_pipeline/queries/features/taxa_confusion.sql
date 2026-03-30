@@ -45,6 +45,8 @@ nbor_taxa_diversity AS (
     SELECT
         s.taxon_id,
         COUNT(DISTINCT(t.genus_id)) AS neighbor_genus_diversity,
+        COUNT(DISTINCT(t.family_id)) AS neighbor_family_diversity,
+
         MIN(t.rank_level) neighbor_rank_min
 
     FROM staged.similar_species s
@@ -168,7 +170,7 @@ ranked AS (
             ORDER BY (rg_rate * (1.0 / (1.0 + taxonomic_distance))) ASC
         ) AS rg_percentile_dist_weighted,
 
-        --COUNT(*) OVER (PARTITION BY focal_taxon_id) AS neighborhood_pool_size
+        COUNT(*) OVER (PARTITION BY focal_taxon_id) AS neighborhood_pool_size
 
     FROM neighborhood_pool
 )
@@ -179,7 +181,7 @@ SELECT
     -- Taxon rg rate ranked in neighbors pool
     r.rg_percentile_in_neighborhood,
     r.rg_percentile_dist_weighted,
-    --r.neighborhood_pool_size,
+    r.neighborhood_pool_size,
 
     n.* EXCLUDE (n.taxon_id),
     s.* EXCLUDE (s.taxon_id),

@@ -98,7 +98,7 @@ def ranking_summary(
         ["k", "n_reviewed", "recall_at_k", "precision_at_k", "lift_at_k"]
     ].copy()
     summary.insert(
-        0, "K%", (summary.pop("k") * 100).round(0).astype(int).astype(str) + "%"
+        0, "K%", (summary.pop("k") * 100).round(1).astype(float).astype(str) + "%"
     )
 
     return summary.reset_index(drop=True)

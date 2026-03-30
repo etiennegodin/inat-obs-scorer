@@ -1,6 +1,8 @@
 CREATE OR REPLACE TABLE features.observations AS
 WITH config AS (
-    SELECT to_days(:label_window_days) AS window_val
+    SELECT
+        to_days(:label_window_days) AS window_val,
+        10.0 as alpha
 
 ),
 
@@ -20,7 +22,8 @@ base_obs AS (
         o.species,
         u.created_at AS user_created_at,
         u.orcid,
-        t.effective_rg_rate_shrunk AS expected_rg_rate,
+        t.taxon_rg_rate_shrunk AS expected_rg_rate,
+
         rg.n_identifiers_at_window,
         rg.n_identifiers_agree_at_window,
         -- Honest RG label from macro (no leakage)
@@ -30,7 +33,7 @@ base_obs AS (
     JOIN staged.users u
         ON o.user_id = u.user_id
     LEFT JOIN features.taxon t
-        ON t.taxon_id = o.taxon_id
+        ON t.observation_id = o.id
     -- All identifications within score window
     LEFT JOIN research_grade_windowed((SELECT window_val FROM config)) rg
         ON rg.observation_id = o.id
@@ -53,10 +56,11 @@ aggregates AS (
         COALESCE(COUNT(*) OVER observer_history, 0) AS observer_obs_count_at_t,
         COALESCE(SUM(is_rg::INT) OVER observer_history, 0) AS observer_rg_count_at_t,
 
-        -- Bayesian-shrunk RG rate (α=10, matches taxon shrinkage convention)
+        -- Bayesian-shrunk RG rate (α=c.alpha, matches taxon shrinkage convention)
         expected_rg_rate,
-        (COALESCE(SUM(is_rg::INT) OVER observer_history, 0) + 10 * expected_rg_rate)
-        / NULLIF(COALESCE(COUNT(*) OVER observer_history, 0) + 10, 0)
+
+        (COALESCE(SUM(is_rg::INT) OVER observer_history, 0) + c.alpha * expected_rg_rate)
+        / NULLIF(COALESCE(COUNT(*) OVER observer_history, 0) + c.alpha, 0)
             AS observer_rg_rate_at_t,
 
         COALESCE(observer_rg_rate_at_t / NULLIF(expected_rg_rate, 0), 0) AS observer_reputation_raw,
@@ -114,6 +118,7 @@ aggregates AS (
         ) OVER observer_history / NULLIF(observer_obs_count_at_t, 0), 0) AS pct_obs_from_mobile,
 
     FROM base_obs
+    CROSS JOIN config c
 
     WINDOW
         observer_history AS (

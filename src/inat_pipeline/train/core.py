@@ -13,7 +13,6 @@ from .registery import (
     CATEGORICAL_IMPUTER_REGISTRY,
     CLASSIFIER_REGISTRY,
     ENCODER_REGISTRY,
-    IMPUTER_REGISTRY,
     REDUCER_REGISTRY,
     SCALER_REGISTRY,
 )
@@ -85,6 +84,9 @@ def load_and_split(
     # Double check ordered
     df.sort_index()
 
+    # Drop taxon_id
+    df.drop(columns=["taxon_id"], inplace=True)
+
     # Splits
     train = df[df["split"] == "train"]
     val = df[df["split"] == "val"]
@@ -121,8 +123,8 @@ def _build_categorical_transformer(config: PipelineConfig) -> Pipeline:
 def _build_numeric_transformer(config: PipelineConfig) -> Pipeline:
     steps = []
 
-    imputer = _instantiate(IMPUTER_REGISTRY, config.numeric_imputer)
-    steps.append(("imputer", imputer))
+    # imputer = _instantiate(IMPUTER_REGISTRY, config.numeric_imputer)
+    # steps.append(("imputer", imputer))
 
     scaler = _instantiate(SCALER_REGISTRY, config.scaler)
     if scaler is not None:  # scaler = "none" skips this step
