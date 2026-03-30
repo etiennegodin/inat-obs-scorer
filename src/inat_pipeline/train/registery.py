@@ -64,7 +64,7 @@ CLASSIFIER_REGISTRY = {
         "LGBMClassifier",
         {
             "verbose": -1,
-            "n_estimators": 2000,
+            "n_estimators": 1000,
             "scale_pos_weight": 1,
             "bagging_freq": 1,
             "force_col_wise": True,

@@ -137,8 +137,10 @@ def make_objective(
                     eval_metric="average_precision",
                     callbacks=[
                         # LightGBM native early stopping callback
-                        # 'early_stopping_rounds' is now a callback in newer versions
-                        lgb.early_stopping(stopping_rounds=50, verbose=False),
+                        # 'stopping_rounds' is now a callback in newer versions
+                        lgb.early_stopping(
+                            stopping_rounds=config.stopping_rounds, verbose=False
+                        ),
                         lgb.log_evaluation(period=0),  # keep logs clean
                     ],
                 )

@@ -99,6 +99,7 @@ class ApplicationService:
                 random_seed=args.seed,
                 use_gpu=args.gpu,
                 n_jobs=args.n_jobs,
+                stopping_rounds=args.stopping_rounds,
             )
         except InatPipelineError as e:
             logger.error("Train workflow failed: %s", e)

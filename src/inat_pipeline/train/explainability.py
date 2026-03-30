@@ -268,3 +268,13 @@ def log_hyperparam_importance(study: optuna.Study) -> None:
     fig = ax.figure  # Access the figure object from the axes
     mlflow.log_figure(fig, "hyperparameter_importance.png")
     plt.close(fig)
+
+    fig = optuna.visualization.plot_slice(
+        study,
+        params=[
+            "classifier__learning_rate",
+            "classifier__num_leaves",
+            "classifier__min_child_samples",
+        ],
+    )
+    mlflow.log_figure(fig, "hyperparameter_slice.png")

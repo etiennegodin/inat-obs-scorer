@@ -40,6 +40,7 @@ def execute(
     random_seed: int,
     use_gpu: bool,
     n_jobs: int,
+    stopping_rounds: int,
 ) -> dict:
     # Initialise pipeline configs
     config = train.PipelineConfig(
@@ -54,6 +55,7 @@ def execute(
         use_gpu=use_gpu,
         version=deps.version,
         n_jobs=n_jobs,
+        stopping_rounds=stopping_rounds,
         experiment_name="inat_obs_scorer_v0_2",
     )
 

@@ -36,6 +36,7 @@ class PipelineConfig:
     experiment_name: str = "inat_obs_scorer_v0_1"
     n_trials: int = 10  # Optuna: number of hyperparameter combos to try
     cv_folds: int = 5  # cross-validation folds per trial
+    stopping_rounds: int = 50
     scoring_metric: str = "roc_auc"  # what Optuna optimizes for
     run_name: str = field(init=False)  # Run name
 

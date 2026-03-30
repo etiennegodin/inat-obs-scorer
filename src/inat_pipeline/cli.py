@@ -164,6 +164,15 @@ def create_parser() -> argparse.ArgumentParser:
         type=min_cv_folds,
         help="Number of cross validation folds",
     )
+
+    train_parser.add_argument(
+        "--stopping-rounds",
+        "-sr",
+        default=50,
+        type=int,
+        help="Stop training if validation metric doesn't"
+        " improve for N consecutive rounds.",
+    )
     train_parser.add_argument(
         "--seed",
         "-r",
