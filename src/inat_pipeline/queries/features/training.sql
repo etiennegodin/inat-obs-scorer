@@ -7,6 +7,8 @@ SELECT
     --Label
     l.label,
 
+    m.created_at, -- for cv splits
+
     -- Initial submisison
     m.taxon_id,
     m.init_rank_level,

@@ -56,7 +56,7 @@ def execute(
         version=deps.version,
         n_jobs=n_jobs,
         stopping_rounds=stopping_rounds,
-        experiment_name="inat_obs_scorer_v0_2",
+        experiment_name="inat_obs_scorer_v0_2.1",
     )
 
     # ── 1. Data & Config setup ─────────────────────────────────────────────────

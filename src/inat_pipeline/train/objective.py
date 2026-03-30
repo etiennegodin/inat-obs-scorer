@@ -63,7 +63,9 @@ def make_objective(
     """
     search_space = SEARCH_SPACES.get(config.classifier, {})
 
-    custom_cv = ExpandingWindowCvSplit(n_folds=config.cv_folds)
+    custom_cv = ExpandingWindowCvSplit(
+        n_folds=config.cv_folds, gap_days=30, date_col="created_at"
+    )
 
     # Set base params
     base_params = {"n_jobs": config.n_jobs}

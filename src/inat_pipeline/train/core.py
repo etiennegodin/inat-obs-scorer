@@ -22,40 +22,42 @@ logger = logging.getLogger(__name__)
 
 
 class ExpandingWindowCvSplit(BaseCrossValidator):
-    def __init__(self, n_folds=3, gap_size: int | None = None):
+    def __init__(self, n_folds=3, gap_days: int = 30, date_col="created_at"):
         self.n_folds = n_folds
-        self.gap_size = gap_size
+        self.gap_days = gap_days
+        self.date_col = date_col
 
     def split(self, X, y=None, groups=None):
-        n_samples = len(X)
-        indices = np.arange(n_samples)
+        indices = np.arange(len(X))
+        dates = pd.to_datetime(X[self.date_col].values)
+        gap = pd.Timedelta(days=self.gap_days)
+
         chunks = np.array_split(indices, self.n_folds + 1)
+        logger.debug(f"Using a {self.gap_days} days gap")
         for i in range(self.n_folds):
             train_idx = np.concatenate(chunks[: i + 1])
+            start_train_idx = train_idx
             val_idx = chunks[i + 1]
 
-            if self.gap_size is not None:
-                # Drop gap_size rows from tail of train and head of val
-                train_idx = train_idx[: -self.gap_size] if self.gap_size else train_idx
-                val_idx = val_idx[self.gap_size :] if self.gap_size else val_idx
+            if self.gap_days > 0:
+                # Boundary: first date in the raw val chunk (before any trimming)
+                val_boundary = dates[val_idx[0]]
+                train_cutoff = val_boundary - gap
+                train_idx = train_idx[dates[train_idx] <= train_cutoff]
 
-            yield train_idx, val_idx
+            if len(train_idx) == 0 or len(val_idx) == 0:
+                # Degenerate fold — gap consumed the entire train or val set.
+                # Log a warning rather than silently skipping.
+                logger.warning(
+                    f"Fold {i + 1}: gap_days={self.gap_days} produced an empty "
+                    f"{'train' if len(train_idx) == 0 else 'val'} set. "
+                    "Consider reducing gap_days or n_folds."
+                )
+                continue
 
-    def get_n_splits(self, X=None, y=None, groups=None):
-        return self.n_folds
-
-
-class SlidingWindowCvSplit(BaseCrossValidator):
-    def __init__(self, n_folds=3):
-        self.n_folds = n_folds
-
-    def split(self, X, y=None, groups=None):
-        n_samples = len(X)
-        indices = np.arange(n_samples)
-        chunks = np.array_split(indices, self.n_folds + 1)
-        for i in range(self.n_folds):
-            train_idx = chunks[i]
-            val_idx = chunks[i + 1]
+            logger.debug(
+                f"Removed {len(start_train_idx) - len(train_idx)}rows on fold {i + 1}"
+            )
             yield train_idx, val_idx
 
     def get_n_splits(self, X=None, y=None, groups=None):

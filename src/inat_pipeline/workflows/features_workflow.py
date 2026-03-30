@@ -26,7 +26,7 @@ def execute(deps: Dependencies):
             max_val_size=30000,
             val_window_days=410,
             max_test_size=100000,
-            gap_days=14,
+            gap_days=30,
         )
 
         # Macros registering
