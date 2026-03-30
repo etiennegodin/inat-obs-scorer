@@ -133,7 +133,7 @@ def make_objective(
                     X_train_transformed,
                     y_train_fold,
                     eval_set=[(X_val_transformed, y_val_fold)],
-                    eval_metric="map",  # Mean Average Precision
+                    eval_metric="average_precision",
                     callbacks=[
                         # LightGBM native early stopping callback
                         # 'early_stopping_rounds' is now a callback in newer versions
