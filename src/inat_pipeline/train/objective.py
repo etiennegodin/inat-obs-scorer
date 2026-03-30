@@ -145,6 +145,7 @@ def make_objective(
                         lgb.log_evaluation(period=0),  # keep logs clean
                     ],
                 )
+                logger.debug(f"Total number of trees: {model.booster_.num_trees()}")
 
                 y_pred = model.predict_proba(X_val_transformed)[:, 1]
 

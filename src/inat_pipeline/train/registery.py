@@ -67,13 +67,9 @@ CLASSIFIER_REGISTRY = {
             "n_estimators": 20000,
             "scale_pos_weight": 1,
             "bagging_freq": 1,
-            "reg_lambda": 0.019650407042576614,
-            "subsample": 0.525,
-            "learning_rate": 0.01,
-            "min_child_sample": 12,
-            "num_leaves": 4,
-            "min_child_samples": 41,
-            "reg_alpha": 0.0001,
+            "learning_rate": 0.03,
+            "num_leaves": 8,
+            "subsample": 0.5,
         },
     ),
 }
@@ -117,11 +113,23 @@ SEARCH_SPACES = {
     },
     "lightgbm": {
         # Regularisation
-        "classifier__reg_alpha": {
-            "type": "float",
-            "low": 1e-4,
-            "high": 0.001,
+        "classifier__min_child_samples": {
+            "type": "int",
+            "low": 20,
+            "high": 40,
             "log": True,
+        },
+        "classifier__reg_lambda": {
+            "type": "float",
+            "low": 5.0,
+            "high": 100.0,
+            "log": True,
+        },
+        #
+        "classifier__colsample_bytree": {
+            "type": "float",
+            "low": 0.75,
+            "high": 0.85,
         },
     },
 }

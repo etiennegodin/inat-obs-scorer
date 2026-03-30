@@ -136,24 +136,26 @@ def execute(
             show_progress_bar=False,
         )
 
-        explainability.log_hyperparam_importance(study, config)
-
         best_params = study.best_params
         best_pr_score = study.best_value
+
+        if best_params:
+            explainability.log_hyperparam_importance(study, config)
+            logger.info(f"  Best params: {best_params}\n")
+            # Log best params and best CV score to the parent run
+            mlflow.log_params({f"best_{k}": v for k, v in best_params.items()})
+            mlflow.log_dict(best_params, "best_params.json")
 
         logger.info(
             f"\n✓ Optuna finished. Best PR {config.scoring_metric}: {best_pr_score:.4f}"
         )
-        logger.info(f"  Best params: {best_params}\n")
-
-        # Log best params and best CV score to the parent run
-        mlflow.log_params({f"best_{k}": v for k, v in best_params.items()})
-        mlflow.log_dict(best_params, "best_params.json")
         mlflow.log_metric(f"cv/best_pr_{config.scoring_metric}", best_pr_score)
 
         # ── 4. Final model training ────────────────────────────────────────────
         logger.info("Training final model on full training set...")
-        final_model = train.train_final_model(config, best_params, X_train, y_train)
+        final_model = train.train_final_model(
+            config, best_params, X_train, y_train, X_val, y_val
+        )
 
         # ── 5. Evaluate on held-out test set ──────────────────────────────────
         y_pred = final_model.predict(X_val)
