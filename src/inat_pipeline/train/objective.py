@@ -18,6 +18,7 @@ warnings.filterwarnings("ignore", category=UserWarning)
 optuna.logging.set_verbosity(optuna.logging.WARNING)
 
 logger = logging.getLogger(__name__)
+warnings.filterwarnings("ignore", category=UserWarning)
 
 # ── OPTUNA OBJECTIVE FUNCTION ──────────────────────────────────────────────────
 
@@ -137,12 +138,12 @@ def make_objective(
                     callbacks=[
                         # LightGBM native early stopping callback
                         # 'early_stopping_rounds' is now a callback in newer versions
-                        lgb.early_stopping(stopping_rounds=50),
+                        lgb.early_stopping(stopping_rounds=50, verbose=False),
                         lgb.log_evaluation(period=0),  # keep logs clean
                     ],
                 )
 
-                y_pred = pipeline.predict_proba(X_val_transformed)[:, 1]
+                y_pred = model.predict_proba(X_val_transformed)[:, 1]
 
                 # --- Metrics ---
                 pr_auc = average_precision_score(y_val_fold, y_pred)
