@@ -115,14 +115,14 @@ SEARCH_SPACES = {
         # Regularisation
         "classifier__min_child_samples": {
             "type": "int",
-            "low": 20,
+            "low": 25,
             "high": 40,
             "log": True,
         },
         "classifier__reg_lambda": {
             "type": "float",
-            "low": 5.0,
-            "high": 100.0,
+            "low": 0.5,
+            "high": 10.0,
             "log": True,
         },
         #
