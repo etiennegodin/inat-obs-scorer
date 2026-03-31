@@ -64,10 +64,10 @@ CLASSIFIER_REGISTRY = {
         "LGBMClassifier",
         {
             "verbose": -1,
-            "n_estimators": 20000,
+            "n_estimators": 50000,
             "scale_pos_weight": 1,
             "bagging_freq": 1,
-            "learning_rate": 0.03,
+            "learning_rate": 0.01,
             "num_leaves": 8,
             "subsample": 0.5,
         },
@@ -116,12 +116,12 @@ SEARCH_SPACES = {
         "classifier__min_child_samples": {
             "type": "int",
             "low": 25,
-            "high": 40,
+            "high": 35,
             "log": True,
         },
         "classifier__reg_lambda": {
             "type": "float",
-            "low": 0.5,
+            "low": 0.1,
             "high": 10.0,
             "log": True,
         },

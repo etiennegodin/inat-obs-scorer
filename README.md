@@ -466,6 +466,8 @@ Comparing mean absolute SHAP values **and feature value distributions** across t
 Planned work:
 - Complete EDA by feature × error bucket — feature value distributions per bucket, not just SHAP deltas
 - Complementary species confusuon graph features.
+  - PageRank / eigenvector centrality
+  - 2-hop expansion rate
 - Geographic range signal (is this observation outside the taxon's typical range?)
 - AWS S3 ingestion source migration to facilitate scope expansion beyond Québec
 - **Two-model routing architecture**: route observations at inference time on
