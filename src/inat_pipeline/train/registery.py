@@ -63,14 +63,28 @@ CLASSIFIER_REGISTRY = {
         "lightgbm",
         "LGBMClassifier",
         {
+            "boosting_type": "gbdt",
+            "class_weight": None,
+            "colsample_bytree": 0.8094242422084595,
+            "importance_type": "split",
+            "learning_rate": 0.01,
+            "max_depth": -1,
+            "min_child_samples": 28,
+            "min_child_weight": 0.001,
+            "min_split_gain": 0.0,
+            "n_estimators": 1617,
+            "n_jobs": 4,
+            "num_leaves": 8,
+            "objective": None,
+            "random_state": 549,
+            "reg_alpha": 0.0,
+            "reg_lambda": 0.26296671646609576,
+            "subsample": 0.5,
+            "subsample_for_bin": 200000,
+            "subsample_freq": 0,
             "verbose": -1,
-            "n_estimators": 50000,
             "scale_pos_weight": 1,
             "bagging_freq": 1,
-            "learning_rate": 0.01,
-            "num_leaves": 8,
-            "subsample": 0.5,
-            "min_child_samples": 28,
         },
     ),
 }
@@ -111,20 +125,5 @@ SEARCH_SPACES = {
     "logistic": {
         "classifier__C": {"type": "float", "low": 1e-4, "high": 100, "log": True},
         "classifier__solver": {"type": "categorical", "choices": ["lbfgs", "saga"]},
-    },
-    "lightgbm": {
-        # Regularisation
-        "classifier__reg_lambda": {
-            "type": "float",
-            "low": 0.1,
-            "high": 3.0,
-            "log": True,
-        },
-        #
-        "classifier__colsample_bytree": {
-            "type": "float",
-            "low": 0.8,
-            "high": 0.85,
-        },
     },
 }
