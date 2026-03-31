@@ -70,6 +70,7 @@ CLASSIFIER_REGISTRY = {
             "learning_rate": 0.01,
             "num_leaves": 8,
             "subsample": 0.5,
+            "min_child_samples": 28,
         },
     ),
 }
@@ -113,22 +114,16 @@ SEARCH_SPACES = {
     },
     "lightgbm": {
         # Regularisation
-        "classifier__min_child_samples": {
-            "type": "int",
-            "low": 25,
-            "high": 35,
-            "log": True,
-        },
         "classifier__reg_lambda": {
             "type": "float",
             "low": 0.1,
-            "high": 10.0,
+            "high": 3.0,
             "log": True,
         },
         #
         "classifier__colsample_bytree": {
             "type": "float",
-            "low": 0.75,
+            "low": 0.8,
             "high": 0.85,
         },
     },
