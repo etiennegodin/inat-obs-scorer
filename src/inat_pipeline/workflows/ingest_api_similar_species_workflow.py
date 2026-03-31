@@ -36,12 +36,18 @@ def execute(deps: Dependencies, rate: int, ignore_not_found: bool) -> None:
         )
         items = df[SOURCE_KEY].to_list()
 
+        params = {"place_id": 6712}
+
+        fields = {"rank_level": True, "count": True}
+
         if items:
             # Set up configs
             config = EndpointConfig(
                 "identifications/similar_species",
                 id_param="taxon_id",
                 write_empty_rows=ignore_not_found,
+                params=params,
+                fields=fields,
             )
             fetcher = RateLimiterFetcher(rate=rate, ignore_not_found=ignore_not_found)
 
