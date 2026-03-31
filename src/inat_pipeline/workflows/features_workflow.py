@@ -56,6 +56,7 @@ def execute(deps: Dependencies):
         sql_features.execute("taxon_specialist", params=params)
         sql_graph.execute("confusion_graph")
         sql_graph.execute("confusion_graph_metrics")
+        sql_features.execute("taxon_confusion", params=params)
         sql_features.execute("network_events_raw", params=params)
 
         # Bases and non paramterised queries
