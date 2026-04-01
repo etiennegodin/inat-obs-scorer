@@ -39,6 +39,10 @@ data/*
 !data/*.dvc
 !data/.gitignore
 
+#Optuna
+optuna.sqlite3
+
+
 # Ml Flow
 mlruns/*
 mlruns.db

@@ -50,9 +50,12 @@ CLASSIFIER_REGISTRY = {
         {
             "verbose": -1,
             "n_estimators": 50000,
-            "learning_rate": 0.05,
+            "learning_rate": 0.03,
             "scale_pos_weight": 1,
             "subsample_freq": 1,
+            "reg_alpha": 0.5987133447610614,
+            "reg_lambda": 0.007829252467134224,
+            "subsample": 0.6000493288544528,
         },
     ),
 }
@@ -74,39 +77,20 @@ SEARCH_SPACES = {
         # Capacity
         "classifier__num_leaves": {
             "type": "int",
-            "low": 10,
-            "high": 31,
+            "low": 5,
+            "high": 15,
             "log": True,
         },
         "classifier__min_child_samples": {
             "type": "int",
             "low": 5,
-            "high": 50,
+            "high": 75,
             "log": True,
-        },
-        # Regularisation
-        "classifier__reg_alpha": {
-            "type": "float",
-            "low": 1e-4,
-            "high": 10.0,
-            "log": True,
-        },
-        "classifier__reg_lambda": {
-            "type": "float",
-            "low": 1e-4,
-            "high": 10.0,
-            "log": True,
-        },
-        # Subsampling
-        "classifier__subsample": {
-            "type": "float",
-            "low": 0.4,
-            "high": 1.0,
         },
         "classifier__colsample_bytree": {
             "type": "float",
-            "low": 0.4,
-            "high": 1.0,
+            "low": 0.75,
+            "high": 0.85,
         },
     },
 }

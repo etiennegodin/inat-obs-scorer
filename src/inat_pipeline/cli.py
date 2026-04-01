@@ -6,6 +6,7 @@ from argparse import Namespace
 from pathlib import Path
 
 import psutil
+import semver
 
 from .app import ApplicationService, Dependencies
 from .exceptions import InatPipelineError
@@ -120,6 +121,14 @@ def create_parser() -> argparse.ArgumentParser:
 
     # Train command
     train_parser = subparsers.add_parser("train", help="Train model")
+
+    train_parser.add_argument(
+        "--version",
+        "-v",
+        type=validate_version,
+        default="0.2.0",
+        help="SemVer style string",
+    )
     train_parser.add_argument(
         "--classifier",
         default="lightgbm",
@@ -269,3 +278,11 @@ def n_jobs(x) -> int:
     if x == -2:
         return psutil.cpu_count(logical=False) - 1
     return x
+
+
+def validate_version(x: str):
+    try:
+        return semver.VersionInfo.parse(x)
+    except ValueError as e:
+        print(f"Error: {e}")
+        sys.exit(1)

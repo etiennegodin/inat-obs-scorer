@@ -32,6 +32,9 @@ class Dependencies:
         self.SQL_STAGE_PATH = self.QUERY_FOLDER / "stage"
         self.SQL_FEATURES_PATH = self.QUERY_FOLDER / "features"
 
+        self.optunaDB = "sqlite:///optuna.sqlite3"
+        self.mlflowDB = self.project_root / "mlruns.db"
+
     def to_dict(self) -> dict:
         """Serialize config for logging to MLflow."""
         return asdict(self)

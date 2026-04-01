@@ -6,6 +6,7 @@ from pathlib import Path
 import mlflow
 import mlflow.models
 import optuna
+import semver
 from mlflow.models.signature import infer_signature
 from sklearn.metrics import (
     accuracy_score,
@@ -18,6 +19,7 @@ from sklearn.metrics import (
 from .. import train
 from ..app.container import Dependencies
 from ..train import explainability, metrics, ranking
+from ..train.utils.helpers import get_next_study_name
 
 logger = logging.getLogger(__name__)
 
@@ -41,7 +43,11 @@ def execute(
     use_gpu: bool,
     n_jobs: int,
     stopping_rounds: int,
+    version: semver.Version,
 ) -> dict:
+
+    experiment_name = f"inat_obs_scorer_v{version.major}.{version.minor}"
+
     # Initialise pipeline configs
     config = train.PipelineConfig(
         classifier=classifier,
@@ -56,7 +62,8 @@ def execute(
         version=deps.version,
         n_jobs=n_jobs,
         stopping_rounds=stopping_rounds,
-        experiment_name="inat_obs_scorer_v0_2.1",
+        experiment_name=experiment_name,
+        run_name=get_next_study_name(experiment_name, storage_url=deps.optunaDB),
     )
 
     # ── 1. Data & Config setup ─────────────────────────────────────────────────
@@ -119,6 +126,8 @@ def execute(
         # ── 3. Optuna hyperparameter search ───────────────────────────────────
         logger.info(f"Starting Optuna search ({config.n_trials} trials)...\n")
         study = optuna.create_study(
+            study_name=config.run_name,
+            storage="sqlite:///optuna.sqlite3",
             direction="maximize",  # we want the highest ROC-AUC
             sampler=optuna.samplers.TPESampler(seed=config.random_seed),
             pruner=optuna.pruners.MedianPruner(n_warmup_steps=10),

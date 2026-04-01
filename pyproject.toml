@@ -31,7 +31,8 @@ dependencies = [
     "aiolimiter",
     "duckdb == 1.4.3",
     "seaborn",
-    "kaleido"
+    "kaleido",
+    "semver"
 
 
 
