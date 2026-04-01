@@ -48,25 +48,11 @@ CLASSIFIER_REGISTRY = {
         "lightgbm",
         "LGBMClassifier",
         {
-            "boosting_type": "gbdt",
-            "colsample_bytree": 0.8558083612168199,
-            "importance_type": "split",
-            "learning_rate": 0.01,
-            "max_depth": -1,
-            "min_child_samples": 32,
-            "min_child_weight": 0.001,
-            "min_split_gain": 0,
-            "n_estimators": 2001,
-            "n_jobs": 4,
-            "num_leaves": 7,
-            "random_state": 42,
-            "reg_alpha": 0.0014718547064252957,
-            "reg_lambda": 1.1734247901028145,
-            "subsample": 0.593727005942368,
-            "subsample_for_bin": 200000,
-            "subsample_freq": 1,
             "verbose": -1,
+            "n_estimators": 50000,
+            "learning_rate": 0.05,
             "scale_pos_weight": 1,
+            "subsample_freq": 1,
         },
     ),
 }
@@ -84,5 +70,43 @@ LIGHTGBM_GPU_PARAMS = {
 # All other keys are passed as kwargs to the suggest function.
 
 SEARCH_SPACES = {
-    "lightgbm": {},
+    "lightgbm": {
+        # Capacity
+        "classifier__num_leaves": {
+            "type": "int",
+            "low": 10,
+            "high": 31,
+            "log": True,
+        },
+        "classifier__min_child_samples": {
+            "type": "int",
+            "low": 5,
+            "high": 50,
+            "log": True,
+        },
+        # Regularisation
+        "classifier__reg_alpha": {
+            "type": "float",
+            "low": 1e-4,
+            "high": 10.0,
+            "log": True,
+        },
+        "classifier__reg_lambda": {
+            "type": "float",
+            "low": 1e-4,
+            "high": 10.0,
+            "log": True,
+        },
+        # Subsampling
+        "classifier__subsample": {
+            "type": "float",
+            "low": 0.4,
+            "high": 1.0,
+        },
+        "classifier__colsample_bytree": {
+            "type": "float",
+            "low": 0.4,
+            "high": 1.0,
+        },
+    },
 }

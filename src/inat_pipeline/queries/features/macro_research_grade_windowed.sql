@@ -67,3 +67,4 @@ CREATE OR REPLACE MACRO research_grade_windowed(eval_interval) AS TABLE
         t.id_user,
         t.id_created_at,
 ;
+--date_part('day', rg.id_created_at - rg.created_at)::INT AS time_to_rg_days,

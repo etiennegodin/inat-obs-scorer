@@ -12,8 +12,8 @@ obs_counts AS (
         taxon_id,
         COUNT(DISTINCT observation_id) AS obs_count,
         COUNT(observation_id) FILTER (WHERE is_rg) AS rg_count,
-        MEDIAN(media_time_to_rg_days) AS time_to_rg_days_median,
-        AVG(media_time_to_rg_days) AS time_to_rg_days_mean
+        MEDIAN(time_to_rg_days) AS time_to_rg_days_median,
+        AVG(time_to_rg_days) AS time_to_rg_days_mean
 
     FROM research_grade_windowed(INTERVAL '999 years')
     WHERE created_at < :cutoff_date

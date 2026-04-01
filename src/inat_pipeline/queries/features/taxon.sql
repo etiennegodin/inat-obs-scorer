@@ -19,8 +19,7 @@ base AS (
         t.order_id,
         t.rank_level,
         date_part('day', rg.created_at - rg.observed_on)::INT AS lag_days,
-        date_part('day', rg.id_created_at - rg.created_at)::INT AS time_to_rg_days,
-
+        rg.time_to_rg_days,
         rg.taxon_id
 
     FROM research_grade_windowed((SELECT window_val FROM config)) rg
