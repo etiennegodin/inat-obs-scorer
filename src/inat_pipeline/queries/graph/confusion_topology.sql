@@ -95,6 +95,11 @@ focal_taxon_aggs AS (
         MAX(similar_rank_level) single_hop_rank_max,
         MIN(similar_rank_level) single_hop_rank_min,
 
+        -- Taxonomic boundary crossing
+        COUNT(*) FILTER (WHERE confusion_boundary = 1) AS nbor_count_same_genus,
+        COUNT(*) FILTER (WHERE confusion_boundary = 2) AS nbor_count_cross_genus,
+        COUNT(*) FILTER (WHERE confusion_boundary = 3) AS nbor_count_cross_family,
+
         MAX(confusion_boundary) AS max_confusion_boundary_crossed,
 
         -- Fraction of confusers that cross genus boundary (0→1)

@@ -121,6 +121,24 @@ SELECT
     ct.clustering_coefficient,
     ct.single_hop_rank_max,
     ct.single_hop_rank_min,
+    ct.nbor_count_same_genus,
+    ct.nbor_count_cross_genus,
+    ct.nbor_count_cross_family,
+
+    -- Dynamic confusion stats
+    tc.nbor_rg_rate_mean,
+    tc.rg_percentile_in_neighborhood,
+    tc.rg_rate_vs_neighbors,
+    tc.rg_percentile_dist_weighted,
+    tc.neighborhood_difficulty_inv_dist,
+    tc.neighborhood_difficulty_dist_weighted,
+    tc.nbor_rg_rate_inv_dist_weighted,
+    tc.weighted_mean_neighbor_rg_rate,
+    tc.nbor_rg_rate_mean,
+    tc.nbor_rg_rate_std,
+    tc.nbor_rg_rate_min,
+    tc.nbor_obs_count_mean,
+    tc.nbor_obs_count_std,
 
     --Confusion graph topology
     dh.double_hop_nbrhd_size AS tx_conf_2hop_size,
@@ -147,6 +165,7 @@ LEFT JOIN features.label l ON m.observation_id = l.observation_id
 JOIN features.identifications i ON m.observation_id = i.observation_id
 LEFT JOIN features.taxon t ON m.observation_id = t.observation_id
 LEFT JOIN features.taxon_specialist ts ON m.taxon_id = ts.taxon_id
+LEFT JOIN features.taxa_confusion tc ON m.taxon_id = tc.taxon_id
 LEFT JOIN graph.confusion_topology ct ON m.taxon_id = ct.taxon_id
 LEFT JOIN graph.double_hop dh ON m.taxon_id = dh.taxon_id
 LEFT JOIN features.temporal tp ON m.observation_id = tp.observation_id
