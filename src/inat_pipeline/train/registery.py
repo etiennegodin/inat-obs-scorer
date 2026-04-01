@@ -50,9 +50,13 @@ CLASSIFIER_REGISTRY = {
         {
             "verbose": -1,
             "n_estimators": 50000,
-            "learning_rate": 0.05,
+            "learning_rate": 0.03,
             "scale_pos_weight": 1,
             "subsample_freq": 1,
+            "reg_alpha": 0.0014718547064252957,
+            "num_leaves": 7,
+            "min_child_samples": 32,
+            "reg_lambda": 1.1734247901028145,
         },
     ),
 }
@@ -72,40 +76,15 @@ LIGHTGBM_GPU_PARAMS = {
 SEARCH_SPACES = {
     "lightgbm": {
         # Capacity
-        "classifier__num_leaves": {
-            "type": "int",
-            "low": 5,
-            "high": 12,
-            "log": True,
-        },
-        "classifier__min_child_samples": {
-            "type": "int",
-            "low": 5,
-            "high": 50,
-            "log": True,
-        },
-        # Regularisation
-        "classifier__reg_alpha": {
-            "type": "float",
-            "low": 1e-4,
-            "high": 10.0,
-            "log": True,
-        },
-        "classifier__reg_lambda": {
-            "type": "float",
-            "low": 1e-4,
-            "high": 10.0,
-            "log": True,
-        },
         # Subsampling
         "classifier__subsample": {
             "type": "float",
-            "low": 0.4,
-            "high": 1.0,
+            "low": 0.55,
+            "high": 0.65,
         },
         "classifier__colsample_bytree": {
             "type": "float",
-            "low": 0.40,
+            "low": 0.7,
             "high": 1.0,
         },
     },
