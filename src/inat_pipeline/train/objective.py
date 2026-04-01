@@ -151,14 +151,28 @@ def make_objective(
 
                 # --- Metrics ---
                 pr_auc = average_precision_score(y_val_fold, y_pred)
-                trial.report(pr_auc, fold_idx)
+                roc_auc = roc_auc_score(y_val_fold, y_pred)
 
                 # --- OPTUNA PRUNING ---
                 # report the result of the current fold to the pruner
+
+                # Keep track of the worst fold so far
+                current_min_pr = min(pr_aucs) if pr_aucs else pr_auc
+                # Calculate stability of the folds completed SO FAR
+                if len(pr_aucs) > 1:
+                    running_stability = np.mean(pr_aucs) - np.std(pr_aucs)
+                else:
+                    running_stability = pr_auc  # First fold has no Std Dev
+
+                trial.set_user_attr(f"fold_{fold_idx}_pr_auc", pr_auc)
+                trial.set_user_attr(f"fold_{fold_idx}_roc_auc", roc_auc)
+
+                # Report the RUNNING MINIMUM to the pruner
+                trial.report(running_stability, step=fold_idx)
+
+                trial.set_user_attr("running_min", current_min_pr)
                 if trial.should_prune():
                     raise optuna.exceptions.TrialPruned()
-
-                roc_auc = roc_auc_score(y_val_fold, y_pred)
 
                 roc_aucs.append(roc_auc)
                 pr_aucs.append(pr_auc)
@@ -172,10 +186,13 @@ def make_objective(
             roc_auc_std = float(np.std(roc_aucs))
 
             pr_auc_mean = float(np.mean(pr_aucs))
+            pr_auc_min = float(min(pr_aucs))
             pr_auc_std = float(np.std(pr_aucs))
+            pr_stability = pr_auc_mean - pr_auc_std
 
-            logger.debug(f"ROC-AUC: {roc_auc_mean}")
-            logger.debug(f"PR-AUC: {pr_auc_mean}")
+            logger.debug(f"ROC-AUC mean: {roc_auc_mean}")
+            logger.debug(f"PR-AUC mean: {pr_auc_mean}")
+            logger.debug(f"PR-AUC min: {pr_auc_min}")
 
             # ── Step 4: Log this trial as a child MLflow run ──────────────────────
             with mlflow.start_run(
@@ -189,17 +206,22 @@ def make_objective(
                         "cv_roc_auc_mean": roc_auc_mean,
                         "cv_roc_auc_std": roc_auc_std,
                         "cv_pr_auc_mean": pr_auc_mean,
+                        "cv_pr_auc_min": pr_auc_min,
                         "cv_pr_auc_std": pr_auc_std,
+                        "cv_pr_stability": pr_stability,
                         "cv_duration_seconds": elapsed,
                     }
                 )
             print(
-                f"  Trial {trial.number:3d}: roc_auc={roc_auc_mean:.4f}"
-                f" ±{roc_auc_std:.4f} | pr_auc = {pr_auc_mean:.4f}"
-                f" ±{pr_auc_std:.4f} [{elapsed:.1f}s]"
+                f"  Trial {trial.number:3d}: "
+                f"pr_auc = {pr_auc_mean:.4f} "
+                f"±{pr_auc_std:.4f} | "
+                f"pr_min = {pr_auc_min:.4f} "
+                f"pr_stability = {pr_stability:.4f} "
+                f"[{elapsed:.1f}s] "
             )
 
-            return pr_auc_mean  # Optuna maximizes this
+            return pr_stability  # Optuna maximizes this
         except Exception as e:
             logger.error(f"Error on trial #{trial.number}: {e}")
             raise

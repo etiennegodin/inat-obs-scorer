@@ -129,6 +129,7 @@ def create_parser() -> argparse.ArgumentParser:
         default="0.2.0",
         help="SemVer style string",
     )
+
     train_parser.add_argument(
         "--classifier",
         default="lightgbm",
@@ -179,8 +180,15 @@ def create_parser() -> argparse.ArgumentParser:
         "-sr",
         default=50,
         type=int,
-        help="Stop training if validation metric doesn't"
-        " improve for N consecutive rounds.",
+        help="LightGBM stopping_rounds using val set",
+    )
+
+    train_parser.add_argument(
+        "--early-stop",
+        "-es",
+        default=20,
+        type=int,
+        help="Stop optuna trials after no metric improvement",
     )
     train_parser.add_argument(
         "--seed",

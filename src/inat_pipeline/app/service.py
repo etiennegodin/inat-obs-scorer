@@ -101,6 +101,7 @@ class ApplicationService:
                 n_jobs=args.n_jobs,
                 stopping_rounds=args.stopping_rounds,
                 version=args.version,
+                early_stopping_rounds=args.early_stop,
             )
         except InatPipelineError as e:
             logger.error("Train workflow failed: %s", e)
