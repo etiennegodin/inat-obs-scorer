@@ -4,6 +4,7 @@ CREATE OR REPLACE MACRO research_grade_windowed(eval_interval) AS TABLE
 
         SELECT
             c.observation_id,
+            o.user_id,
             c.community_taxon,
             c.taxon_id,
             c.consensus_level_rg,
@@ -12,8 +13,8 @@ CREATE OR REPLACE MACRO research_grade_windowed(eval_interval) AS TABLE
             c.n_ids_at_window,
             c.created_at,
             c.observed_on,
-            c.id_rg,
-            c.id_user,
+            c.identification_id_ct,
+            c.identifier_ct,
             c.id_created_at,
 
             -- verifiable label

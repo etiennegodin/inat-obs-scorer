@@ -5,7 +5,7 @@ CREATE OR REPLACE MACRO community_taxon_windowed(eval_interval) AS TABLE
             i.observation_id,
             i.taxon_id AS id_taxon_id,
             i.user_id,
-            i.id AS identification_id,
+            i.id AS identification_id_ct,
             i.own_observation,
             i.created_at,
 
@@ -75,7 +75,7 @@ CREATE OR REPLACE MACRO community_taxon_windowed(eval_interval) AS TABLE
             c.observation_id,
             c.candidate_taxon_id,
             c.rank_level,
-            iw.identification_id,
+            iw.identification_id_ct,
             iw.created_at,
             iw.user_id,
 
@@ -131,7 +131,7 @@ CREATE OR REPLACE MACRO community_taxon_windowed(eval_interval) AS TABLE
         SELECT DISTINCT ON (observation_id)
             observation_id,
             candidate_taxon_id AS community_taxon,
-            identification_id,
+            identification_id_ct,
             created_at,
             user_id,
             rank_level,
@@ -155,9 +155,9 @@ CREATE OR REPLACE MACRO community_taxon_windowed(eval_interval) AS TABLE
         ct.rank_level,
         ct.score,
         ct.cumulative AS n_ids_at_window,
-        ct.identification_id AS id_rg,
+        ct.identification_id_ct AS identification_id_ct,
         ct.created_at as id_created_at,
-        ct.user_id AS id_user,
+        ct.user_id AS identifier_ct,
         COALESCE(ct.consensus_level_rg, FALSE) AS consensus_level_rg,
     -- RG requires community taxon to match submitted taxon
 

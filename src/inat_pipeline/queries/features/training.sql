@@ -122,6 +122,7 @@ SELECT
     ct.clustering_coefficient,
     ct.single_hop_rank_max,
     ct.single_hop_rank_min,
+    ct.single_hop_rank_median,
     ct.nbor_count_same_genus,
     ct.nbor_count_cross_genus,
     ct.nbor_count_cross_family,
@@ -174,6 +175,12 @@ SELECT
     th.confusion_nbrhd_pheno_activity,
     th.focal_vs_nbrhd_pheno_ratio,
 
+    -- Community velocity
+    c.trailing_community_rg_rate_90d,
+    c.community_window_count,
+    c.observer_ratio,
+    c.identifier_ratio,
+
 FROM features.model_population m
 JOIN features.splits s ON m.observation_id = s.observation_id
 LEFT JOIN features.observations ob ON m.observation_id = ob.observation_id
@@ -187,7 +194,7 @@ LEFT JOIN graph.confusion_topology ct ON m.taxon_id = ct.taxon_id
 LEFT JOIN graph.double_hop_derived dh ON m.taxon_id = dh.taxon_id
 LEFT JOIN features.temporal tp ON m.observation_id = tp.observation_id
 LEFT JOIN features.taxon_histo_conf th ON m.observation_id = th.observation_id
-
+LEFT JOIN features.community c ON m.observation_id = c.observation_id
 WHERE
     l.label IS NOT NULL
 ORDER BY m.observation_id;

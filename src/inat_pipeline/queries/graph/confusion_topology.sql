@@ -101,6 +101,7 @@ focal_taxon_aggs AS (
 
         COUNT(DISTINCT(similar_genus_id)) AS single_hop_genus_diversity,
         COUNT(DISTINCT(similar_family_id)) AS single_hop_family_diversity,
+        MEDIAN(similar_rank_level) single_hop_rank_median,
         MAX(similar_rank_level) single_hop_rank_max,
         MIN(similar_rank_level) single_hop_rank_min,
 

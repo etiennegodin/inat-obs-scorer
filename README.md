@@ -17,6 +17,14 @@ dynamic confusion rates, is_rg, time_to_rg - at train cutoff
 cyclic data, cv fold design
 optuna objective `Actual PR-AUC / Positive Rate` normalise drifting pos rate
 
+Your CV folds all live within the training split (pre-2023, pos_rate ~0.47). But your val and test splits have pos_rates of 0.339 and 0.287 — a substantial drift. This means your Optuna objective is being evaluated on a distribution that's meaningfully richer in positives than what the model will actually face. HPs tuned on CV folds may be slightly overfit to the ~0.47 world.
+This is worth documenting as a known limitation, but it's not easily fixable through CV restructuring without losing a lot of training data. The 365-day label window is partly responsible (older observations have had more time to settle into RG status). Worth a sentence in your README's limitations section.
+
+The seasonal pos_rate cycling is much stronger than I appreciated from the fold numbers alone. The dashed line swings from roughly 20% in summer to 60-65% in winter — a 3× range within a single year. That's not mild variation, it's a dominant signal.
+Two things are driving this:
+
+What you're seeing in the pos_rate drift (train 0.47 → val 0.34 → test 0.29) is real platform shift — the iNaturalist community's identification throughput is actually declining relative to observation volume over time. More observations are being submitted than the identifier community can resolve, so recent cohorts have structurally lower RG rates. That's a genuine distributional shift your model needs to handle, not an artifact to correct for
+
 ---
 
 ## The Problem

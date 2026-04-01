@@ -225,7 +225,7 @@ def make_objective(
                 f"[{elapsed:.1f}s] "
             )
 
-            return pr_stability  # Optuna maximizes this
+            return pr_auc_mean
         except Exception as e:
             logger.error(f"Error on trial #{trial.number}: {e}")
             raise
