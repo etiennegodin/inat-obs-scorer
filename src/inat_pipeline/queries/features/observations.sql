@@ -24,8 +24,6 @@ base_obs AS (
         u.orcid,
         t.taxon_rg_rate_shrunk AS expected_rg_rate,
 
-        rg.n_identifiers_at_window,
-        rg.n_identifiers_agree_at_window,
         -- Honest RG label from macro (no leakage)
         COALESCE(rg.is_rg, FALSE) AS is_rg
 
@@ -97,10 +95,6 @@ aggregates AS (
         COUNT(DISTINCT("order")) OVER observer_history AS taxon_diversity_order,
         COUNT(DISTINCT(family)) OVER observer_history AS taxon_diversity_family,
         COUNT(DISTINCT(genus)) OVER observer_history AS taxon_diversity_genus,
-
-        -- ── Community engagement received ────────────────────────────
-        AVG(n_identifiers_at_window) OVER observer_history AS n_identifiers_mean,
-        AVG(n_identifiers_agree_at_window) OVER observer_history AS n_identifiers_agree_mean,
 
         -- Documentation quality
         COALESCE(

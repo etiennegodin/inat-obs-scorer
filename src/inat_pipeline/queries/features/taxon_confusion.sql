@@ -160,7 +160,7 @@ aggregates AS (
     -- obs stats from pre-aggregated table, single lookup
     JOIN obs_stats o ON o.taxon_id = n.taxon_id
     JOIN graph.confusion_topology t ON t.taxon_id = n.taxon_id
-    GROUP BY n.taxon_id, o.obs_count, o.rg_count, o.rg_rate, t.similar_species_count,
+    GROUP BY n.taxon_id, o.obs_count, o.rg_count, o.rg_rate, t.similar_species_count, o.time_to_rg_days_mean
 
 ),
 
