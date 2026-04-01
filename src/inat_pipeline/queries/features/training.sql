@@ -36,7 +36,7 @@ SELECT
     --Temporal
     date_part('day', ob.observer_tenure) AS obv_tenure_days,
     ob.is_veteran AS obv_is_veteran,
-    --date_part('day', ob.lag_since_last_obs) AS obv_lag_days_since_last_post,
+    date_part('day', ob.lag_since_last_obs) AS obv_lag_days_since_last_post,
 
     -- Observations
     LOG(ob.observer_obs_count_at_t + 1) AS obv_obs_count_log,
@@ -62,10 +62,10 @@ SELECT
 
     COALESCE(i.prior_ids_received, 0) AS id_prior_ids_received,
     COALESCE(i.prior_identifier_diversity, 0) AS id_prior_identifier_diversity,
-    --COALESCE(i.prior_observer_rg_rate, 0) AS id_prior_observer_rg_rate,
+    COALESCE(i.prior_observer_rg_rate, 0) AS id_prior_observer_rg_rate,
     COALESCE(i.prior_ids_given, 0) AS id_prior_ids_given,
-    --COALESCE(i.prior_taxa_identified, 0) AS id_prior_taxa_identified, --negative shap delta for uncertain and certain
-    --COALESCE(i.prior_ids_vision_rate, 0) AS id_prior_ids_vision_rate,
+    COALESCE(i.prior_taxa_identified, 0) AS id_prior_taxa_identified, --negative shap delta for uncertain and certain
+    COALESCE(i.prior_ids_vision_rate, 0) AS id_prior_ids_vision_rate,
     COALESCE(i.reciprocity_ratio, 0) AS id_reciprocity_ratio,
 
     --Taxon time windowed features
@@ -105,12 +105,13 @@ SELECT
     ts.pct_pure_specialists,
     ts.pct_specialists,
     ts.pct_generalist,
-    --ts.total_taxon_identifications,
-    --ts.identifier_count,
+    ts.pct_ids_from_family_specialists,
+    ts.total_taxon_identifications,
+    ts.identifier_count,
 
     -- Confusion graph topolgy stats (static)
     ct.similar_species_count IS NOT NULL AS has_similar_species, -- boolean flag
-    --ct.similar_species_count, -- in incorrect shap for both certain and uncertain
+    ct.similar_species_count,
     --ct.nbor_dist_max,
     ct.nbor_dist_mean,
     ct.nbor_dist_median,
@@ -137,7 +138,6 @@ SELECT
     tc.nbor_rg_rate_mean,
     tc.nbor_rg_rate_std,
     tc.nbor_rg_rate_min,
-    tc.nbor_rg_rate_median,
     tc.nbor_rg_rate_median,
     tc.nbor_obs_count_mean,
     tc.nbor_obs_count_median,
