@@ -126,6 +126,12 @@ SELECT
     ct.nbor_count_cross_genus,
     ct.nbor_count_cross_family,
     ct.magnet_score,
+    ct.time_to_rg_vs_neighbors,
+    ct.nbor_time_to_rg_inv_dist_weighted,
+    ct.nbor_time_to_rg_mean,
+    ct.nbor_time_to_rg_std,
+    ct.nbor_time_to_rg_max,
+    ct.nbor_time_to_rg_min,
 
     -- Dynamic confusion stats
     tc.rg_percentile_in_neighborhood,
@@ -159,7 +165,11 @@ SELECT
     tp.activity_at_pheno,
     tp.months_from_peak_pheno,
     tp.pheno_season_width,
+    tp.upload_season_width,
     tp.observed_kurtosis,
+    tp.months_from_peak_upload,
+    tp.peak_lag_weeks,
+    tp.created_kurtosis,
 
     th.confusion_nbrhd_pheno_activity,
     th.focal_vs_nbrhd_pheno_ratio,

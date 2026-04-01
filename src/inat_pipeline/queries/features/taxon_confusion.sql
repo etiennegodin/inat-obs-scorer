@@ -11,7 +11,9 @@ obs_counts AS (
     SELECT
         taxon_id,
         COUNT(DISTINCT observation_id) AS obs_count,
-        COUNT(observation_id) FILTER (WHERE is_rg) AS rg_count
+        COUNT(observation_id) FILTER (WHERE is_rg) AS rg_count,
+        MEDIAN(media_time_to_rg_days) AS time_to_rg_days_median,
+        AVG(media_time_to_rg_days) AS time_to_rg_days_mean
 
     FROM research_grade_windowed(INTERVAL '999 years')
     WHERE created_at < :cutoff_date
@@ -27,7 +29,7 @@ obs_stats AS (
 
         -- dynamic alpha
         CASE
-            WHEN obs_count < 10 THEN 15   -- high shrinkage
+            WHEN obs_count < 6 THEN 15   -- high shrinkage
             WHEN obs_count < 50 THEN 5
             ELSE 2    -- trust the data
         END AS alpha,
@@ -45,7 +47,8 @@ similar_species_agg AS (
         o.rg_count AS similar_species_rg_count,
         o.rg_rate AS similar_species_rg_rate_raw,
         d.taxonomic_distance,
-
+        o.time_to_rg_days_mean AS similar_species_time_to_rg_mean,
+        o.time_to_rg_days_median AS similar_species_time_to_rg_median,
         (o.obs_count * o.rg_rate + o.alpha * c.global_rg_rate)
         / NULLIF(o.obs_count + o.alpha, 0) AS similar_species_rg_rate_shrunk_global,
 
@@ -69,7 +72,14 @@ pool_mean_agg AS (
             SUM(similar_species_rg_rate_raw) OVER (PARTITION BY taxon_id)
             - similar_species_rg_rate_raw
         )
-        / NULLIF(COUNT(*) OVER (PARTITION BY taxon_id) - 1, 0) AS pool_mean
+        / NULLIF(COUNT(*) OVER (PARTITION BY taxon_id) - 1, 0) AS pool_mean,
+
+        (
+            SUM(similar_species_time_to_rg_mean) OVER (PARTITION BY taxon_id)
+            - similar_species_time_to_rg_mean
+        )
+        / NULLIF(COUNT(*) OVER (PARTITION BY taxon_id) - 1, 0) AS time_to_rg_pool_mean
+
     FROM similar_species_agg
 ),
 
@@ -126,6 +136,25 @@ aggregates AS (
 
         -- Relative standing
         o.rg_rate - AVG(n.similar_species_rg_rate_shrunk_nbor) AS rg_rate_vs_neighbors,
+
+        -- Neighbor time-to-RG aggregates
+
+        ROUND(AVG(n.similar_species_time_to_rg_mean), 2) AS nbor_time_to_rg_mean,
+        ROUND(STDDEV(n.similar_species_time_to_rg_mean), 4) AS nbor_time_to_rg_std,
+        MAX(n.similar_species_time_to_rg_mean) AS nbor_time_to_rg_max,
+        MIN(n.similar_species_time_to_rg_mean) AS nbor_time_to_rg_min,
+
+        -- Distance-weighted: nearby slow-resolvers are more diagnostic
+        ROUND(
+            SUM(n.similar_species_time_to_rg_mean / NULLIF(n.taxonomic_distance, 0))
+            / NULLIF(SUM(1.0 / NULLIF(n.taxonomic_distance, 0)), 0),
+            2
+        ) AS nbor_time_to_rg_inv_dist_weighted,
+
+        -- Relative standing: does focal resolve faster or slower than its neighborhood?
+        -- Positive = focal is faster than neighbors (easier)
+        o.time_to_rg_days_mean - ROUND(AVG(n.similar_species_time_to_rg_mean), 2)
+            AS time_to_rg_vs_neighbors,
 
     FROM shrunk_toward_neighborhood n
     -- obs stats from pre-aggregated table, single lookup
