@@ -19,7 +19,7 @@ from sklearn.metrics import (
 from .. import train
 from ..app.container import Dependencies
 from ..train import explainability, metrics, ranking
-from ..train.utils.helpers import get_next_study_name
+from ..train.utils.optuna_helpers import EarlyStoppingCallback, get_next_study_name
 
 logger = logging.getLogger(__name__)
 
@@ -139,10 +139,13 @@ def execute(
             config, X_train, y_train, parent_run_id
         )
 
+        # Stop after x trials
+        stop_callback = EarlyStoppingCallback(early_stopping_rounds=20)
         study.optimize(
             objective,
             n_trials=config.n_trials,
             show_progress_bar=False,
+            callbacks=[stop_callback],
         )
 
         best_params = study.best_params
