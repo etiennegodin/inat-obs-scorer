@@ -141,11 +141,13 @@ SELECT
     tc.nbor_obs_count_std,
 
     --Confusion graph topology
-    dh.double_hop_nbrhd_size AS tx_conf_2hop_size,
-    dh.double_hop_nbrhd_genus AS tx_conf_2hop_genus,
-    dh.double_hop_nbrhd_family AS tx_conf_2hop_family,
-    dh.genus_crossover_count AS tx_conf_genus_crossovers,
-    dh.family_crossover_count AS tx_conf_family_crossover,
+    dh.double_hop_nbrhd_size,
+    dh.double_hop_nbrhd_genus_count,
+    dh.double_hop_nbrhd_family_count,
+    dh.genus_crossover_count,
+    dh.family_crossover_count,
+    dh.double_hop_genus_crossover_rate,
+    dh.double_hop_max_boundary_crossed,
 
     -- Taxon observation and submission distributions
     tp.submission_pressure,
