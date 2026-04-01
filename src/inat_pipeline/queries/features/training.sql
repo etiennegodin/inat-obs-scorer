@@ -126,12 +126,6 @@ SELECT
     ct.nbor_count_cross_genus,
     ct.nbor_count_cross_family,
     ct.magnet_score,
-    ct.time_to_rg_vs_neighbors,
-    ct.nbor_time_to_rg_inv_dist_weighted,
-    ct.nbor_time_to_rg_mean,
-    ct.nbor_time_to_rg_std,
-    ct.nbor_time_to_rg_max,
-    ct.nbor_time_to_rg_min,
 
     -- Dynamic confusion stats
     tc.rg_percentile_in_neighborhood,
@@ -148,6 +142,12 @@ SELECT
     tc.nbor_obs_count_mean,
     tc.nbor_obs_count_median,
     tc.nbor_obs_count_std,
+    tc.time_to_rg_vs_neighbors,
+    tc.nbor_time_to_rg_inv_dist_weighted,
+    tc.nbor_time_to_rg_mean,
+    tc.nbor_time_to_rg_std,
+    tc.nbor_time_to_rg_max,
+    tc.nbor_time_to_rg_min,
 
     --Confusion graph topology
     dh.double_hop_nbrhd_size,
