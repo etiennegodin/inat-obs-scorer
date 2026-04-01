@@ -1,3 +1,21 @@
+-- Step 3: exclusive 2-hop via hash anti-join on two small materialized tables
+CREATE OR REPLACE TABLE graph.exclusive_2hop AS
+SELECT
+    d.taxon_id,
+    COUNT(DISTINCT d.similar_taxon_id) AS exclusive_2hop_size
+FROM graph.double_hop_pairs d
+LEFT JOIN graph.single_hop s
+    ON  s.taxon_id      = d.taxon_id
+    AND s.similar_taxon_id = d.similar_taxon_id
+WHERE s.similar_taxon_id IS NULL   -- not reachable at hop 1
+GROUP BY d.taxon_id;
+
+
+
+
+
+
+
 CREATE OR REPLACE TABLE graph.double_hop_derived AS
 WITH exclusive_2hop AS (
     SELECT d.taxon_id, COUNT(DISTINCT d.similar_taxon_id) AS exclusive_2hop_size

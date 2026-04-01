@@ -1,5 +1,16 @@
 SET search_path = 'staged,main';
 
+
+-- Step 1: materialize 2-hop pairs as a table first (don't compute exclusive inline)
+CREATE OR REPLACE TABLE graph.double_hop_pairs AS
+SELECT DISTINCT focal_taxon_id AS taxon_id, similar_taxon_id
+FROM GRAPH_TABLE(confusion_graph
+    MATCH (a:taxon)-[s1:similar_to]->(b:taxon)-[s2:similar_to]->(c:taxon)
+    COLUMNS (a.taxon_id AS focal_taxon_id, c.taxon_id AS similar_taxon_id)
+)
+WHERE focal_taxon_id != similar_taxon_id;  -- exclude self-loops early
+
+
 -- Double hop neighborhood stats
 CREATE OR REPLACE TABLE graph.double_hop AS
 SELECT focal_taxon_id as taxon_id,
