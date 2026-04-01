@@ -100,34 +100,32 @@ aggregates AS (
 
         -- Neighbor obs aggregates
         SUM(n.similar_species_obs_count) AS nbor_obs_count_sum,
-        ROUND(AVG(n.similar_species_obs_count), 2) AS nbor_obs_count_mean,
-        ROUND(STDDEV(n.similar_species_obs_count), 5) AS nbor_obs_count_std,
+        AVG(n.similar_species_obs_count) AS nbor_obs_count_mean,
+        MEDIAN(n.similar_species_obs_count) AS nbor_obs_count_median,
+
+        STDDEV(n.similar_species_obs_count) AS nbor_obs_count_std,
         MAX(n.similar_species_obs_count) AS nbor_obs_count_max,
 
         -- Neighbor RG aggregates
-        ROUND(AVG(n.similar_species_rg_rate_shrunk_nbor), 4) AS nbor_rg_rate_mean,
-        ROUND(STDDEV(n.similar_species_rg_rate_shrunk_nbor), 5) AS nbor_rg_rate_std,
+        AVG(n.similar_species_rg_rate_shrunk_nbor) AS nbor_rg_rate_mean,
+        STDDEV(n.similar_species_rg_rate_shrunk_nbor) AS nbor_rg_rate_std,
         MIN(n.similar_species_rg_rate_shrunk_nbor) AS nbor_rg_rate_min,
+        MEDIAN(n.similar_species_rg_rate_shrunk_nbor) AS nbor_rg_rate_median,
 
         -- Distance-weighted RG rate (far confusers weighted more)
-        ROUND(AVG(n.similar_species_rg_rate_shrunk_nbor * n.taxonomic_distance), 4)
+        AVG(n.similar_species_rg_rate_shrunk_nbor * n.taxonomic_distance)
             AS weighted_mean_neighbor_rg_rate,
 
         -- Inverse-distance weighted RG rate (near confusers weighted more)
-        ROUND(
-            SUM(n.similar_species_rg_rate_shrunk_nbor / NULLIF(n.taxonomic_distance, 0))
-            / NULLIF(SUM(1.0 / NULLIF(n.taxonomic_distance, 0)), 0),
-            4
-        ) AS nbor_rg_rate_inv_dist_weighted,
 
-        ROUND(
-            (1 - AVG(n.similar_species_rg_rate_shrunk_nbor * n.taxonomic_distance))
-            * LOG(t.similar_species_count),
-            4
-        ) AS neighborhood_difficulty_dist_weighted,
+        SUM(n.similar_species_rg_rate_shrunk_nbor / NULLIF(n.taxonomic_distance, 0))
+        / NULLIF(SUM(1.0 / NULLIF(n.taxonomic_distance, 0)), 0) AS nbor_rg_rate_inv_dist_weighted,
+
+        (1 - AVG(n.similar_species_rg_rate_shrunk_nbor * n.taxonomic_distance))
+        * LOG(t.similar_species_count) AS neighborhood_difficulty_dist_weighted,
 
         -- Relative standing
-        o.rg_rate - ROUND(AVG(n.similar_species_rg_rate_shrunk_nbor), 4) AS rg_rate_vs_neighbors,
+        o.rg_rate - AVG(n.similar_species_rg_rate_shrunk_nbor) AS rg_rate_vs_neighbors,
 
     FROM shrunk_toward_neighborhood n
     -- obs stats from pre-aggregated table, single lookup
@@ -192,7 +190,7 @@ SELECT
     -- Relative stand
 
     -- Summary statistic
-    ROUND((1 - a.nbor_rg_rate_inv_dist_weighted) * LOG(a.similar_species_count + 1), 4) AS neighborhood_difficulty_inv_dist
+    (1 - a.nbor_rg_rate_inv_dist_weighted) * LOG(a.similar_species_count + 1) AS neighborhood_difficulty_inv_dist
 
 FROM aggregates a
 JOIN ranked r ON r.focal_taxon_id = a.taxon_id

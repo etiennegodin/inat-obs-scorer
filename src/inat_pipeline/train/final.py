@@ -1,6 +1,8 @@
+import json
 import logging
 
 import lightgbm as lgb
+import mlflow
 import pandas as pd
 
 from .config import PipelineConfig
@@ -15,8 +17,8 @@ def train_final_model(
     best_params: dict,
     X_train: pd.DataFrame,
     y_train: pd.Series,
-    X_val: pd.DataFrame,
-    y_val: pd.Series,
+    X_val: pd.DataFrame | None = None,
+    y_val: pd.Series | None = None,
 ) -> object:
     """
     After Optuna finds the best hyperparameters, we retrain on the FULL training set.
@@ -40,23 +42,53 @@ def train_final_model(
         classifier_params.update(LIGHTGBM_GPU_PARAMS)
 
     final_pipeline = build_pipeline(config, classifier_params=classifier_params)
+
     X_train_transformed = final_pipeline[:-1].fit_transform(X_train, y_train)
     X_val_transformed = final_pipeline[:-1].transform(X_val)
 
     model = final_pipeline.named_steps["classifier"]
 
-    model.fit(
-        X_train_transformed,
-        y_train,
-        eval_set=[(X_val_transformed, y_val)],
-        eval_metric="average_precision",
-        callbacks=[
-            # LightGBM native early stopping callback
-            # 'stopping_rounds' is now a callback in newer versions
-            lgb.early_stopping(stopping_rounds=config.stopping_rounds, verbose=False),
-            lgb.log_evaluation(period=0),  # keep logs clean
-        ],
-    )
+    # Optionnal val set
+    if X_val is not None or y_val is not None:
+        model.fit(
+            X_train_transformed,
+            y_train,
+            eval_set=[(X_val_transformed, y_val)],
+            eval_metric=config.scoring_metric,
+            callbacks=[
+                # LightGBM native early stopping callback
+                # 'stopping_rounds' is now a callback in newer versions
+                lgb.early_stopping(
+                    stopping_rounds=config.stopping_rounds, verbose=False
+                ),
+                lgb.log_evaluation(period=0),  # keep logs clean
+            ],
+        )
+
+    else:
+        model.fit(
+            X_train_transformed,
+            y_train,
+            eval_metric=config.scoring_metric,
+            callbacks=[
+                # LightGBM native early stopping callback
+                # 'stopping_rounds' is now a callback in newer versions
+                lgb.early_stopping(
+                    stopping_rounds=config.stopping_rounds, verbose=False
+                ),
+                lgb.log_evaluation(period=0),  # keep logs clean
+            ],
+        )
     logger.debug(f"Final model number of trees: {model.booster_.num_trees()}")
+
+    # Log final model
+    params = model.get_params()
+    params["n_estimators"] = model.booster_.num_trees()
+    mlflow.log_dict(params, "final_model_params.json")
+    try:
+        with open("../test/final_model.json", "w") as json_file:
+            json.dump(params, json_file, indent=4)
+    except Exception as e:
+        logger.error(f"Failed to write final model params: {e}")
 
     return final_pipeline

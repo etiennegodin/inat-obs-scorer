@@ -44,47 +44,15 @@ REDUCER_REGISTRY = {
 }
 
 CLASSIFIER_REGISTRY = {
-    "random_forest": (
-        "sklearn.ensemble",
-        "RandomForestClassifier",
-        {},
-    ),
-    "gradient_boost": (
-        "sklearn.ensemble",
-        "GradientBoostingClassifier",
-        {},
-    ),
-    "logistic": (
-        "sklearn.linear_model",
-        "LogisticRegression",
-        {"max_iter": 500},
-    ),
     "lightgbm": (
         "lightgbm",
         "LGBMClassifier",
         {
-            "boosting_type": "gbdt",
-            "class_weight": None,
-            "colsample_bytree": 0.8094242422084595,
-            "importance_type": "split",
-            "learning_rate": 0.01,
-            "max_depth": -1,
-            "min_child_samples": 28,
-            "min_child_weight": 0.001,
-            "min_split_gain": 0.0,
-            "n_estimators": 1617,
-            "n_jobs": 4,
-            "num_leaves": 8,
-            "objective": None,
-            "random_state": 549,
-            "reg_alpha": 0.0,
-            "reg_lambda": 0.26296671646609576,
-            "subsample": 0.5,
-            "subsample_for_bin": 200000,
-            "subsample_freq": 0,
             "verbose": -1,
+            "n_estimators": 50000,
+            "learning_rate": 0.05,
             "scale_pos_weight": 1,
-            "bagging_freq": 1,
+            "subsample_freq": 1,
         },
     ),
 }
@@ -102,28 +70,43 @@ LIGHTGBM_GPU_PARAMS = {
 # All other keys are passed as kwargs to the suggest function.
 
 SEARCH_SPACES = {
-    "random_forest": {
-        "classifier__n_estimators": {"type": "int", "low": 10, "high": 100, "step": 10},
-        "classifier__max_depth": {"type": "int", "low": 3, "high": 15},
-        "classifier__min_samples_leaf": {"type": "int", "low": 1, "high": 10},
-        "classifier__max_features": {
-            "type": "categorical",
-            "choices": ["sqrt", "log2", None],
-        },
-    },
-    "gradient_boost": {
-        "classifier__n_estimators": {"type": "int", "low": 10, "high": 100, "step": 10},
-        "classifier__learning_rate": {
-            "type": "float",
-            "low": 1e-3,
-            "high": 0.3,
+    "lightgbm": {
+        # Capacity
+        "classifier__num_leaves": {
+            "type": "int",
+            "low": 5,
+            "high": 12,
             "log": True,
         },
-        "classifier__max_depth": {"type": "int", "low": 2, "high": 10},
-        "classifier__subsample": {"type": "float", "low": 0.5, "high": 1.0},
-    },
-    "logistic": {
-        "classifier__C": {"type": "float", "low": 1e-4, "high": 100, "log": True},
-        "classifier__solver": {"type": "categorical", "choices": ["lbfgs", "saga"]},
+        "classifier__min_child_samples": {
+            "type": "int",
+            "low": 5,
+            "high": 50,
+            "log": True,
+        },
+        # Regularisation
+        "classifier__reg_alpha": {
+            "type": "float",
+            "low": 1e-4,
+            "high": 10.0,
+            "log": True,
+        },
+        "classifier__reg_lambda": {
+            "type": "float",
+            "low": 1e-4,
+            "high": 10.0,
+            "log": True,
+        },
+        # Subsampling
+        "classifier__subsample": {
+            "type": "float",
+            "low": 0.4,
+            "high": 1.0,
+        },
+        "classifier__colsample_bytree": {
+            "type": "float",
+            "low": 0.40,
+            "high": 1.0,
+        },
     },
 }

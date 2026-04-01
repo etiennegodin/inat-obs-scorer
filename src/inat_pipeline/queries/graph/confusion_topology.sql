@@ -91,6 +91,7 @@ clustering_coefficient AS (
 focal_taxon_aggs AS (
     SELECT
         taxon_id,
+        magnet_score,
         COUNT(DISTINCT(similar_taxon_id)) AS similar_species_count,
 
         -- Taxonomic distance aggregates
@@ -118,7 +119,7 @@ focal_taxon_aggs AS (
         ) AS cross_genus_confusion_rate,
 
     FROM augmented_edges e
-    GROUP BY taxon_id
+    GROUP BY taxon_id, magnet_score
 )
 
 SELECT

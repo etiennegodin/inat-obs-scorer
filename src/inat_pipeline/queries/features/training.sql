@@ -124,6 +124,7 @@ SELECT
     ct.nbor_count_same_genus,
     ct.nbor_count_cross_genus,
     ct.nbor_count_cross_family,
+    ct.magnet_score,
 
     -- Dynamic confusion stats
     tc.rg_percentile_in_neighborhood,
@@ -136,7 +137,10 @@ SELECT
     tc.nbor_rg_rate_mean,
     tc.nbor_rg_rate_std,
     tc.nbor_rg_rate_min,
+    tc.nbor_rg_rate_median,
+    tc.nbor_rg_rate_median,
     tc.nbor_obs_count_mean,
+    tc.nbor_obs_count_median,
     tc.nbor_obs_count_std,
 
     --Confusion graph topology
