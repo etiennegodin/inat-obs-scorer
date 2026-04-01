@@ -9,7 +9,12 @@ from ..utils.splits import splits_report
 logger = logging.getLogger(__name__)
 
 
-def execute(deps: Dependencies):
+def execute(
+    deps: Dependencies,
+    params: TrainingSplitParams | None = None,
+    output_name: str = "features",
+):
+
     with DuckDBAdapter(deps.DB_PATH) as con:
         # Transform data and create features
 

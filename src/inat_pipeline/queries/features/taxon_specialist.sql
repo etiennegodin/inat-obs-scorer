@@ -60,6 +60,50 @@ taxon_specialist_signal AS (
     WHERE i.own_observation IS FALSE
     GROUP BY i.taxon_id, t.family_id
     HAVING total_taxon_identifications >= 6
+),
+
+specialist_resolution AS (
+    SELECT
+        i.taxon_id,
+        t_obs.family_id,
+
+        -- What fraction of this taxon's identifiers are "specialists"
+        -- (>50% of their IDs in this family)?
+        AVG(
+            CASE WHEN id_entropy.family_concentration >= 0.5 THEN 1.0 ELSE 0.0 END
+        ) AS pct_ids_from_family_specialists,
+
+        COUNT(DISTINCT i.user_id) AS identifier_count
+
+    FROM staged.identifications i
+    JOIN staged.taxa t_obs ON i.taxon_id = t_obs.taxon_id
+    JOIN (
+        SELECT
+            user_id,
+            family_id,
+            SUM(COUNT(*)) OVER (PARTITION BY user_id, family_id) * 1.0
+            / SUM(COUNT(*)) OVER (PARTITION BY user_id) AS family_concentration
+        FROM staged.identifications id2
+        JOIN staged.taxa t2 ON id2.taxon_id = t2.taxon_id
+        WHERE
+            id2.own_observation IS FALSE
+            AND id2.created_at < :cutoff_date
+        GROUP BY user_id, family_id
+    ) id_entropy
+        ON
+            i.user_id = id_entropy.user_id
+            AND t_obs.family_id = id_entropy.family_id
+    WHERE
+        i.own_observation IS FALSE
+        AND i.created_at < :cutoff_date
+    GROUP BY i.taxon_id, t_obs.family_id
 )
 
-SELECT * FROM taxon_specialist_signal;
+SELECT
+    ts.*,
+
+    sr.pct_ids_from_family_specialists,
+    sr.identifier_count
+
+FROM taxon_specialist_signal ts
+JOIN specialist_resolution sr ON ts.taxon_id = sr.taxon_id;

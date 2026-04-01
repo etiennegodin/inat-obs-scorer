@@ -62,9 +62,9 @@ SELECT
 
     COALESCE(i.prior_ids_received, 0) AS id_prior_ids_received,
     COALESCE(i.prior_identifier_diversity, 0) AS id_prior_identifier_diversity,
-    COALESCE(i.prior_observer_rg_rate, 0) AS id_prior_observer_rg_rate,
+    --COALESCE(i.prior_observer_rg_rate, 0) AS id_prior_observer_rg_rate,
     COALESCE(i.prior_ids_given, 0) AS id_prior_ids_given,
-    COALESCE(i.prior_taxa_identified, 0) AS id_prior_taxa_identified,
+    --COALESCE(i.prior_taxa_identified, 0) AS id_prior_taxa_identified, --negative shap delta for uncertain and certain
     --COALESCE(i.prior_ids_vision_rate, 0) AS id_prior_ids_vision_rate,
     COALESCE(i.reciprocity_ratio, 0) AS id_reciprocity_ratio,
 
@@ -105,12 +105,12 @@ SELECT
     ts.pct_pure_specialists,
     ts.pct_specialists,
     ts.pct_generalist,
-    ts.total_taxon_identifications,
-    ts.identifier_count,
+    --ts.total_taxon_identifications,
+    --ts.identifier_count,
 
     -- Confusion graph topolgy stats (static)
     ct.similar_species_count IS NOT NULL AS has_similar_species, -- boolean flag
-    ct.similar_species_count,
+    --ct.similar_species_count, -- in incorrect shap for both certain and uncertain
     --ct.nbor_dist_max,
     ct.nbor_dist_mean,
     ct.nbor_dist_median,
