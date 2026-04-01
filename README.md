@@ -12,6 +12,8 @@
 
 * Notes
 
+static graph_confusion topology
+dynamic confusion rates, is_rg, time_to_rg - at train cutoff
 
 
 ---

@@ -1,4 +1,5 @@
 src/inat_pipeline/queries/features/identifications_at_window.sql
 src/inat_pipeline/queries/stage/stage_obs_observations.sql
-src/inat_pipeline/queries/graph/graph_double_hop.sql
+src/inat_pipeline/queries/graph/double_hop.sql
 src/inat_pipeline/queries/graph/double_hop_derived.sql
+src/inat_pipeline/queries/graph/confusion_topology.sql

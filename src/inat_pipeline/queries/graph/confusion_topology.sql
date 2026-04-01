@@ -1,3 +1,11 @@
+-- Single hop for clustering
+CREATE OR REPLACE TABLE graph.single_hop AS
+--SELECT taxon_id, COUNT(DISTINCT(n_taxon_id)) AS hop_neighborhood_size
+FROM GRAPH_TABLE(confusion_graph
+    MATCH (a:taxon)-[s:similar_to]->(b:taxon)
+    COLUMNS (a.taxon_id, b.taxon_id as similar_taxon_id)
+);
+
 CREATE OR REPLACE TABLE graph.confusion_topology AS
 
 WITH base_edges AS (

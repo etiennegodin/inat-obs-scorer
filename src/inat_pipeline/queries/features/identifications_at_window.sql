@@ -79,11 +79,11 @@ community_state AS (
 
     SELECT
         observation_id,
-        community_taxon_id IS NOT NULL                      AS has_community_taxon_at_window,
+        community_taxon IS NOT NULL                      AS has_community_taxon_at_window,
         consensus_level_rg                                  AS community_consensus_at_window,
         -- NULL-safe equality: handles observations with no community taxon yet
     -- sqlfluff:off
-        community_taxon_id IS NOT DISTINCT FROM taxon_id   AS community_matches_submitted_at_window
+        community_taxon IS NOT DISTINCT FROM taxon_id   AS community_matches_submitted_at_window
     FROM research_grade_windowed((SELECT score_window_days FROM params))
     -- sqlfluff:on
 

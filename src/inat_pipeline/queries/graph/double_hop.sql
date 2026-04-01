@@ -11,6 +11,7 @@ FROM GRAPH_TABLE(confusion_graph
 WHERE focal_taxon_id != similar_taxon_id;  -- exclude self-loops early
 
 
+
 -- Double hop neighborhood stats
 CREATE OR REPLACE TABLE graph.double_hop AS
 SELECT focal_taxon_id as taxon_id,
@@ -43,4 +44,6 @@ FROM GRAPH_TABLE(confusion_graph
         c.genus_id  AS n_genus_id,
         c.family_id AS n_family_id,
         c.order_id  AS n_order_id)
-) GROUP BY focal_taxon_id;
+)
+WHERE focal_taxon_id != similar_taxon_id  -- ← prune self-loops before grouping
+GROUP BY focal_taxon_id;

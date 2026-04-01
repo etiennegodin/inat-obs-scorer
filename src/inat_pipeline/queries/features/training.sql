@@ -55,7 +55,7 @@ SELECT
     ob.pct_obs_with_description AS obv_pct_obs_with_description,
     ob.pct_obs_with_license AS obv_pct_obs_with_license,
     ob.pct_obs_from_mobile AS obv_pct_obs_from_mobile,
-    ob.has_orcid AS obv_has_orcid,
+    --ob.has_orcid AS obv_has_orcid,
 
     -- Role stats from identifications history
     -- Observer as an identifier features
@@ -81,10 +81,10 @@ SELECT
     -- time
     t.effective_time_to_rg_mean, --fallback
     t.effective_time_to_rg_std,  --fallback
-    t.taxon_time_to_rg_mean,
+    --t.taxon_time_to_rg_mean,
     t.genus_time_to_rg_mean,
     t.family_time_to_rg_mean,
-    t.taxon_time_to_rg_std,
+    --t.taxon_time_to_rg_std,
     t.genus_time_to_rg_std,
     t.family_time_to_rg_std,
 
@@ -111,7 +111,7 @@ SELECT
     -- Confusion graph topolgy stats (static)
     ct.similar_species_count IS NOT NULL AS has_similar_species, -- boolean flag
     ct.similar_species_count,
-    ct.nbor_dist_max,
+    --ct.nbor_dist_max,
     ct.nbor_dist_mean,
     ct.nbor_dist_median,
     ct.single_hop_genus_diversity,
@@ -126,7 +126,6 @@ SELECT
     ct.nbor_count_cross_family,
 
     -- Dynamic confusion stats
-    tc.nbor_rg_rate_mean,
     tc.rg_percentile_in_neighborhood,
     tc.rg_rate_vs_neighbors,
     tc.rg_percentile_dist_weighted,
@@ -148,6 +147,8 @@ SELECT
     dh.family_crossover_count,
     dh.double_hop_genus_crossover_rate,
     dh.double_hop_max_boundary_crossed,
+    dh.confusion_expansion_rate,
+    dh.hidden_confusion_rate,
 
     -- Taxon observation and submission distributions
     tp.submission_pressure,
@@ -169,7 +170,7 @@ LEFT JOIN features.taxon t ON m.observation_id = t.observation_id
 LEFT JOIN features.taxon_specialist ts ON m.taxon_id = ts.taxon_id
 LEFT JOIN features.taxa_confusion tc ON m.taxon_id = tc.taxon_id
 LEFT JOIN graph.confusion_topology ct ON m.taxon_id = ct.taxon_id
-LEFT JOIN graph.double_hop dh ON m.taxon_id = dh.taxon_id
+LEFT JOIN graph.double_hop_derived dh ON m.taxon_id = dh.taxon_id
 LEFT JOIN features.temporal tp ON m.observation_id = tp.observation_id
 LEFT JOIN features.taxon_histo_conf th ON m.observation_id = th.observation_id
 

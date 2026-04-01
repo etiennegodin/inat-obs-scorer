@@ -15,7 +15,6 @@ def execute(deps: Dependencies):
 
         sql_features = DuckDbSQL(con, deps.SQL_FEATURES_PATH)
         sql_split = DuckDbSQL(con, deps.QUERY_FOLDER / "split")
-        sql_graph = DuckDbSQL(con, deps.QUERY_FOLDER / "graph", ignore_params=True)
 
         # Train/Val/Test splits
         params = TrainingSplitParams(
@@ -52,31 +51,25 @@ def execute(deps: Dependencies):
         sql_split.execute("split", params=params)
         splits_report(sql_split, params)
 
-        # Static features
+        # Taxon features
         sql_features.execute("taxon_specialist", params=params)
-        sql_graph.execute("confusion_graph")
-        sql_graph.execute("graph_double_hop")
-        sql_graph.execute("double_hop_derived")
-
-        sql_graph.execute("confusion_topology")
         sql_features.execute("taxon_confusion", params=params)
+
         sql_features.execute("network_events_raw", params=params)
 
-        # Bases and non paramterised queries
+        # Bases and non parametrised queries
         sql_features.execute_many(
             "network_events",
             "user_role_timeline",
         )
 
         # Time-windowed features :
-
         sql_features.execute("observations", params=params)
         sql_features.execute("identifications_at_window", params=params)
 
         # With dependencies
         sql_features.execute_many(
             "identifications",
-            "taxa_confusion",
             "observers_entropy",
         )
 
