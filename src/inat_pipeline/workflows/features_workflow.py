@@ -26,7 +26,7 @@ def execute(
             label_window_days=365,
             scraped_at=date(2026, 3, 1),
             score_window_days=7,
-            cutoff_date=date(2023, 1, 1),
+            cutoff_date=date(2024, 1, 1),
             max_val_size=30000,
             val_window_days=410,
             max_test_size=100000,
@@ -82,7 +82,7 @@ def execute(
         sql_features.execute("training")
 
         # Export to data version controlled file
-        output_path = deps._DATA_FOLDER / "features.parquet"
+        output_path = deps._DATA_FOLDER / "features_test.parquet"
         con.execute(
             f"""COPY features.training TO
             '{output_path}' (FORMAT PARQUET);"""

@@ -114,11 +114,17 @@ def make_objective(
             pr_aucs = []
 
             for fold_idx, (train_idx, val_idx) in enumerate(custom_cv.split(X_train)):
+                logger.debug(f"Starting fold {fold_idx} / {config.cv_folds - 1} done ")
+
                 X_train_fold = X_train.iloc[train_idx]
                 y_train_fold = y_train.iloc[train_idx]
 
                 X_val_fold = X_train.iloc[val_idx]
                 y_val_fold = y_train.iloc[val_idx]
+                logger.debug(
+                    f"Train fold {fold_idx} pos_rate = {y_train_fold.mean():.4f}"
+                )
+                logger.debug(f"Val fold {fold_idx} pos_rate = {y_val_fold.mean():.4f}")
 
                 # Pre-transform the validation data using the pipeline's earlier steps
                 # This ensures X_val_fold matches the format the classifier expects
@@ -176,8 +182,6 @@ def make_objective(
 
                 roc_aucs.append(roc_auc)
                 pr_aucs.append(pr_auc)
-
-                logger.debug(f"Fold {fold_idx + 1} / {config.cv_folds} done ")
 
             elapsed = time.time() - start
             logger.debug(f"End cv {elapsed}")

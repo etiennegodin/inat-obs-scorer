@@ -42,6 +42,9 @@ class ExpandingWindowCvSplit(BaseCrossValidator):
             if self.gap_days > 0:
                 # Boundary: first date in the raw val chunk (before any trimming)
                 val_boundary = dates[val_idx[0]]
+                logger.debug(f"val start boundary : {val_boundary}")
+                logger.debug(f"val end boundary : {dates[val_idx[-1]]}")
+
                 train_cutoff = val_boundary - gap
                 train_idx = train_idx[dates[train_idx] <= train_cutoff]
 
@@ -55,9 +58,10 @@ class ExpandingWindowCvSplit(BaseCrossValidator):
                 )
                 continue
 
-            logger.debug(
-                f"Removed {len(start_train_idx) - len(train_idx)} rows on fold {i + 1}"
-            )
+            logger.debug(f"{len(train_idx)} train observations")
+            logger.debug(f"{len(val_idx)} val observations")
+
+            logger.debug(f"Removed {len(start_train_idx) - len(train_idx)}")
             yield train_idx, val_idx
 
     def get_n_splits(self, X=None, y=None, groups=None):

@@ -14,7 +14,8 @@
 
 static graph_confusion topology
 dynamic confusion rates, is_rg, time_to_rg - at train cutoff
-
+cyclic data, cv fold design
+optuna objective `Actual PR-AUC / Positive Rate` normalise drifting pos rate
 
 ---
 
