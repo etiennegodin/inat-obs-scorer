@@ -1,5 +1,6 @@
 import json
 import logging
+import pprint
 import warnings
 from pathlib import Path
 
@@ -85,6 +86,12 @@ def execute(
     features_diff = train.utils.get_feature_diff(
         config,
     )
+
+    # Log
+    config_log = pprint.pformat(config, indent=4)
+    logger.debug(config_log)
+
+    logger.debug(config)
 
     # ── 2. MLflow setup ───────────────────────────────────────────────────────
 

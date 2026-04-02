@@ -106,3 +106,6 @@ class PipelineConfig:
         self.numeric_features = list(num_set - pass_set)
         self.categorical_features = list(cat_set - pass_set)
         self.passthrough_features = list(pass_set)
+
+    def __str__(self):
+        return asdict(self)
