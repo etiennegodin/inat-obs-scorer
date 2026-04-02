@@ -48,37 +48,21 @@ def train_final_model(
 
     model = final_pipeline.named_steps["classifier"]
 
+    lgb_fit_params = {
+        "eval_metric": config.scoring_metric,
+        "callbacks": [
+            lgb.log_evaluation(period=0),
+        ],
+    }
+
     # Optionnal val set
     if X_val is not None or y_val is not None:
-        model.fit(
-            X_train_transformed,
-            y_train,
-            eval_set=[(X_val_transformed, y_val)],
-            eval_metric=config.scoring_metric,
-            callbacks=[
-                # LightGBM native early stopping callback
-                # 'stopping_rounds' is now a callback in newer versions
-                lgb.early_stopping(
-                    stopping_rounds=config.stopping_rounds, verbose=False
-                ),
-                lgb.log_evaluation(period=0),  # keep logs clean
-            ],
+        lgb_fit_params["eval_set"] = [(X_val_transformed, y_val)]
+        lgb_fit_params["callbacks"].append(
+            lgb.early_stopping(stopping_rounds=config.stopping_rounds, verbose=False)
         )
 
-    else:
-        model.fit(
-            X_train_transformed,
-            y_train,
-            eval_metric=config.scoring_metric,
-            callbacks=[
-                # LightGBM native early stopping callback
-                # 'stopping_rounds' is now a callback in newer versions
-                lgb.early_stopping(
-                    stopping_rounds=config.stopping_rounds, verbose=False
-                ),
-                lgb.log_evaluation(period=0),  # keep logs clean
-            ],
-        )
+    model.fit(X_train_transformed, y_train, **lgb_fit_params)
     logger.debug(f"Final model number of trees: {model.booster_.num_trees()}")
 
     # Log final model

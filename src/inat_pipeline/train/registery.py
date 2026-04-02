@@ -81,7 +81,7 @@ SEARCH_SPACES = {
         "classifier__min_child_samples": {
             "type": "int",
             "low": 5,
-            "high": 50,
+            "high": 150,
             "log": True,
         },
         # Regularisation

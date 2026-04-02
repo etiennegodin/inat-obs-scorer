@@ -44,7 +44,7 @@ def execute(
     n_jobs: int,
     stopping_rounds: int,
     version: semver.Version,
-    early_stopping_rounds: int,
+    early_stopping_rounds: int | None,
 ) -> dict:
 
     experiment_name = f"inat_obs_scorer_v{version.major}.{version.minor}"
@@ -139,16 +139,15 @@ def execute(
         objective = train.objective.make_objective(
             config, X_train, y_train, parent_run_id
         )
+        callbacks = []
+        if early_stopping_rounds is not None:
+            callbacks.append(EarlyStoppingCallback(early_stopping_rounds))
 
-        # Stop after x trials
-        stop_callback = EarlyStoppingCallback(
-            early_stopping_rounds=early_stopping_rounds
-        )
         study.optimize(
             objective,
             n_trials=config.n_trials,
             show_progress_bar=False,
-            callbacks=[stop_callback],
+            callbacks=callbacks,
         )
 
         best_params = study.best_params

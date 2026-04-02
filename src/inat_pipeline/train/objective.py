@@ -162,21 +162,9 @@ def make_objective(
                 # --- OPTUNA PRUNING ---
                 # report the result of the current fold to the pruner
 
-                # Keep track of the worst fold so far
-                current_min_pr = min(pr_aucs) if pr_aucs else pr_auc
-                # Calculate stability of the folds completed SO FAR
-                if len(pr_aucs) > 1:
-                    running_stability = np.mean(pr_aucs) - np.std(pr_aucs)
-                else:
-                    running_stability = pr_auc  # First fold has no Std Dev
-
-                trial.set_user_attr(f"fold_{fold_idx}_pr_auc", pr_auc)
-                trial.set_user_attr(f"fold_{fold_idx}_roc_auc", roc_auc)
-
                 # Report the RUNNING MINIMUM to the pruner
-                trial.report(running_stability, step=fold_idx)
+                trial.report(pr_auc, step=fold_idx)
 
-                trial.set_user_attr("running_min", current_min_pr)
                 if trial.should_prune():
                     raise optuna.exceptions.TrialPruned()
 

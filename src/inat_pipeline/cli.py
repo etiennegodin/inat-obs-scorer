@@ -186,9 +186,10 @@ def create_parser() -> argparse.ArgumentParser:
     train_parser.add_argument(
         "--early-stop",
         "-es",
-        default=20,
+        default=None,
         type=int,
         help="Stop optuna trials after no metric improvement",
+        nargs="?",
     )
     train_parser.add_argument(
         "--seed",
