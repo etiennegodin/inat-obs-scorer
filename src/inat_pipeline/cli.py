@@ -60,12 +60,12 @@ def train_cmd(args: Namespace, app: ApplicationService):
 
 def test_cmd(args: Namespace, app: ApplicationService):
     try:
-        result = app.test(args)
+        app.test(args)
     except InatPipelineError as e:
         print(f"[red]✗ {e}[/red]")
         return 1
 
-    print(f"  Test score: {result['test_metrics']['test/test_avg_precision']:.4f}")
+    # print(f"  Test score: {result['test_metrics']['test/test_avg_precision']:.4f}")
 
 
 def create_parser() -> argparse.ArgumentParser:

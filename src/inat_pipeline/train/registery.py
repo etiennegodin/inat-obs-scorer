@@ -50,9 +50,15 @@ CLASSIFIER_REGISTRY = {
         {
             "verbose": -1,
             "n_estimators": 50000,
-            "learning_rate": 0.05,
+            "learning_rate": 0.01,
             "scale_pos_weight": 1,
             "subsample_freq": 1,
+            "reg_lambda": 0.0001646546585358844,
+            "reg_alpha": 0.009024164467839586,
+            "num_leaves": 9,
+            "subsampe": 0.6,
+            "colsample_bytree": 0.985,
+            "min_child_samples": 34,
         },
     ),
 }
@@ -70,43 +76,5 @@ LIGHTGBM_GPU_PARAMS = {
 # All other keys are passed as kwargs to the suggest function.
 
 SEARCH_SPACES = {
-    "lightgbm": {
-        # Capacity
-        "classifier__num_leaves": {
-            "type": "int",
-            "low": 10,
-            "high": 31,
-            "log": True,
-        },
-        "classifier__min_child_samples": {
-            "type": "int",
-            "low": 5,
-            "high": 150,
-            "log": True,
-        },
-        # Regularisation
-        "classifier__reg_alpha": {
-            "type": "float",
-            "low": 1e-4,
-            "high": 10.0,
-            "log": True,
-        },
-        "classifier__reg_lambda": {
-            "type": "float",
-            "low": 1e-4,
-            "high": 10.0,
-            "log": True,
-        },
-        # Subsampling
-        "classifier__subsample": {
-            "type": "float",
-            "low": 0.4,
-            "high": 1.0,
-        },
-        "classifier__colsample_bytree": {
-            "type": "float",
-            "low": 0.4,
-            "high": 1.0,
-        },
-    },
+    "lightgbm": {},
 }

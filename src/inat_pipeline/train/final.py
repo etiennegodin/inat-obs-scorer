@@ -1,8 +1,6 @@
-import json
 import logging
 
 import lightgbm as lgb
-import mlflow
 import pandas as pd
 
 from .config import PipelineConfig
@@ -64,15 +62,5 @@ def train_final_model(
 
     model.fit(X_train_transformed, y_train, **lgb_fit_params)
     logger.debug(f"Final model number of trees: {model.booster_.num_trees()}")
-
-    # Log final model
-    params = model.get_params()
-    params["n_estimators"] = model.booster_.num_trees()
-    mlflow.log_dict(params, "final_model_params.json")
-    try:
-        with open("../test/final_model.json", "w") as json_file:
-            json.dump(params, json_file, indent=4)
-    except Exception as e:
-        logger.error(f"Failed to write final model params: {e}")
 
     return final_pipeline

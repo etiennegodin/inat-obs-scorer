@@ -20,6 +20,7 @@ from sklearn.metrics import (
 from .. import train
 from ..app.container import Dependencies
 from ..train import explainability, metrics, ranking
+from ..train.utils.logger import export_config, export_final_model
 from ..train.utils.optuna_helpers import EarlyStoppingCallback, get_next_study_name
 
 logger = logging.getLogger(__name__)
@@ -90,8 +91,15 @@ def execute(
     # Log
     config_log = pprint.pformat(config, indent=4)
     logger.debug(config_log)
+    export_config(
+        config, output_path=deps.package_root / "test" / "pipeline_config.json"
+    )
 
-    logger.debug(config)
+    try:
+        with open("config.json", "w") as json_file:
+            json.dump(config, json_file, indent=4)
+    except Exception as e:
+        logger.error(f"Failed to write final model params: {e}")
 
     # ── 2. MLflow setup ───────────────────────────────────────────────────────
 
@@ -176,6 +184,11 @@ def execute(
         logger.info("Training final model on full training set...")
         final_model = train.train_final_model(
             config, best_params, X_train, y_train, X_val, y_val
+        )
+
+        export_final_model(
+            final_model,
+            output_path=deps.package_root / "test" / "final_model_params.json",
         )
 
         # ── 5. Evaluate on held-out test set ──────────────────────────────────
