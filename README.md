@@ -15,7 +15,7 @@
 
 iNaturalist accumulates millions of wildlife observations from citizen scientists. A subset earn **Research Grade (RG)** status — a quality threshold that makes observations scientifically usable for biodiversity research. Getting there requires community agreement from knowledgeable identifiers, but expert attention is a scarce resource.
 
-The challenge is that **most observations resolve on their own**. The community finds and confirms high-quality observations of well-documented species within days. What gets lost are observations that slip through unnoticed — unusual taxa, ambiguous photos, submissions from regions with few active identifiers, or species that require specialist knowledge to confirm.
+The challenge is that **most observations resolve on their own**. The community finds and confirms high-quality observations of well-documented species within days. What gets lost are observations that slip through unnoticed — unusual taxa, ambiguous photos, or species that require specialist knowledge to confirm.
 
 This project builds a **probabilistic ranking system** that scores each open "Needs ID" observation on its likelihood of reaching Research Grade, enabling triage of expert review queues toward observations with real potential that the community has not yet engaged with.
 
@@ -46,16 +46,22 @@ Extending the window to 365 days captures 93.6% of eventual-RG observations — 
 
 ## What the Model Actually Learns
 
-The model's predictive signal decomposes into three independently meaningful dimensions, confirmed by SHAP importance analysis:
+The model's predictive signal organises into three clusters, confirmed by SHAP importance analysis on the held-out test set.
 
-**1 — Who observed it**
-Observer reputation is the single strongest signal. An observer's historical Research Grade rate for a given taxon (`obv_tx_rg_rate`, SHAP rank #1), their lifetime RG rate, tenure, and account-level behavioural signals (photo count habits, description rate, use of mobile vs. desktop) all encode whether this observer reliably produces confirmable observations.
+**1 — Observer-taxon history**
+The single strongest predictor is how this observer historically performs within this taxon group. `obv_tx_rg_rate` (SHAP rank #1, mean |SHAP| = 0.745) — the observer's Bayesian-shrunk RG rate within this specific taxon, with the prior drawn from the taxon's own community-wide RG rate — and `obv_rg_rate_lifetime` (rank #6, 0.106) together signal whether this person reliably produces confirmable observations. An observer with a strong track record in Poaceae is a meaningfully stronger prior than one submitting their first grass identification.
 
-**2 — What was observed**
-Taxon identifiability drives the second cluster of signal. The confusion graph neighbourhood rank (`tx_conf_nbrhd_rank_min`, SHAP rank #2) captures how distinguishable this species is within its cluster of visually similar taxa. Static taxon difficulty aggregates — how long this family historically takes to reach RG, how many identifications are typically required, how much the lag varies — capture structurally difficult groups like *Carex* or *Asteraceae* that resist rapid community confirmation regardless of observation quality.
+**2 — Confusion graph neighbourhood**
+Six of the top eleven features come from the species confusion graph, splitting into two sub-signals:
 
-**3 — What the community has already signalled**
-Early identification dynamics carry real information even in the not-RG-at-day-7 population. The taxon confusion rate relative to neighbourhood peers (`tx_conf_rate_vs_neighbors`), identification reciprocity, and whether the first identifier agreed with the submitted taxon all encode the community's implicit confidence in the observation.
+*Static topology:* `single_hop_rank_max` (rank #2, 0.721) — single_hop_rank_max — the maximum taxonomic rank level of any confusion neighbor in the focal species' confusion graph (higher = more distantly related confused species)
+
+*Dynamic neighbourhood rates* (computed at the train cutoff, point-in-time): `time_to_rg_vs_neighbors` (rank #3, 0.324), `rg_rate_vs_neighbors` (rank #4, 0.210), `nbor_rg_rate_mean` (#8, 0.094), `rg_percentile_in_neighborhood` (#10, 0.074), `nbor_rg_rate_median` (#11, 0.067) — how this taxon's resolution dynamics compare to its confusion peers. A species that resolves faster and at a higher rate than its neighbourhood is meaningfully easier to confirm. Together, these five dynamic features rival the top static topology feature in aggregate SHAP weight.
+
+**3 — Taxon difficulty and identifiability**
+Static aggregates capture structurally hard groups independently of the confusion graph. `tx_avg_ids_to_rg` (rank #5, 0.157) and `effective_time_to_rg_mean` (rank #7, 0.096) measure how many identifications a taxon typically requires and how long resolution takes — independent signals that together identify specialist-dependent families. The hierarchical RG rate fallback chain (`tx_genus_rg_rate` #12, `tx_family_rg_rate` #17, and popularity ranks #18, #20) provides coverage for taxa with limited per-species history.
+
+Community signals are present but weaker than the model framing might suggest: `trailing_community_rg_rate_90d` (rank #13, 0.058) and initial submission taxonomy specificity (`init_rank_level`, rank #14, 0.056) contribute meaningful but secondary signal. The day-7 population filter has already selected against observations with clear early community engagement; what remains is genuinely ambiguous, and the community signals available at day 7 carry limited discriminating power for this population.
 
 ---
 
@@ -79,12 +85,16 @@ P(RG) > 0.70    →  High-confidence candidates: likely to receive community con
 
 The model ranks all open observations and outputs a priority score. Threshold boundaries are configurable deployment parameters — the model scores the full population; the actionable zone is a queue management decision, not a hard filter.
 
-### Operating Point (v0.2 — uncalibrated, val set)
+### Operating Point (v0.2 — uncalibrated, test set)
 
-The triage threshold is selected to prioritise recall — missing a recoverable observation is costlier than occasionally surfacing a borderline case. The current operating point targets:
+The precision-recall curve is steep at this positive rate — a property of the class imbalance, not a model flaw. Two meaningful operating points emerge:
 
-- **Recall**: ~90% of eventual-RG observations in the not-RG-at-day-7 population surfaced
-- **Precision**: ~60% of routed observations are confirmed RG within the label window
+| Mode | Recall | Precision | Use case |
+|---|---|---|---|
+| **High-recall** | 90% | 50% | Surface nearly all recoverable observations; accept that 1 in 2 routed observations won't resolve within the label window |
+| **Balanced** | 75% | 60% | Tighter queue for time-constrained reviewers; sacrifices 15% of recoverable observations for a meaningfully higher-confidence list |
+
+Neither threshold is objectively better — the right choice depends on expert queue capacity. The 15% recall cost of moving from 50% to 60% precision is significant and should inform deployment decisions. Post-calibration in v0.3, thresholds will be interpretable as literal probabilities, enabling operators to set a principled precision floor relative to their review bandwidth.
 
 > ⚠️ *LightGBM's raw probabilities are systematically underconfident — the model's predicted 0.5 corresponds to a true positive rate closer to 0.44. Probability calibration (Platt scaling) is part of the v0.3 serving layer. Until then, threshold values should not be interpreted as literal probabilities. Ranking metrics (PR-AUC, Lift@K) are calibration-independent and are the primary evaluation signal in v0.2.*
 
@@ -93,6 +103,8 @@ The triage threshold is selected to prioritise recall — missing a recoverable 
 ## Model Performance
 
 **Ranking metrics — held-out test set (n = 27,474 observations, positive rate: 28.2%)**
+
+> The final model is retrained on the combined train + val sets before test evaluation. HP search and feature selection are performed on val; the test set is used once for terminal reporting only.
 
 | Top K% reviewed | n reviewed | Recall@K | Precision@K | Lift@K |
 |---|---|---|---|---|
@@ -165,7 +177,7 @@ Most ML pipelines guard against one form of leakage. This project explicitly ide
 | **Label leakage** | Scraped `quality_grade` reflects current state, not state at prediction time | RG label re-derived from windowed identification history via DuckDB table macro |
 | **Feature leakage** | Aggregating observer/taxon stats across the full dataset contaminates past observations with future signal | All window functions bounded to `created_at` |
 | **Split leakage** | Shuffling within temporal partitions destroys gap buffer integrity | Hard date-range boundaries from `SplitConfig`; val/test rows ordered by `created_at`, never shuffled |
-| **CV split leakage** | Standard K-fold with shuffling violates temporal structure, producing optimistically biased estimates | Custom `ExpandingWindowCvSplit(BaseCrossValidator)` — equal-chunk expanding window, sklearn-compatible, with `gap_size` hook |
+| **CV split leakage** | Standard K-fold with shuffling violates temporal structure, producing optimistically biased estimates | Custom `ExpandingWindowCvSplit(BaseCrossValidator)` — equal-chunk expanding window, sklearn-compatible; gap expressed as `timedelta` applied to the training tail boundary|
 
 ### 2. Research Grade — a two-stage label re-derivation
 
@@ -200,12 +212,20 @@ These aggregates specifically capture structurally difficult groups where commun
 
 ### 4. Species confusion graph features
 
-Visually similar species create systematic misidentification patterns. The confusion graph, built with DuckPGQ, encodes:
+Visually similar species create systematic misidentification patterns. The confusion graph, built with DuckPGQ, contributes two distinct feature families:
 
-- **Neighbourhood difficulty**: how hard is the local species cluster to disambiguate?
-- **Asymmetric sink flag**: is this taxon disproportionately the *recipient* of misidentifications from visually similar species?
-- **Focal taxon rank within neighbourhood**: where does this species sit in terms of identifier confidence relative to its confusion cluster?
-- **2-hop graph metrics**: clustering coefficient and graph size capturing the broader confusion neighbourhood
+**Static graph topology** (computed once from the full graph structure):
+- **Neighbourhood difficulty**: aggregate RG rate and identifier confidence across the local species cluster
+- **Asymmetric sink flag**: whether this taxon is disproportionately the *recipient* of misidentifications from visually similar species
+- **Focal taxon rank within neighbourhood** (`single_hop_rank_max`): where this species sits relative to its confusion peers in terms of identifier confidence — SHAP rank #2 overall
+- **2-hop topology metrics**: expansion rate, clustering coefficient, and connected component size capturing the broader misidentification network
+
+**Dynamic confusion rates** (computed as windowed aggregates at the train cutoff, point-in-time):
+- `time_to_rg_vs_neighbors`: how this taxon's resolution speed compares to its confusion neighbours — SHAP rank #3
+- `rg_rate_vs_neighbors`: relative RG rate within the confusion cluster — SHAP rank #4
+- Neighbour RG rate distributions (`nbor_rg_rate_mean`, `nbor_rg_rate_median`) and focal taxon percentile rank within the neighbourhood
+
+The dynamic features outperform static topology on most metrics because they encode current identifier community behaviour rather than graph structure alone.
 
 ### 5. Protocol-based async API client
 
@@ -249,11 +269,12 @@ All feature transforms are expressed as `.sql` files using DuckDB window functio
 | **Observer history** | Historical RG rate (actual vs. expected), obs count, account tenure, taxon diversity, observer reputation rank |
 | **Observation documentation** | Photo count, average photo count, presence of notes, coordinate uncertainty, submission lag (observed → created) |
 | **Taxon context** | Taxon rank, RG rate with Bayesian shrinkage and hierarchical fallback, taxon popularity rank |
-| **Static taxon difficulty** | Time-to-RG mean/std, lag distributions at species/genus/family, IDs required for RG, lag deviation from taxon norm |
+| **Static taxon difficulty** | Time-to-RG mean/std, lag distributions at species/genus/family, IDs required for RG, identifier specialist concentration |
 | **Identification dynamics** | IDs received, agreement rate, identifier diversity, ID velocity, reciprocity ratio, maverick count |
-| **Confusion graph** | Neighbourhood difficulty, sink-species flag, focal taxon rank in cluster, 2-hop clustering coefficient |
+| **Confusion graph — static topology** | Neighbourhood size, sink-species asymmetry flag, focal taxon rank in cluster (`single_hop_rank_max`), 2-hop expansion rate and clustering coefficient |
+| **Confusion graph — dynamic rates** | Neighbour RG rate mean/median, `time_to_rg_vs_neighbors`, `rg_rate_vs_neighbors`, focal taxon percentile in neighbourhood — all computed at train cutoff |
 | **Temporal / phenological** | Submitted week (sin/cos), observed week (sin/cos), submission pressure, activity at phenological peak, months from peak phenology |
-| **Community consensus** | Community taxon rank, first-ID agreement, pct IDs refining at window, pct IDs agreeing at window |
+| **Community** | Trailing community RG rate over 90-day window (`trailing_community_rg_rate_90d`), community observation count in window |
 
 ---
 
@@ -264,7 +285,7 @@ All feature transforms are expressed as `.sql` files using DuckDB window functio
 | Storage & transforms | DuckDB (SQL-first, no ORM) + DuckPGQ |
 | Pipeline composition | scikit-learn `Pipeline` |
 | Model | LightGBM |
-| Hyperparameter search | Optuna (TPE sampler, MedianPruner, fANOVA importance logged to MLflow) |
+| Hyperparameter search | Optuna (TPE sampler, MedianPruner, fANOVA importance logged to MLflow) + Optuna Dashboard |
 | Experiment tracking | MLflow (params, metrics, artifacts, model registry) |
 | Explainability | SHAP (global importance, beeswarm plots, error-bucket delta analysis) |
 | Data versioning | DVC |
@@ -354,13 +375,9 @@ Splits use hard date-range boundaries derived from a `SplitConfig` dataclass anc
   ~55%                  ~17%            ~27%
 ```
 
-**Positive rate drift across splits:** train ~47% → val ~34% → test ~29%. This is a meaningful shift, not a sign of overfitting, and it has two compounding causes:
+**Positive rate drift across splits:** train ~47% → val ~34% → test ~29%. This is a genuine distributional shift, not a sign of overfitting. The dataset was scraped on March 3, 2026, and all observations required a completed 365-day label window before receiving a label — so the drift cannot be attributed to label maturation. What it reflects is platform-level change: iNaturalist's observation volume has grown faster than identifier throughput, meaning recent cohorts are structurally harder to resolve. The model is generalising across this shift, not correcting for it.
 
-1. **Label-window maturation:** Training observations (pre-2023) have had more time to accumulate identifications and settle into RG status. The 365-day label window makes older cohorts structurally richer in positives — a closed-window property, not a data error.
-
-2. **Platform-level distributional shift:** The iNaturalist community's identification throughput is growing more slowly than observation volume. Recent cohorts have structurally lower RG rates because the identifier community can resolve a smaller fraction of incoming observations. This is a real environmental trend the model must generalise across.
-
-A practical consequence: Optuna's CV objective is evaluated on folds drawn entirely from the training partition (~47% positive rate), while the model is ultimately deployed against distributions closer to 29%. Hyperparameters tuned on CV may be slightly overfit to the richer-positive training world. This is documented as a known limitation; correcting it would require either resampling to match test-time positive rates (distorting the temporal structure) or accepting the mismatch.
+A practical consequence: Optuna's CV objective is evaluated on training-period folds (~47% positive rate), while the model is ultimately evaluated against a distribution near 29%. Hyperparameters tuned on CV may be slightly overfit to the richer-positive training world. This is a known limitation without a clean fix that preserves temporal split integrity.
 
 ---
 
@@ -430,15 +447,18 @@ inat_pipeline/
 
 ### ✅ v0.2 — Extended features and production model
 - scikit-learn Pipeline with registry pattern
-- LightGBM + Optuna (TPE + MedianPruner) + MLflow experiment tracking
+- LightGBM + Optuna (TPE + MedianPruner) + MLflow experiment tracking + Optuna Dashboard
 - SHAP explainability — global importance and beeswarm plots
 - Windowed community taxon and RG label re-derivation (DuckDB table macro)
 - Bayesian shrinkage for taxon RG rates with hierarchical fallback
-- Species confusion graph features via DuckPGQ
-- Static taxon difficulty aggregates (time-to-RG, lag distributions, IDs to RG)
+- Static confusion graph topology features via DuckPGQ (neighbourhood rank, sink asymmetry, 2-hop expansion, clustering coefficient)
+- Dynamic confusion graph features computed at train cutoff (neighbour RG rates, `time_to_rg_vs_neighbors`, `rg_rate_vs_neighbors`, focal taxon percentile)
+- Static taxon difficulty aggregates (time-to-RG, lag distributions, IDs to RG, identifier specialist concentration)
 - Temporal and phenological features
-- Custom `ExpandingWindowCvSplit` for temporally-safe cross-validation
+- Community trailing RG rate features (`trailing_community_rg_rate_90d`, community window count)
+- Custom `ExpandingWindowCvSplit` with `pd.Timedelta` gap for temporally-safe cross-validation
 - Population filter: model scoped to observations not-RG at day 7
+- Final model retrained on train + val before test evaluation
 - Primary metric: Average Precision (PR-AUC) — calibration-independent, directly reflects ranking quality at low recall thresholds
 - DVC for data versioning
 
@@ -463,12 +483,11 @@ v0.4 applies a structured SHAP delta analysis across error buckets:
 | Correct / uncertain | Model hedges but is right — which features help resolve ambiguity? |
 | Incorrect / uncertain | Model hedges and is wrong — where is signal absent or misleading? |
 
-Comparing mean absolute SHAP values **and feature value distributions** across these buckets distinguishes absence (feature is missing or near-zero) from misfiring (feature is present but pushes the wrong direction). Preliminary analysis suggests that uncertain-zone errors correlate with thin community consensus signals (`pct_ids_agree_at_window`, `community_taxon_rank`) — pointing toward cold-start uncertainty as the primary failure driver.
+Comparing mean absolute SHAP values **and feature value distributions** across these buckets distinguishes absence (feature is missing or near-zero) from misfiring (feature is present but pushes the wrong direction). Preliminary analysis suggests that uncertain-zone errors correlate with thin observer-taxon history and sparse confusion neighbourhood signal — pointing toward cold-start uncertainty as the primary failure driver.
 
 Planned work:
 - Complete EDA by feature × error bucket — feature value distributions per bucket, not just SHAP deltas
-- Complementary species confusion graph features: PageRank / eigenvector centrality, 2-hop expansion rate, hidden confusion rate (confusion edges with no observed misidentification events)
-- Dynamic confusion features computed at train cutoff (confusion neighbourhood RG rates as windowed aggregates rather than static graph topology)
+- Complementary confusion graph features: PageRank / eigenvector centrality, hidden confusion rate (confusion edges with no observed misidentification events)
 - Geographic range signal (is this observation outside the taxon's typical range?)
 - AWS S3 ingestion source migration to facilitate scope expansion beyond Québec
 - **Two-model routing architecture**: route observations at inference time on `has_any_id` — a discoverability model (no-ID population, current scope) and a resolution model (has-ID population, disputed/specialist cases). The routing gate is a single binary feature; both models share the same pipeline and serving infrastructure. Requires ~10× current has-ID training volume to be viable — addressable by expanding scope beyond Québec.
@@ -480,13 +499,13 @@ Planned work:
 - Currently scoped to **Plantae** observations in **Québec**
 - Observer cold-start (accounts with < 20 observations) handled via precomputed fallback stats in v0.3
 - Probability scores are uncalibrated pre-v0.3; ranking metrics are the primary evaluation signal in v0.2
-- The CV objective is evaluated on training-period folds (~47% positive rate); the model is tested against a distribution at ~29% — see [Split Strategy](#split-strategy) for detail on the CV/deployment positive rate mismatch
+- The CV objective is evaluated on training-period folds (~47% positive rate); the model is tested against a distribution at ~29% — see [Split Strategy](#split-strategy) for detail. This reflects platform-level distributional shift, not label maturation
 
 **Known leakage (accepted)**
 
 | Feature | Leakage type | Severity | Notes |
 |---|---|---|---|
-| `taxon_avg_ids_to_rg` | Uses final scraped ID count rather than point-in-time count | Low | Attenuated by `1 PRECEDING` window boundary and front-loaded iNaturalist ID activity patterns |
+| `taxon_avg_ids_to_rg` | Taxon-level aggregate computed from training observations using their 365-day label window outcomes — not strictly the point-in-time ID count at the score window | Low | Historical average for the taxon, not the current observation's future ID count; taxon-level aggregation attenuates per-observation bias |
 
 **Population scope — discovery vs. resolution**
 
