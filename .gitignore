@@ -31,6 +31,7 @@ notebooks/*
 *.sh
 *.parquet
 *.zip
+examples/*
 
 .sqlfluffignore
 
@@ -41,6 +42,7 @@ data/*
 
 #Optuna
 optuna.sqlite3
+optuna.db
 *.ctl
 
 
