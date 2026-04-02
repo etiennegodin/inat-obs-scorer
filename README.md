@@ -9,22 +9,6 @@
 [![DuckDB](https://img.shields.io/badge/storage-DuckDB-yellow)](https://duckdb.org/)
 [![DVC](https://img.shields.io/badge/data-DVC-purple)](https://dvc.org/)
 
-
-* Notes
-
-static graph_confusion topology
-dynamic confusion rates, is_rg, time_to_rg - at train cutoff
-cyclic data, cv fold design
-optuna objective `Actual PR-AUC / Positive Rate` normalise drifting pos rate
-
-Your CV folds all live within the training split (pre-2023, pos_rate ~0.47). But your val and test splits have pos_rates of 0.339 and 0.287 — a substantial drift. This means your Optuna objective is being evaluated on a distribution that's meaningfully richer in positives than what the model will actually face. HPs tuned on CV folds may be slightly overfit to the ~0.47 world.
-This is worth documenting as a known limitation, but it's not easily fixable through CV restructuring without losing a lot of training data. The 365-day label window is partly responsible (older observations have had more time to settle into RG status). Worth a sentence in your README's limitations section.
-
-The seasonal pos_rate cycling is much stronger than I appreciated from the fold numbers alone. The dashed line swings from roughly 20% in summer to 60-65% in winter — a 3× range within a single year. That's not mild variation, it's a dominant signal.
-Two things are driving this:
-
-What you're seeing in the pos_rate drift (train 0.47 → val 0.34 → test 0.29) is real platform shift — the iNaturalist community's identification throughput is actually declining relative to observation volume over time. More observations are being submitted than the identifier community can resolve, so recent cohorts have structurally lower RG rates. That's a genuine distributional shift your model needs to handle, not an artifact to correct for
-
 ---
 
 ## The Problem
@@ -108,22 +92,26 @@ The triage threshold is selected to prioritise recall — missing a recoverable 
 
 ## Model Performance
 
-*Final HP-tuned results on held-out test set: **TBD** — pending Optuna search completion.*
+**Ranking metrics — held-out test set (n = 27,474 observations, positive rate: 28.2%)**
 
-**Ranking metrics — held-out test set (overall RG rate: TBD)**
-
-| Top K% reviewed | Recall@K | Precision@K | Lift@K |
-|---|---|---|---|
-| 1% | TBD | TBD | TBD |
-| 5% | TBD | TBD | TBD |
-| 10% | TBD | TBD | TBD |
-| 20% | TBD | TBD | TBD |
-| 50% | TBD | TBD | TBD |
+| Top K% reviewed | n reviewed | Recall@K | Precision@K | Lift@K |
+|---|---|---|---|---|
+| 0.5% | 138 | 1.7% | 98.6% | 3.45× |
+| 1% | 275 | 3.5% | 98.5% | 3.45× |
+| 5% | 1,374 | 16.5% | 93.9% | 3.29× |
+| 10% | 2,748 | 30.6% | 87.3% | 3.06× |
+| 20% | 5,495 | 52.5% | 74.9% | 2.62× |
+| 50% | 13,737 | 88.7% | 50.6% | 1.77× |
 
 | Metric | Value |
 |---|---|
-| PR-AUC (Average Precision) | TBD |
-| Baseline (positive rate) | TBD |
+| PR-AUC (Average Precision) | 0.743 |
+| Baseline (positive rate) | 0.282 |
+| Brier Score | 0.134 |
+
+**Generalization to unseen taxa**
+
+The model was evaluated against 613 observations from 402 taxa that appeared in neither training nor validation sets (positive rate: 18.4%). ROC-AUC on this population was 0.54 — near-random. This is expected: the model's two strongest signals (observer-taxon history and confusion graph neighbourhood rank) are both sparse or absent for taxa with no prior representation. Cold-start handling for rare taxa is documented as a v0.3 objective.
 
 ---
 
@@ -206,9 +194,7 @@ Rare taxa have too few observations to compute reliable difficulty estimates. A 
 - Average and standard deviation of time-to-RG (how long does this taxon typically take to resolve?)
 - Lag distributions across the taxonomic hierarchy (how long before identifications arrive?)
 - Average number of identifications required to reach RG
-- Average time required to reach RG
-- Identifier specialist, calculates per-family identifier entropy and calculates rate of `specialist` (near 0), `near_specialist` (<0.5) and `generalist` (<2.0) for users that have more than 5 ids and taxa with at least 6 identifications.
-
+- Identifier specialist concentration: per-family identifier entropy partitioned into `specialist` (H < 0.5), `near_specialist` (H < 1.0), and `generalist` (H ≥ 2.0) rates for users with ≥ 5 IDs across taxa with ≥ 6 identifications
 
 These aggregates specifically capture structurally difficult groups where community expertise is sparse and resolution timelines are long regardless of individual observation quality.
 
@@ -368,8 +354,13 @@ Splits use hard date-range boundaries derived from a `SplitConfig` dataclass anc
   ~55%                  ~17%            ~27%
 ```
 
-Positive rate drifts across splits (train ~41% → val ~32% → test ~28%), reflecting the evolving composition of the iNaturalist community over time. This is expected and is not a sign of overfitting.
+**Positive rate drift across splits:** train ~47% → val ~34% → test ~29%. This is a meaningful shift, not a sign of overfitting, and it has two compounding causes:
 
+1. **Label-window maturation:** Training observations (pre-2023) have had more time to accumulate identifications and settle into RG status. The 365-day label window makes older cohorts structurally richer in positives — a closed-window property, not a data error.
+
+2. **Platform-level distributional shift:** The iNaturalist community's identification throughput is growing more slowly than observation volume. Recent cohorts have structurally lower RG rates because the identifier community can resolve a smaller fraction of incoming observations. This is a real environmental trend the model must generalise across.
+
+A practical consequence: Optuna's CV objective is evaluated on folds drawn entirely from the training partition (~47% positive rate), while the model is ultimately deployed against distributions closer to 29%. Hyperparameters tuned on CV may be slightly overfit to the richer-positive training world. This is documented as a known limitation; correcting it would require either resampling to match test-time positive rates (distorting the temporal structure) or accepting the mismatch.
 
 ---
 
@@ -476,17 +467,12 @@ Comparing mean absolute SHAP values **and feature value distributions** across t
 
 Planned work:
 - Complete EDA by feature × error bucket — feature value distributions per bucket, not just SHAP deltas
-- Complementary species confusuon graph features.
-  - PageRank / eigenvector centrality
-  - 2-hop expansion rate
+- Complementary species confusion graph features: PageRank / eigenvector centrality, 2-hop expansion rate, hidden confusion rate (confusion edges with no observed misidentification events)
+- Dynamic confusion features computed at train cutoff (confusion neighbourhood RG rates as windowed aggregates rather than static graph topology)
 - Geographic range signal (is this observation outside the taxon's typical range?)
 - AWS S3 ingestion source migration to facilitate scope expansion beyond Québec
-- **Two-model routing architecture**: route observations at inference time on
-  `has_any_id` — a discoverability model (no-ID population, current scope) and
-  a resolution model (has-ID population, disputed/specialist cases). The routing
-  gate is a single binary feature; both models share the same pipeline and
-  serving infrastructure. Requires ~10× current has-ID training volume to be
-  viable — addressable by expanding scope beyond Québec.
+- **Two-model routing architecture**: route observations at inference time on `has_any_id` — a discoverability model (no-ID population, current scope) and a resolution model (has-ID population, disputed/specialist cases). The routing gate is a single binary feature; both models share the same pipeline and serving infrastructure. Requires ~10× current has-ID training volume to be viable — addressable by expanding scope beyond Québec.
+
 ---
 
 ## Scope & Limitations
@@ -494,25 +480,26 @@ Planned work:
 - Currently scoped to **Plantae** observations in **Québec**
 - Observer cold-start (accounts with < 20 observations) handled via precomputed fallback stats in v0.3
 - Probability scores are uncalibrated pre-v0.3; ranking metrics are the primary evaluation signal in v0.2
+- The CV objective is evaluated on training-period folds (~47% positive rate); the model is tested against a distribution at ~29% — see [Split Strategy](#split-strategy) for detail on the CV/deployment positive rate mismatch
+
+**Known leakage (accepted)**
+
+| Feature | Leakage type | Severity | Notes |
+|---|---|---|---|
+| `taxon_avg_ids_to_rg` | Uses final scraped ID count rather than point-in-time count | Low | Attenuated by `1 PRECEDING` window boundary and front-loaded iNaturalist ID activity patterns |
+
 **Population scope — discovery vs. resolution**
-Open "Needs ID" observations that haven't reached Research Grade at day 7 fall
-into two structurally distinct sub-populations:
+
+Open "Needs ID" observations that haven't reached Research Grade at day 7 fall into two structurally distinct sub-populations:
 
 | Sub-population | Definition | Train positives | Positive rate |
 |---|---|---|---|
 | **No-ID** | Zero external identifications at day 7 | ~23,000 | ~43% |
 | **Has-ID** | Identifications received but no consensus | ~1,500 | ~26% |
 
-The no-ID population represents a **discoverability problem** — quality
-observations that haven't gained community attention yet. The has-ID population
-represents a **resolution problem** — observations where early identifications
-exist but taxonomic consensus hasn't formed.
+The no-ID population represents a **discoverability problem** — quality observations that haven't gained community attention yet. The has-ID population represents a **resolution problem** — observations where early identifications exist but taxonomic consensus hasn't formed.
 
-This model is scoped exclusively to the no-ID population. The has-ID population
-has a lower and more stable positive rate (~20% across val/test) consistent with
-structural difficulty rather than neglect, and its training set size (~1,500
-positives) is insufficient for a reliable separate model at the current data
-volume. It is documented here as a distinct problem class for future work.
+This model is scoped exclusively to the no-ID population. The has-ID population has a lower and more stable positive rate (~20% across val/test) consistent with structural difficulty rather than neglect, and its training set size (~1,500 positives) is insufficient for a reliable separate model at the current data volume. It is documented here as a distinct problem class for future work.
 
 ---
 
