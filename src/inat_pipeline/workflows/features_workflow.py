@@ -82,7 +82,7 @@ def execute(
         sql_features.execute("training")
 
         # Export to data version controlled file
-        output_path = deps._DATA_FOLDER / "features_test.parquet"
+        output_path = deps._DATA_FOLDER / "features.parquet"
         con.execute(
             f"""COPY features.training TO
             '{output_path}' (FORMAT PARQUET);"""

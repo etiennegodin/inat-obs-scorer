@@ -26,7 +26,8 @@ htmlcov/
 *.duckdb
 !README.md
 obsidian/
-notebooks/*
+notebooks_work/*
+
 *.log
 *.sh
 *.parquet
