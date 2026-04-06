@@ -36,11 +36,11 @@ Day 730  ███████████████████████�
 
 Over half of all eventually-RG observations are confirmed within 24 hours. By day 7, nearly 70% have resolved without any intervention — found and confirmed through normal community activity.
 
-The **30% remainder at day 7** is the model's target: observations that have slipped through the first wave of community engagement. This population filter is applied at training time — the model is scoped exclusively to observations that are not Research Grade one week after submission, either because they received no identifications or because early identifications have not yet reached community consensus.
+The **30% remainder at day 7** is the model's target: observations that have slipped through the first wave of community engagement. This population filter is applied at training time — the model is scoped exclusively to observations that are not Research Grade one week after submission because they received no identifications.
 
-**Why a 365-day label window?** A common approach is to label an observation as RG or not based on its status at a fixed horizon — 90 days is a natural choice since most activity happens early. But the settlement curve shows that 90 days captures only 82% of observations that will eventually reach RG. The remaining 18% are disproportionately the hard cases: unusual taxa, observations that required a specialist to discover, or species where identifications trickle in slowly over months. Labelling them as negatives at 90 days would introduce systematic noise into exactly the population the model is trying to learn from.
+**Why a 365-day label window?** My approach is to label an observation as RG or not based on its status at a fixed horizon — 90 days felt like a natural choice since most activity happens early. But the settlement curve shows that 90 days captures only 82% of observations that will eventually reach RG. The remaining 18% are disproportionately the hard cases: unusual taxa, observations that required a specialist to discover, or species where identifications trickle in slowly over months. Labelling them as negatives at 90 days would introduce systematic noise into exactly the population the model is trying to learn from.
 
-Extending the window to 365 days captures 93.6% of eventual-RG observations — recovering most of that signal — while keeping the dataset manageable. Observations must be at least 365 days old at scrape time to receive a label, ensuring the closed-window assumption holds and that no observation is labelled before its outcome is known.
+Extending the window to 365 days captures 93.6% of eventual-RG observations — recovering most of that signal — while keeping the dataset and label window manageable. Observations must be at least 365 days old at scrape time to receive a label, ensuring the closed-window assumption holds and that no observation is labelled before its outcome is known.
 
 ---
 
@@ -54,7 +54,7 @@ The single strongest predictor is how this observer historically performs within
 **2 — Confusion graph neighbourhood**
 Six of the top eleven features come from the species confusion graph, splitting into two sub-signals:
 
-*Static topology:* `single_hop_rank_max` (rank #2, 0.721) — single_hop_rank_max — the maximum taxonomic rank level of any confusion neighbor in the focal species' confusion graph (higher = more distantly related confused species)
+*Static topology:* `single_hop_rank_max` (rank #2, 0.721) — the maximum taxonomic rank level of any confusion neighbor in the focal species' confusion graph (higher = more distantly related confused species)
 
 *Dynamic neighbourhood rates* (computed at the train cutoff, point-in-time): `time_to_rg_vs_neighbors` (rank #3, 0.324), `rg_rate_vs_neighbors` (rank #4, 0.210), `nbor_rg_rate_mean` (#8, 0.094), `rg_percentile_in_neighborhood` (#10, 0.074), `nbor_rg_rate_median` (#11, 0.067) — how this taxon's resolution dynamics compare to its confusion peers. A species that resolves faster and at a higher rate than its neighbourhood is meaningfully easier to confirm. Together, these five dynamic features rival the top static topology feature in aggregate SHAP weight.
 
@@ -62,6 +62,7 @@ Six of the top eleven features come from the species confusion graph, splitting 
 Static aggregates capture structurally hard groups independently of the confusion graph. `tx_avg_ids_to_rg` (rank #5, 0.157) and `effective_time_to_rg_mean` (rank #7, 0.096) measure how many identifications a taxon typically requires and how long resolution takes — independent signals that together identify specialist-dependent families. The hierarchical RG rate fallback chain (`tx_genus_rg_rate` #12, `tx_family_rg_rate` #17, and popularity ranks #18, #20) provides coverage for taxa with limited per-species history.
 
 Community signals are present but weaker than the model framing might suggest: `trailing_community_rg_rate_90d` (rank #13, 0.058) and initial submission taxonomy specificity (`init_rank_level`, rank #14, 0.056) contribute meaningful but secondary signal. The day-7 population filter has already selected against observations with clear early community engagement; what remains is genuinely ambiguous, and the community signals available at day 7 carry limited discriminating power for this population.
+
 
 ---
 
