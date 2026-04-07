@@ -64,7 +64,36 @@ Static aggregates capture structurally hard groups independently of the confusio
 Community signals are present but weaker than the model framing might suggest: `trailing_community_rg_rate_90d` (rank #13, 0.058) and initial submission taxonomy specificity (`init_rank_level`, rank #14, 0.056) contribute meaningful but secondary signal. The day-7 population filter has already selected against observations with clear early community engagement; what remains is genuinely ambiguous, and the community signals available at day 7 carry limited discriminating power for this population.
 
 
+
 ---
+
+## Model Performance
+
+**Ranking metrics — held-out test set (n = 27,474 observations, positive rate: 28.2%)**
+
+> The final model is retrained on the combined train + val sets before test evaluation. HP search and feature selection are performed on val; the test set is used once for terminal reporting only.
+
+| Top K% reviewed | n reviewed | Recall@K | Precision@K | Lift@K |
+|---|---|---|---|---|
+| 0.5% | 138 | 1.7% | 98.6% | 3.45× |
+| 1% | 275 | 3.5% | 98.5% | 3.45× |
+| 5% | 1,374 | 16.5% | 93.9% | 3.29× |
+| 10% | 2,748 | 30.6% | 87.3% | 3.06× |
+| 20% | 5,495 | 52.5% | 74.9% | 2.62× |
+| 50% | 13,737 | 88.7% | 50.6% | 1.77× |
+
+| Metric | Value |
+|---|---|
+| PR-AUC (Average Precision) | 0.743 |
+| Baseline (positive rate) | 0.282 |
+| Brier Score | 0.134 |
+
+**Generalization to unseen taxa**
+
+The model was evaluated against 613 observations from 402 taxa that appeared in neither training nor validation sets (positive rate: 18.4%). Average Precision on this population was 0.54 — only modestly above the 18.4% baseline. This is expected: the model's two strongest signals (observer-taxon history and confusion graph neighbourhood rank) are both sparse or absent for taxa with no prior representation. Cold-start handling for rare taxa is documented as a v0.3 objective.
+
+---
+
 
 ## The Actionable Zone
 
@@ -99,32 +128,8 @@ Neither threshold is objectively better — the right choice depends on expert q
 
 > ⚠️ *LightGBM's raw probabilities are systematically underconfident — the model's predicted 0.5 corresponds to a true positive rate closer to 0.44. Probability calibration (Platt scaling) is part of the v0.3 serving layer. Until then, threshold values should not be interpreted as literal probabilities. Ranking metrics (PR-AUC, Lift@K) are calibration-independent and are the primary evaluation signal in v0.2.*
 
----
 
-## Model Performance
 
-**Ranking metrics — held-out test set (n = 27,474 observations, positive rate: 28.2%)**
-
-> The final model is retrained on the combined train + val sets before test evaluation. HP search and feature selection are performed on val; the test set is used once for terminal reporting only.
-
-| Top K% reviewed | n reviewed | Recall@K | Precision@K | Lift@K |
-|---|---|---|---|---|
-| 0.5% | 138 | 1.7% | 98.6% | 3.45× |
-| 1% | 275 | 3.5% | 98.5% | 3.45× |
-| 5% | 1,374 | 16.5% | 93.9% | 3.29× |
-| 10% | 2,748 | 30.6% | 87.3% | 3.06× |
-| 20% | 5,495 | 52.5% | 74.9% | 2.62× |
-| 50% | 13,737 | 88.7% | 50.6% | 1.77× |
-
-| Metric | Value |
-|---|---|
-| PR-AUC (Average Precision) | 0.743 |
-| Baseline (positive rate) | 0.282 |
-| Brier Score | 0.134 |
-
-**Generalization to unseen taxa**
-
-The model was evaluated against 613 observations from 402 taxa that appeared in neither training nor validation sets (positive rate: 18.4%). ROC-AUC on this population was 0.54 — near-random. This is expected: the model's two strongest signals (observer-taxon history and confusion graph neighbourhood rank) are both sparse or absent for taxa with no prior representation. Cold-start handling for rare taxa is documented as a v0.3 objective.
 
 ---
 
