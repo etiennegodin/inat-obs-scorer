@@ -23,8 +23,10 @@ htmlcov/
 .dvc/
 .env
 *.md
-*.duckdb
+!notebooks/evaluation.md
 !README.md
+*.duckdb
+
 obsidian/
 notebooks_work/*
 
