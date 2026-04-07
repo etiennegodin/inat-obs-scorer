@@ -1,7 +1,9 @@
 # inat-obs-scorer - Model Evaluation v0.2
 
 **Task:**  Expert Review Prioritization Engine for iNaturalist   - will a Quebec Plantae Needs ID observation reach Research Grade within 365 days?
+
 **Population:** Observations with no external identifications at day 7 (no-ID subpopulation)
+
 **Test set:** 27,474 observations - 28.2% positive rate
 
 
@@ -16,8 +18,6 @@
 ## Ranking Metrics
 
 
-<style type="text/css">
-</style>
 <table id="T_befac">
   <thead>
     <tr>
