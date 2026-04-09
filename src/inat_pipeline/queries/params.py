@@ -24,6 +24,11 @@ class IngestCSVParams:
 
 
 @dataclass
+class IngestS3Params:
+    s3_path: str
+
+
+@dataclass
 class TrainingSplitParams:
     cutoff_date: date
     scraped_at: date

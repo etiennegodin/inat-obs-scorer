@@ -15,6 +15,8 @@ from ..workflows import (
     features_workflow,
     ingest_api_workflow,
     ingest_local_workflow,
+    ingest_s3_workflow,
+    test_s3_workflow,
     test_workflow,
     train_workflow,
 )
@@ -52,6 +54,24 @@ class ApplicationService:
             raise WorkflowError(f"Ingest downloads failed failed {e}") from e
         except Exception as e:
             logger.exception(e)
+
+    def ingest_s3(self, args):
+        logger.info("Starting S3 ingest workflow")
+        try:
+            ingest_s3_workflow.execute(self.deps)
+        except InatPipelineError as e:
+            logger.error(f"Ingest S3 failed {e}")
+            raise WorkflowError(f"Ingest S3 failed {e}") from e
+        except Exception as e:
+            logger.exception(e)
+
+    def test_s3(self, args):
+        logger.info("Starting S3 test workflow")
+        try:
+            test_s3_workflow.execute(self.deps)
+        except Exception as e:
+            logger.exception(e)
+            raise WorkflowError(f"S3 test failed {e}") from e
 
     def ingest_api(self, args):
         logger.info("Starting api ingest workflow")

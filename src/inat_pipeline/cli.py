@@ -28,6 +28,22 @@ def ingest_local_cmd(args: Namespace, app: ApplicationService):
         return 1
 
 
+def ingest_s3_cmd(args: Namespace, app: ApplicationService):
+    try:
+        app.ingest_s3(args)
+    except InatPipelineError as e:
+        print(f"[red]✗ {e}[/red]")
+        return 1
+
+
+def ingest_s3_test_cmd(args: Namespace, app: ApplicationService):
+    try:
+        app.test_s3(args)
+    except InatPipelineError as e:
+        print(f"[red]✗ {e}[/red]")
+        return 1
+
+
 def ingest_api_cmd(args: Namespace, app: ApplicationService):
     try:
         app.ingest_api(args)
@@ -98,6 +114,18 @@ def create_parser() -> argparse.ArgumentParser:
         help="Ingests data from prior downloads",
     )
     ingest_local_parser.set_defaults(func=ingest_local_cmd)
+
+    ingest_s3_parser = ingest_subparsers.add_parser(
+        "s3",
+        help="Ingests data from S3",
+    )
+    ingest_s3_parser.set_defaults(func=ingest_s3_cmd)
+
+    ingest_s3_test_parser = ingest_subparsers.add_parser(
+        "s3_test",
+        help="Tests S3 connectivity and schemas",
+    )
+    ingest_s3_test_parser.set_defaults(func=ingest_s3_test_cmd)
 
     ingest_api_parser = ingest_subparsers.add_parser(
         "api",

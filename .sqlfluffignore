@@ -3,3 +3,4 @@ src/inat_pipeline/queries/stage/stage_obs_observations.sql
 src/inat_pipeline/queries/graph/double_hop.sql
 src/inat_pipeline/queries/graph/double_hop_derived.sql
 src/inat_pipeline/queries/graph/confusion_topology.sql
+src/inat_pipeline/queries/stage/ingest_s3.sql

@@ -26,6 +26,11 @@ class DuckDBAdapter:
         self._con.execute("INSTALL spatial;")
         self._con.execute("LOAD spatial;")
 
+        # httpfs extension
+        self._con.execute("INSTALL httpfs;")
+        self._con.execute("LOAD httpfs;")
+        self._con.execute("SET s3_region='us-east-1';")
+
         # duckpgq extension
         self._con.install_extension("duckpgq", repository="community")
         self._con.load_extension("duckpgq")

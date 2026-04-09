@@ -27,6 +27,8 @@ class Dependencies:
 
         self.DB_PATH = self._DATA_FOLDER / "inat.duckdb"
 
+        self.S3_METADATA_URL = "s3://inaturalist-open-data/"
+
         self.QUERY_FOLDER = self.package_root / "queries"
         self.SQL_API_PATH = self.QUERY_FOLDER / "api"
         self.SQL_STAGE_PATH = self.QUERY_FOLDER / "stage"
