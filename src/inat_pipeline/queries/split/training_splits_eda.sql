@@ -1,5 +1,6 @@
 -- Check 2: Split size and label rate per split
 
+CREATE SCHEMA IF NOT EXISTS eda;
 CREATE OR REPLACE TABLE eda.splits AS
 
 WITH base AS (

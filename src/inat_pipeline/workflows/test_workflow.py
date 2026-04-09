@@ -35,7 +35,7 @@ def execute(
     # ── 1. Data & Config setup ─────────────────────────────────────────────────
 
     X_train, y_train, X_val, y_val, X_test, y_test = train.load_and_split(
-        deps._DATA_FOLDER / "features_test.parquet"
+        deps.FEATURES_FOLDER / "features_full.parquet"
     )
 
     # ── 2. MLflow setup ───────────────────────────────────────────────────────

@@ -9,8 +9,10 @@ This is the entry point for all use cases. It handles:
 """
 
 import logging
+from datetime import date
 
 from ..exceptions import DBConnectionError, DBError, InatPipelineError, WorkflowError
+from ..queries.params import TrainingSplitParams
 from ..workflows import (
     features_workflow,
     ingest_api_workflow,
@@ -48,6 +50,7 @@ class ApplicationService:
     def ingest_local(self, args):
         logger.info("Starting local ingest workflow")
         try:
+            self.deps.DB_PATH = self.deps.RAW_DB_PATH
             ingest_local_workflow.execute(self.deps)
         except InatPipelineError as e:
             logger.error(f"Ingest downloads failed {e}")
@@ -58,6 +61,7 @@ class ApplicationService:
     def ingest_s3(self, args):
         logger.info("Starting S3 ingest workflow")
         try:
+            self.deps.DB_PATH = self.deps.RAW_DB_PATH
             ingest_s3_workflow.execute(self.deps)
         except InatPipelineError as e:
             logger.error(f"Ingest S3 failed {e}")
@@ -68,6 +72,7 @@ class ApplicationService:
     def test_s3(self, args):
         logger.info("Starting S3 test workflow")
         try:
+            self.deps.DB_PATH = self.deps.RAW_DB_PATH
             test_s3_workflow.execute(self.deps)
         except Exception as e:
             logger.exception(e)
@@ -76,6 +81,7 @@ class ApplicationService:
     def ingest_api(self, args):
         logger.info("Starting api ingest workflow")
         try:
+            self.deps.DB_PATH = self.deps.RAW_DB_PATH
             ingest_api_workflow.execute(
                 self.deps, rate=args.rate, ignore_not_found=args.ignore_not_found
             )
@@ -88,7 +94,36 @@ class ApplicationService:
     def features(self):
         logger.info("Starting features workflow")
         try:
-            features_workflow.execute(self.deps)
+            # 1- Train/Val set (2023-01-01 cutoff)
+            train_val_params = TrainingSplitParams(
+                label_window_days=365,
+                scraped_at=date(2026, 3, 1),
+                score_window_days=7,
+                cutoff_date=date(2023, 1, 1),
+                max_val_size=30000,
+                val_window_days=410,
+                max_test_size=100000,
+                gap_days=30,
+            )
+            features_workflow.execute(
+                self.deps, params=train_val_params, feature_set_name="train_val"
+            )
+
+            # 2- Full set (2024-01-01 cutoff)
+            full_params = TrainingSplitParams(
+                label_window_days=365,
+                scraped_at=date(2026, 3, 1),
+                score_window_days=7,
+                cutoff_date=date(2024, 1, 1),
+                max_val_size=30000,
+                val_window_days=410,
+                max_test_size=100000,
+                gap_days=30,
+            )
+            features_workflow.execute(
+                self.deps, params=full_params, feature_set_name="full"
+            )
+
         except DBError as e:
             # Specific handling
             logger.error("SQL failure in script '%s': %s", e.script, e)

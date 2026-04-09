@@ -26,6 +26,9 @@ class Dependencies:
         self._PROCESSED_DATA_FOLDER = self._DATA_FOLDER / "processed"
 
         self.DB_PATH = self._DATA_FOLDER / "inat.duckdb"
+        self.RAW_DB_PATH = self._DATA_FOLDER / "raw.duckdb"
+        self.FEATURES_FOLDER = self._DATA_FOLDER / "features"
+        self.FEATURES_FOLDER.mkdir(parents=True, exist_ok=True)
 
         self.S3_METADATA_URL = "s3://inaturalist-open-data/"
 

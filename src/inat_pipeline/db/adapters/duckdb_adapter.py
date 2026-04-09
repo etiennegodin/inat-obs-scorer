@@ -9,16 +9,83 @@ logger = logging.getLogger(__name__)
 
 
 class DuckDBAdapter:
-    def __init__(self, db_path: str):
+    def __init__(
+        self,
+        db_path: str,
+        attach_path: str | None = None,
+        attach_alias: str | None = None,
+        read_only: bool = False,
+    ):
         self.db_path = db_path
+        self.attach_path = attach_path
+        self.attach_alias = attach_alias
+        self.read_only = read_only
         self._con: duckdb.DuckDBPyConnection | None = None
 
     def __enter__(self):
-        logger.debug("Opening DuckDB connection: %s", self.db_path)
+        # We connect to the feature database (writable)
+        # and attach the raw database as 'raw_db' (read-only)
+        logger.debug(
+            "Opening DuckDB connection: %s (read_only=%s)", self.db_path, self.read_only
+        )
         try:
+            # Main connection is the writable database
             self._con = duckdb.connect(
-                self.db_path, config={"allow_unsigned_extensions": "true"}
+                str(self.db_path),
+                read_only=False,  # Must be writable to create schemas/views
+                config={"allow_unsigned_extensions": "true"},
             )
+
+            if self.attach_path and self.attach_alias:
+                # db_path is RAW_DB_PATH and attach_path is FEATURES_DB_PATH
+                # So we connect to FEATURES_DB_PATH and attach RAW_DB_PATH
+                self._con.close()
+                self._con = duckdb.connect(
+                    str(self.attach_path), config={"allow_unsigned_extensions": "true"}
+                )
+                logger.debug(
+                    "Attached raw database %s as %s", self.db_path, self.attach_alias
+                )
+                self._con.execute(
+                    f"ATTACH '{self.db_path}' AS {self.attach_alias} (READ_ONLY TRUE);"
+                )
+
+                # To make 'staged.table' work, we proxy schemas from the raw database
+                # into the features database using views.
+                schemas = self._con.execute(
+                    f"""SELECT schema_name
+                    FROM information_schema.schemata
+                    WHERE catalog_name = '{self.attach_alias}'"""
+                ).fetchall()
+                for (schema,) in schemas:
+                    if schema in ("main", "information_schema", "pg_catalog"):
+                        continue
+
+                    self._con.execute(f"CREATE SCHEMA IF NOT EXISTS {schema};")
+                    tables = self._con.execute(
+                        f"""SELECT table_name
+                        FROM information_schema.tables
+                        WHERE table_catalog = '{self.attach_alias}'
+                            AND table_schema = '{schema}'"""
+                    ).fetchall()
+                    for (table,) in tables:
+                        # Create a view that points to the raw database
+                        # This allows 'staged.table' to work locally.
+                        self._con.execute(
+                            f"""CREATE OR REPLACE VIEW {schema}.{table} AS
+                              SELECT * FROM {self.attach_alias}.{schema}.{table};"""
+                        )
+
+                # Set search path to prioritize local schemas
+                self._con.execute("SET search_path = 'main';")
+            else:
+                # Standard single-db connection
+                self._con.close()
+                self._con = duckdb.connect(
+                    str(self.db_path),
+                    read_only=self.read_only,
+                    config={"allow_unsigned_extensions": "true"},
+                )
         except duckdb.IOException as e:
             raise DBConnectionError(str(e), file=self.db_path)
 

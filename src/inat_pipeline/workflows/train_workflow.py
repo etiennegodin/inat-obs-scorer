@@ -72,7 +72,7 @@ def execute(
     # ── 1. Data & Config setup ─────────────────────────────────────────────────
 
     X_train, y_train, X_val, y_val, X_test, y_test = train.load_and_split(
-        deps._DATA_FOLDER / "features.parquet"
+        deps.FEATURES_FOLDER / "train_val.parquet"
     )
 
     # Store features from dataframe
