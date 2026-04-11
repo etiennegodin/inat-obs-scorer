@@ -13,7 +13,7 @@ SELECT
     l.label AS is_rg,
     -- outcome is only "known" if the obs was old enough when the ID was left
     CASE
-        WHEN i.created_at - o.created_at > to_days(:label_window_days)
+        WHEN i.created_at - o.created_at > to_days(365)
             THEN 1
         ELSE 0
     END AS outcome_settled
@@ -40,7 +40,7 @@ SELECT
     l.label AS is_rg,
     -- outcome is only "known" if the obs was old enough when the ID was left
     CASE
-        WHEN i.created_at - o.created_at > to_days(:label_window_days)
+        WHEN i.created_at - o.created_at > to_days(365)
             THEN 1
         ELSE 0
     END AS outcome_settled

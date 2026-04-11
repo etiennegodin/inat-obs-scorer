@@ -18,6 +18,7 @@ from ..workflows import (
     ingest_api_workflow,
     ingest_local_workflow,
     ingest_s3_workflow,
+    stage_workflow,
     test_s3_workflow,
     test_workflow,
     train_workflow,
@@ -81,6 +82,16 @@ class ApplicationService:
             ingest_api_workflow.execute(
                 self.deps, rate=args.rate, ignore_not_found=args.ignore_not_found
             )
+        except InatPipelineError as e:
+            logger.error(f"Ingest downloads failed {e}")
+            raise WorkflowError(f"Ingest downloads failed failed {e}") from e
+        except Exception as e:
+            logger.exception(e)
+
+    def stage(self, args):
+        logger.info("Starting stage workflow")
+        try:
+            stage_workflow.execute(self.deps)
         except InatPipelineError as e:
             logger.error(f"Ingest downloads failed {e}")
             raise WorkflowError(f"Ingest downloads failed failed {e}") from e

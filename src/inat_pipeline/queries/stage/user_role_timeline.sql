@@ -14,10 +14,6 @@ SELECT
     -- taxa breadth (exact, same trick)
     SUM(is_new_taxon) OVER w AS cumulative_distinct_taxa,
 
-    COALESCE(SUM(1) FILTER (WHERE category = 'supporting') OVER w, 0) AS cumulative_supporting,
-    COALESCE(SUM(1) FILTER (WHERE category = 'maverick') OVER w, 0) AS cumulative_maverick,
-    COALESCE(SUM(1) FILTER (WHERE category = 'leading') OVER w, 0) AS cumulative_leading,
-    COALESCE(SUM(1) FILTER (WHERE category = 'improving') OVER w, 0) AS cumulative_improving,
     COALESCE(SUM(1) FILTER (WHERE vision IS TRUE) OVER w, 0) AS cumulative_vision,
 
     -- RG accumulators: only over settled outcomes

@@ -39,10 +39,7 @@ identifier_features AS (
         t.cumulative_distinct_taxa AS prior_taxa_identified,
 
         -- Category
-        (t.cumulative_improving + t.cumulative_leading)
-        / t.cumulative_events AS prior_ids_given_improving_rate,
-        t.cumulative_supporting / t.cumulative_events AS prior_ids_given_agree_rate,
-        t.cumulative_maverick / t.cumulative_events AS prior_ids_given_disagree_rate,
+
         t.cumulative_vision / t.cumulative_events AS prior_ids_vision_rate,
 
         -- Bayesian-shrunk RG rate as observer (how often do their obs reach RG)

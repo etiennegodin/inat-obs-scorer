@@ -2,7 +2,7 @@
 -- of its confusion neighbors at the same time?
 -- High = many similar species are also active = harder to identify
 
-CREATE OR REPLACE TABLE features.taxon_histo AS
+CREATE OR REPLACE TABLE staged.taxon_histo AS
 
 SELECT
     taxon_id,
@@ -11,7 +11,7 @@ SELECT
 FROM blended_histogram(week_map_observed, 100);
 
 
-CREATE OR REPLACE TABLE features.taxon_histo_conf AS
+CREATE OR REPLACE TABLE staged.taxon_histo_conf AS
 
 SELECT
     o.id AS observation_id,

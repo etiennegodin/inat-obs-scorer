@@ -56,14 +56,3 @@ def execute(deps: Dependencies, rate: int, ignore_not_found: bool) -> None:
                 asyncio.run(client.execute(items))
         else:
             logger.info("All items already requested")
-
-        # 3 Stage collected data in db
-        sql_stage = DuckDbSQL(con, deps.SQL_STAGE_PATH)
-        sql_stage.execute("stage_similar_species")
-
-        # 4 Static confusion features
-        sql_graph = DuckDbSQL(con, deps.QUERY_FOLDER / "graph", ignore_params=True)
-        sql_graph.execute("confusion_graph")
-        sql_graph.execute("confusion_topology")
-        sql_graph.execute("double_hop")
-        sql_graph.execute("double_hop_derived")

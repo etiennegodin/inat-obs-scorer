@@ -189,12 +189,14 @@ LEFT JOIN features.label l ON m.observation_id = l.observation_id
 JOIN features.identifications i ON m.observation_id = i.observation_id
 LEFT JOIN features.taxon t ON m.observation_id = t.observation_id
 LEFT JOIN features.taxon_specialist ts ON m.taxon_id = ts.taxon_id
+LEFT JOIN features.temporal tp ON m.observation_id = tp.observation_id
+LEFT JOIN features.community c ON m.observation_id = c.observation_id
 LEFT JOIN features.taxa_confusion tc ON m.taxon_id = tc.taxon_id
+
 LEFT JOIN graph.confusion_topology ct ON m.taxon_id = ct.taxon_id
 LEFT JOIN graph.double_hop_derived dh ON m.taxon_id = dh.taxon_id
-LEFT JOIN features.temporal tp ON m.observation_id = tp.observation_id
-LEFT JOIN features.taxon_histo_conf th ON m.observation_id = th.observation_id
-LEFT JOIN features.community c ON m.observation_id = c.observation_id
+LEFT JOIN staged.taxon_histo_conf th ON m.observation_id = th.observation_id
+
 WHERE
     l.label IS NOT NULL
 ORDER BY m.observation_id;

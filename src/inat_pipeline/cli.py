@@ -52,6 +52,14 @@ def ingest_api_cmd(args: Namespace, app: ApplicationService):
         return 1
 
 
+def stage_cmd(args: Namespace, app: ApplicationService):
+    try:
+        app.stage(args)
+    except InatPipelineError as e:
+        print(f"[red]✗ {e}[/red]")
+        return 1
+
+
 def features_cmd(args: Namespace, app: ApplicationService):
     try:
         app.features()
@@ -146,6 +154,10 @@ def create_parser() -> argparse.ArgumentParser:
     # Features command
     process_parser = subparsers.add_parser("features", help="Creates features suite")
     process_parser.set_defaults(func=features_cmd)
+
+    # Stage command
+    stage_parser = subparsers.add_parser("stage", help="Stage raw db")
+    stage_parser.set_defaults(func=stage_cmd)
 
     # Train command
     train_parser = subparsers.add_parser("train", help="Train model")

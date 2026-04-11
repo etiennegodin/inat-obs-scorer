@@ -22,6 +22,7 @@ def execute(
         attach_path=db_path,
         attach_alias="features_out",
         read_only=True,
+        schema_path=deps.SQL_SCHEMA_PATH,
     ) as con:
         # Transform data and create features
 
@@ -56,14 +57,6 @@ def execute(
         # Taxon features
         sql_features.execute("taxon_specialist", params=params)
         sql_features.execute("taxon_confusion", params=params)
-
-        sql_features.execute("network_events_raw", params=params)
-
-        # Bases and non parametrised queries
-        sql_features.execute_many(
-            "network_events",
-            "user_role_timeline",
-        )
 
         # Time-windowed features :
         sql_features.execute("observations", params=params)
