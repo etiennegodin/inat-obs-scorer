@@ -10,7 +10,10 @@ This is the entry point for all use cases. It handles:
 
 import logging
 from datetime import date
+from typing import Any, Callable, Optional
 
+from ..db.adapters.duckdb_adapter import DuckDBAdapter
+from ..db.lineage import LineageTracker
 from ..exceptions import DBConnectionError, DBError, InatPipelineError, WorkflowError
 from ..queries.params import TrainingSplitParams
 from ..workflows import (
@@ -47,9 +50,71 @@ class ApplicationService:
             deps: Application dependencies
         """
         self.deps = deps
+        self.tracker: Optional[LineageTracker] = None
+
+    def start_run(self, command: str, args: Any):
+        """Initialize a new run with tracking."""
+        with DuckDBAdapter(
+            self.deps.RAW_DB_PATH,
+            macro_path=self.deps.SQL_MACROS_PATH,
+            schema_path=self.deps.SQL_SCHEMA_PATH,
+        ) as con:
+            self.tracker = LineageTracker(con)
+            config = vars(args) if hasattr(args, "__dict__") else {}
+            self.tracker.start_run(
+                command=command,
+                config=config,
+                git_hash=self.deps.version,
+                git_branch=self.deps.git_branch,
+            )
+        return self.tracker.run_id
+
+    def end_run(self, status: str = "COMPLETED", error: str | None = None):
+        """End the current run tracking."""
+        if self.tracker:
+            with DuckDBAdapter(
+                self.deps.RAW_DB_PATH, macro_path=self.deps.SQL_MACROS_PATH
+            ) as con:
+                self.tracker.con = con
+                self.tracker.end_run(status, error)
+
+    def track_task(
+        self, task_name: str, task_fn: Callable, force: bool = False, *args, **kwargs
+    ):
+        """Helper to run a task with lineage tracking and idempotent skipping."""
+        if not self.tracker:
+            return task_fn(*args, **kwargs)
+
+        with DuckDBAdapter(
+            self.deps.RAW_DB_PATH, macro_path=self.deps.SQL_MACROS_PATH
+        ) as con:
+            self.tracker.con = con
+            if not force and self.tracker.is_task_completed(task_name):
+                logger.info(
+                    f"Skipping task '{task_name}'"
+                    " as it is already completed successfully in a previous run."
+                )
+                return
+
+            lineage_id = self.tracker.start_task(task_name)
+            try:
+                result = task_fn(*args, **kwargs)
+                self.tracker.end_task(lineage_id, status="COMPLETED")
+                return result
+            except Exception as e:
+                self.tracker.end_task(lineage_id, status="FAILED", error=str(e))
+                raise
 
     def ingest_local(self, args):
         logger.info("Starting local ingest workflow")
+        return self.track_task(
+            "ingest_local",
+            self._ingest_local_task,
+            force=getattr(args, "force", False),
+            args=args,
+        )
+
+    def _ingest_local_task(self, args):
         try:
             ingest_local_workflow.execute(self.deps)
         except InatPipelineError as e:
@@ -57,9 +122,18 @@ class ApplicationService:
             raise WorkflowError(f"Ingest downloads failed failed {e}") from e
         except Exception as e:
             logger.exception(e)
+            raise
 
     def ingest_s3(self, args):
         logger.info("Starting S3 ingest workflow")
+        return self.track_task(
+            "ingest_s3",
+            self._ingest_s3_task,
+            force=getattr(args, "force", False),
+            args=args,
+        )
+
+    def _ingest_s3_task(self, args):
         try:
             ingest_s3_workflow.execute(self.deps)
         except InatPipelineError as e:
@@ -67,6 +141,7 @@ class ApplicationService:
             raise WorkflowError(f"Ingest S3 failed {e}") from e
         except Exception as e:
             logger.exception(e)
+            raise
 
     def test_s3(self, args):
         logger.info("Starting S3 test workflow")
@@ -78,6 +153,14 @@ class ApplicationService:
 
     def ingest_api(self, args):
         logger.info("Starting api ingest workflow")
+        return self.track_task(
+            "ingest_api",
+            self._ingest_api_task,
+            force=getattr(args, "force", False),
+            args=args,
+        )
+
+    def _ingest_api_task(self, args):
         try:
             ingest_api_workflow.execute(
                 self.deps, rate=args.rate, ignore_not_found=args.ignore_not_found
@@ -87,6 +170,7 @@ class ApplicationService:
             raise WorkflowError(f"Ingest downloads failed failed {e}") from e
         except Exception as e:
             logger.exception(e)
+            raise
 
     def ingest(self, args):
         """Run all ingest sub-routines."""
@@ -97,6 +181,11 @@ class ApplicationService:
 
     def stage(self, args):
         logger.info("Starting stage workflow")
+        return self.track_task(
+            "stage", self._stage_task, force=getattr(args, "force", False), args=args
+        )
+
+    def _stage_task(self, args):
         try:
             stage_workflow.execute(self.deps)
         except InatPipelineError as e:
@@ -104,9 +193,17 @@ class ApplicationService:
             raise WorkflowError(f"Ingest downloads failed failed {e}") from e
         except Exception as e:
             logger.exception(e)
+            raise
 
-    def features(self):
+    def features(self, args: Any = None):
         logger.info("Starting features workflow")
+        return self.track_task(
+            "features",
+            self._features_task,
+            force=getattr(args, "force", False) if args else False,
+        )
+
+    def _features_task(self):
         try:
             # 1- Train/Val set (2023-01-01 cutoff)
             train_val_params = TrainingSplitParams(
@@ -155,6 +252,11 @@ class ApplicationService:
 
     def train(self, args):
         logger.info("Starting training workflow")
+        return self.track_task(
+            "train", self._train_task, force=getattr(args, "force", False), args=args
+        )
+
+    def _train_task(self, args):
         try:
             return train_workflow.execute(
                 self.deps,
@@ -196,5 +298,5 @@ class ApplicationService:
         logger.info("Starting full pipeline run")
         self.ingest(args)
         self.stage(args)
-        self.features()
+        self.features(args)
         self.train(args)

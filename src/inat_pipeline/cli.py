@@ -108,6 +108,15 @@ def run_cmd(args: Namespace, app: ApplicationService):
         return 1
 
 
+def add_common_args(parser: argparse.ArgumentParser):
+    parser.add_argument(
+        "--force",
+        "-f",
+        action="store_true",
+        help="Force execution even if task was already completed",
+    )
+
+
 def add_ingest_api_args(parser: argparse.ArgumentParser):
     parser.add_argument("--rate", "-r", default=30, type=int, help="Requests per min")
     parser.add_argument(
@@ -190,7 +199,7 @@ def add_train_args(parser: argparse.ArgumentParser):
     )
     parser.add_argument(
         "--seed",
-        "-r",
+        "-s",
         default=42,
         type=int,
         nargs="?",
@@ -228,6 +237,7 @@ def create_parser() -> argparse.ArgumentParser:
     run_parser = subparsers.add_parser(
         "run", help="Run full sequence [ingest -> stage -> features -> train]"
     )
+    add_common_args(run_parser)
     add_ingest_api_args(run_parser)
     add_train_args(run_parser)
     run_parser.set_defaults(func=run_cmd)
@@ -237,6 +247,7 @@ def create_parser() -> argparse.ArgumentParser:
         "ingest",
         help="Ingests data sources [local, api]",
     )
+    add_common_args(ingest_parser)
     add_ingest_api_args(ingest_parser)
     ingest_parser.set_defaults(func=ingest_cmd)
 
@@ -248,42 +259,50 @@ def create_parser() -> argparse.ArgumentParser:
         "local",
         help="Ingests data from prior downloads",
     )
+    add_common_args(ingest_local_parser)
     ingest_local_parser.set_defaults(func=ingest_local_cmd)
 
     ingest_s3_parser = ingest_subparsers.add_parser(
         "s3",
         help="Ingests data from S3",
     )
+    add_common_args(ingest_s3_parser)
     ingest_s3_parser.set_defaults(func=ingest_s3_cmd)
 
     ingest_s3_test_parser = ingest_subparsers.add_parser(
         "s3_test",
         help="Tests S3 connectivity and schemas",
     )
+    add_common_args(ingest_s3_test_parser)
     ingest_s3_test_parser.set_defaults(func=ingest_s3_test_cmd)
 
     ingest_api_parser = ingest_subparsers.add_parser(
         "api",
         help="Ingest data from inaturalist's api",
     )
+    add_common_args(ingest_api_parser)
     add_ingest_api_args(ingest_api_parser)
     ingest_api_parser.set_defaults(func=ingest_api_cmd)
 
     # Features command
     process_parser = subparsers.add_parser("features", help="Creates features suite")
+    add_common_args(process_parser)
     process_parser.set_defaults(func=features_cmd)
 
     # Stage command
     stage_parser = subparsers.add_parser("stage", help="Stage raw db")
+    add_common_args(stage_parser)
     stage_parser.set_defaults(func=stage_cmd)
 
     # Train command
     train_parser = subparsers.add_parser("train", help="Train model")
+    add_common_args(train_parser)
     add_train_args(train_parser)
     train_parser.set_defaults(func=train_cmd)
 
     # Features command
     test_parser = subparsers.add_parser("test", help="Run test on held out split")
+    add_common_args(test_parser)
     test_parser.set_defaults(func=test_cmd)
 
     return parser
@@ -315,19 +334,31 @@ def main():
     # Create application service
     app = ApplicationService(deps)
 
+    # Execute command
     try:
-        # Execute command
         if hasattr(args, "func"):
+            # Start run tracking
+            command_name = sys.argv[1] if len(sys.argv) > 1 else "unknown"
+            run_id = app.start_run(command_name, args)
+            logger.info(f"Run ID: {run_id}")
+
             exit_code = args.func(args, app)
+
+            # End run tracking
+            status = "COMPLETED" if exit_code is None or exit_code == 0 else "FAILED"
+            app.end_run(status=status)
+
             sys.exit(exit_code)
         else:
             parser.print_help()
             sys.exit(0)
     except KeyboardInterrupt:
+        app.end_run(status="CANCELLED")
         print("\n[yellow]Interrupted by user[/yellow]")
         sys.exit(130)
     except Exception as e:
         logger.exception("Unexpected error")
+        app.end_run(status="FAILED", error=str(e))
         print(f"[red]Unexpected error: {e}[/red]")
         sys.exit(1)
 
