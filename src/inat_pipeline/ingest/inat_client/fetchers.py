@@ -55,9 +55,10 @@ class RateLimiterFetcher:
                             await asyncio.sleep(wait)  # reactive: server said stop
                             continue
 
-                        if response.status == 500 and self.ignore_not_found:
+                        if response.status in (404, 500) and self.ignore_not_found:
                             logger.debug(
-                                "HTTP 500 for %s %s — returning empty response",
+                                "HTTP %d for %s %s — returning empty response",
+                                response.status,
                                 url,
                                 params,
                             )
