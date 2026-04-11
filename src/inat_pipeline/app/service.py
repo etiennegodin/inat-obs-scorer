@@ -88,6 +88,13 @@ class ApplicationService:
         except Exception as e:
             logger.exception(e)
 
+    def ingest(self, args):
+        """Run all ingest sub-routines."""
+        logger.info("Starting full ingest sequence")
+        self.ingest_local(args)
+        self.ingest_s3(args)
+        self.ingest_api(args)
+
     def stage(self, args):
         logger.info("Starting stage workflow")
         try:
@@ -183,3 +190,11 @@ class ApplicationService:
         except Exception as e:
             logger.exception("Unexpected error during test workflow")
             raise WorkflowError("Test workflow failed") from e
+
+    def run(self, args):
+        """Run the full pipeline sequence: ingest -> stage -> features -> train."""
+        logger.info("Starting full pipeline run")
+        self.ingest(args)
+        self.stage(args)
+        self.features()
+        self.train(args)

@@ -52,6 +52,14 @@ def ingest_api_cmd(args: Namespace, app: ApplicationService):
         return 1
 
 
+def ingest_cmd(args: Namespace, app: ApplicationService):
+    try:
+        app.ingest(args)
+    except InatPipelineError as e:
+        print(f"[red]✗ {e}[/red]")
+        return 1
+
+
 def stage_cmd(args: Namespace, app: ApplicationService):
     try:
         app.stage(args)
@@ -92,6 +100,115 @@ def test_cmd(args: Namespace, app: ApplicationService):
     # print(f"  Test score: {result['test_metrics']['test/test_avg_precision']:.4f}")
 
 
+def run_cmd(args: Namespace, app: ApplicationService):
+    try:
+        app.run(args)
+    except InatPipelineError as e:
+        print(f"[red]✗ {e}[/red]")
+        return 1
+
+
+def add_ingest_api_args(parser: argparse.ArgumentParser):
+    parser.add_argument("--rate", "-r", default=30, type=int, help="Requests per min")
+    parser.add_argument(
+        "--ignore_not_found",
+        "-i",
+        action="store_true",
+        help="Ignore not found requests",
+    )
+
+
+def add_train_args(parser: argparse.ArgumentParser):
+    parser.add_argument(
+        "--version",
+        "-v",
+        type=validate_version,
+        default="0.2.0",
+        help="SemVer style string",
+    )
+
+    parser.add_argument(
+        "--classifier",
+        default="lightgbm",
+        choices=CLASSIFIER_REGISTRY,
+        help="Classifier algorithm",
+    )
+    parser.add_argument(
+        "--reducer",
+        default="none",
+        choices=REDUCER_REGISTRY,
+        help="Dimensionality reducer choice",
+    )
+    parser.add_argument(
+        "--scaler",
+        default="robust",
+        choices=SCALER_REGISTRY,
+        help="Numerical scaler choice",
+    )
+    parser.add_argument(
+        "--encoder",
+        default="onehot",
+        choices=ENCODER_REGISTRY,
+        help="Categorical data encoder choice",
+    )
+    parser.add_argument(
+        "--imputer",
+        default="median",
+        choices=IMPUTER_REGISTRY,
+        help="Missing data imputer choice",
+    )
+    parser.add_argument(
+        "--n_trials",
+        "-n",
+        default=10,
+        type=min_trials_folds,
+        help="Number of hyperparameters combinations to test",
+    )
+    parser.add_argument(
+        "--cv_folds",
+        "-cv",
+        default=5,
+        type=min_cv_folds,
+        help="Number of cross validation folds",
+    )
+
+    parser.add_argument(
+        "--stopping-rounds",
+        "-sr",
+        default=50,
+        type=int,
+        help="LightGBM stopping_rounds using val set",
+    )
+
+    parser.add_argument(
+        "--early-stop",
+        "-es",
+        default=None,
+        type=int,
+        help="Stop optuna trials after no metric improvement",
+        nargs="?",
+    )
+    parser.add_argument(
+        "--seed",
+        "-r",
+        default=42,
+        type=int,
+        nargs="?",
+        const=random_seed(),
+        help="Randomize training seed",
+    )
+
+    parser.add_argument(
+        "--n-jobs",
+        default=-1,
+        type=n_jobs,
+        help="Number of cores to use. Use -1 for all, -2 for all but one.",
+    )
+    parser.add_argument(
+        "--gpu", "-g", default=False, action="store_true", help="Use gpu with lightgbm"
+    )
+
+
 def create_parser() -> argparse.ArgumentParser:
     """
     Create and configure the command-line argument parser.
@@ -107,11 +224,21 @@ def create_parser() -> argparse.ArgumentParser:
         title="commands", description="Available commands"
     )
 
+    # Run command
+    run_parser = subparsers.add_parser(
+        "run", help="Run full sequence [ingest -> stage -> features -> train]"
+    )
+    add_ingest_api_args(run_parser)
+    add_train_args(run_parser)
+    run_parser.set_defaults(func=run_cmd)
+
     # Ingest command
     ingest_parser = subparsers.add_parser(
         "ingest",
         help="Ingests data sources [local, api]",
     )
+    add_ingest_api_args(ingest_parser)
+    ingest_parser.set_defaults(func=ingest_cmd)
 
     ingest_subparsers = ingest_parser.add_subparsers(
         title="module", description="Available modules"
@@ -139,16 +266,7 @@ def create_parser() -> argparse.ArgumentParser:
         "api",
         help="Ingest data from inaturalist's api",
     )
-    ingest_api_parser.add_argument(
-        "--rate", "-r", default=30, type=int, help="Requests per min"
-    )
-    ingest_api_parser.add_argument(
-        "--ignore_not_found",
-        "-i",
-        action="store_true",
-        help="Ignore not found requests",
-    )
-
+    add_ingest_api_args(ingest_api_parser)
     ingest_api_parser.set_defaults(func=ingest_api_cmd)
 
     # Features command
@@ -161,95 +279,7 @@ def create_parser() -> argparse.ArgumentParser:
 
     # Train command
     train_parser = subparsers.add_parser("train", help="Train model")
-
-    train_parser.add_argument(
-        "--version",
-        "-v",
-        type=validate_version,
-        default="0.2.0",
-        help="SemVer style string",
-    )
-
-    train_parser.add_argument(
-        "--classifier",
-        default="lightgbm",
-        choices=CLASSIFIER_REGISTRY,
-        help="Classifier algorithm",
-    )
-    train_parser.add_argument(
-        "--reducer",
-        default="none",
-        choices=REDUCER_REGISTRY,
-        help="Dimensionality reducer choice",
-    )
-    train_parser.add_argument(
-        "--scaler",
-        default="robust",
-        choices=SCALER_REGISTRY,
-        help="Numerical scaler choice",
-    )
-    train_parser.add_argument(
-        "--encoder",
-        default="onehot",
-        choices=ENCODER_REGISTRY,
-        help="Categorical data encoder choice",
-    )
-    train_parser.add_argument(
-        "--imputer",
-        default="median",
-        choices=IMPUTER_REGISTRY,
-        help="Missing data imputer choice",
-    )
-    train_parser.add_argument(
-        "--n_trials",
-        "-n",
-        default=10,
-        type=min_trials_folds,
-        help="Number of hyperparameters combinations to test",
-    )
-    train_parser.add_argument(
-        "--cv_folds",
-        "-cv",
-        default=5,
-        type=min_cv_folds,
-        help="Number of cross validation folds",
-    )
-
-    train_parser.add_argument(
-        "--stopping-rounds",
-        "-sr",
-        default=50,
-        type=int,
-        help="LightGBM stopping_rounds using val set",
-    )
-
-    train_parser.add_argument(
-        "--early-stop",
-        "-es",
-        default=None,
-        type=int,
-        help="Stop optuna trials after no metric improvement",
-        nargs="?",
-    )
-    train_parser.add_argument(
-        "--seed",
-        "-r",
-        default=42,
-        type=int,
-        nargs="?",
-        const=random_seed(),
-        help="Randomize training seed",
-    )
-
-    train_parser.add_argument(
-        "--n-jobs",
-        default=-1,
-        type=n_jobs,
-        help="Number of cores to use. Use -1 for all, -2 for all but one.",
-    )
-    train_parser.add_argument(
-        "--gpu", "-g", default=False, action="store_true", help="Use gpu with lightgbm"
-    )
+    add_train_args(train_parser)
     train_parser.set_defaults(func=train_cmd)
 
     # Features command
