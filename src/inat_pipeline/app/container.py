@@ -25,7 +25,7 @@ class Dependencies:
         self._RAW_DATA_FOLDER = self._DATA_FOLDER / "raw"
         self._PROCESSED_DATA_FOLDER = self._DATA_FOLDER / "processed"
 
-        self.RAW_DB_PATH = self._DATA_FOLDER / "raw.duckdb"
+        self.RAW_DB_PATH = self._DATA_FOLDER / "inat_raw.duckdb"
         self.FEATURES_FOLDER = self._DATA_FOLDER / "features"
         self.FEATURES_FOLDER.mkdir(parents=True, exist_ok=True)
 
@@ -35,6 +35,7 @@ class Dependencies:
         self.SQL_API_PATH = self.QUERY_FOLDER / "api"
         self.SQL_STAGE_PATH = self.QUERY_FOLDER / "stage"
         self.SQL_FEATURES_PATH = self.QUERY_FOLDER / "features"
+        self.SQL_SCHEMA_PATH = self.QUERY_FOLDER / "schema"
 
         self.optunaDB = "sqlite:///optuna.sqlite3"
         self.mlflowDB = self.project_root / "mlruns.db"
