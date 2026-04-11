@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 
 
 def execute(deps: Dependencies):
-    with DuckDBAdapter(deps.DB_PATH) as con:
+    with DuckDBAdapter(deps.RAW_DB_PATH) as con:
         # Create schema
         con.execute("CREATE SCHEMA IF NOT EXISTS raw;")
 

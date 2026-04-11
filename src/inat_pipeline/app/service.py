@@ -50,7 +50,6 @@ class ApplicationService:
     def ingest_local(self, args):
         logger.info("Starting local ingest workflow")
         try:
-            self.deps.DB_PATH = self.deps.RAW_DB_PATH
             ingest_local_workflow.execute(self.deps)
         except InatPipelineError as e:
             logger.error(f"Ingest downloads failed {e}")
@@ -61,7 +60,6 @@ class ApplicationService:
     def ingest_s3(self, args):
         logger.info("Starting S3 ingest workflow")
         try:
-            self.deps.DB_PATH = self.deps.RAW_DB_PATH
             ingest_s3_workflow.execute(self.deps)
         except InatPipelineError as e:
             logger.error(f"Ingest S3 failed {e}")
@@ -72,7 +70,6 @@ class ApplicationService:
     def test_s3(self, args):
         logger.info("Starting S3 test workflow")
         try:
-            self.deps.DB_PATH = self.deps.RAW_DB_PATH
             test_s3_workflow.execute(self.deps)
         except Exception as e:
             logger.exception(e)
@@ -81,7 +78,6 @@ class ApplicationService:
     def ingest_api(self, args):
         logger.info("Starting api ingest workflow")
         try:
-            self.deps.DB_PATH = self.deps.RAW_DB_PATH
             ingest_api_workflow.execute(
                 self.deps, rate=args.rate, ignore_not_found=args.ignore_not_found
             )

@@ -7,7 +7,7 @@ logger = logging.getLogger(__name__)
 
 
 def execute(deps: Dependencies):
-    with DuckDBAdapter(deps.DB_PATH) as con:
+    with DuckDBAdapter(deps.RAW_DB_PATH) as con:
         # Check observations
         s3_url = deps.S3_METADATA_URL + "observations.csv.gz"
         logger.info(f"Checking S3 file: {s3_url}")
