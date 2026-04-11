@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 def execute(
     deps: Dependencies,
 ):
-    with DuckDBAdapter(deps.RAW_DB_PATH) as con:
+    with DuckDBAdapter(deps.RAW_DB_PATH, macro_path=deps.SQL_MACROS_PATH) as con:
         # Stage collected data in db
         sql_stage = DuckDbSQL(con, deps.SQL_STAGE_PATH)
 

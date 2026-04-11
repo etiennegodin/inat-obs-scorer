@@ -17,12 +17,14 @@ class DuckDBAdapter:
         attach_alias: str | None = None,
         read_only: bool = False,
         schema_path: Path | None = None,
+        macro_path: Path | None = None,
     ):
         self.db_path = db_path
         self.attach_path = attach_path
         self.attach_alias = attach_alias
         self.read_only = read_only
         self.schema_path = schema_path
+        self.macro_path = macro_path
         self._con: duckdb.DuckDBPyConnection | None = None
 
     def __enter__(self):
@@ -74,9 +76,15 @@ class DuckDBAdapter:
                     for (table,) in tables:
                         # Create a view that points to the raw database
                         # This allows 'staged.table' to work locally.
+                        # self._con.execute(
+                        #     f"""CREATE OR REPLACE VIEW {schema}.{table} AS
+                        #       SELECT * FROM {self.attach_alias}.{schema}.{table};"""
+                        # )
+                        # Creating a view in features database that points to raw db
                         self._con.execute(
                             f"""CREATE OR REPLACE VIEW {schema}.{table} AS
-                              SELECT * FROM {self.attach_alias}.{schema}.{table};"""
+                            SELECT *
+                            FROM {self.attach_alias}.{schema}.{table};"""
                         )
 
                 # Set search path to prioritize local schemas
@@ -109,6 +117,10 @@ class DuckDBAdapter:
         if self.schema_path and self.schema_path.exists():
             self._init_schema()
 
+        # Load macros if path provided
+        if self.macro_path and self.macro_path.exists():
+            self._load_macros()
+
         return self
 
     def _init_schema(self):
@@ -120,6 +132,16 @@ class DuckDBAdapter:
                 self._con.execute(sql_file.read_text())
             except duckdb.Error as e:
                 logger.error("Error initializing schema from %s: %s", sql_file, e)
+
+    def _load_macros(self):
+        """Run all .sql files in the macros directory."""
+        logger.debug("Loading macros from %s", self.macro_path)
+        for sql_file in sorted(self.macro_path.glob("*.sql")):
+            logger.debug("Loading macro file: %s", sql_file.name)
+            try:
+                self._con.execute(sql_file.read_text())
+            except duckdb.Error as e:
+                logger.error("Error loading macro from %s: %s", sql_file, e)
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         if self._con:

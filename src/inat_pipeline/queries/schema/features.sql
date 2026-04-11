@@ -75,8 +75,6 @@ CREATE TABLE IF NOT EXISTS features.identifications (
     prior_ids_received UBIGINT,
     prior_identifier_diversity UBIGINT,
     prior_taxa_received_on UBIGINT,
-    prior_ids_received_disagree_rate DOUBLE,
-    prior_ids_received_agree_rate DOUBLE,
     prior_observer_rg_rate DOUBLE,
     prior_ids_given UBIGINT,
     prior_observers_helped UBIGINT,

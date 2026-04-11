@@ -23,16 +23,13 @@ def execute(
         attach_alias="features_out",
         read_only=True,
         schema_path=deps.SQL_SCHEMA_PATH,
+        macro_path=deps.SQL_MACROS_PATH,
     ) as con:
         # Transform data and create features
 
         sql_features = DuckDbSQL(con, deps.SQL_FEATURES_PATH)
         sql_split = DuckDbSQL(con, deps.QUERY_FOLDER / "split")
         con.execute("CREATE SCHEMA IF NOT EXISTS features")
-        # Macros registering
-        sql_features.execute("macro_blended_histogram")
-        sql_features.execute("macro_community_taxon_windowed")
-        sql_features.execute("macro_research_grade_windowed")
 
         # Temporal features -- issue with macro if lower to-do
         sql_features.execute("temporal")
@@ -62,10 +59,7 @@ def execute(
         sql_features.execute("observations", params=params)
 
         # With dependencies
-        sql_features.execute_many(
-            "identifications",
-            "observers_entropy",
-        )
+        sql_features.execute_many("identifications", "observers_entropy", "community")
 
         # Final merge
         sql_features.execute("training")

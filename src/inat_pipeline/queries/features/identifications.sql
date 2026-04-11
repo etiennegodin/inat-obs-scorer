@@ -11,11 +11,6 @@ observer_features AS (
         t.cumulative_distinct_counterparts AS prior_identifier_diversity,
         t.cumulative_distinct_taxa AS prior_taxa_received_on,
 
-        -- Category
-        (t.cumulative_improving + t.cumulative_leading + t.cumulative_maverick)
-        / t.cumulative_events AS prior_ids_received_disagree_rate,
-        t.cumulative_supporting / t.cumulative_events AS prior_ids_received_agree_rate,
-
         -- Bayesian-shrunk RG rate as observer (how often do their obs reach RG)
         -- How reliably does this person's observations close? Quality / completeness signal
         (t.cumulative_settled_rg + 10 * obs.expected_rg_rate)

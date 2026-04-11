@@ -27,7 +27,7 @@ SELECT
         AS focal_vs_nbrhd_pheno_ratio
 
 FROM staged.observations o
-JOIN features.taxon_histo ot ON o.taxon_id = ot.taxon_id
+JOIN staged.taxon_histo ot ON o.taxon_id = ot.taxon_id
 JOIN staged.similar_species e ON o.taxon_id = e.taxon_id
-JOIN features.taxon_histo neighbor_pheno ON e.similar_taxon_id = neighbor_pheno.taxon_id
+JOIN staged.taxon_histo neighbor_pheno ON e.similar_taxon_id = neighbor_pheno.taxon_id
 GROUP BY o.id, ot.o_blended_pmf, WEEK(o.observed_on)
