@@ -20,7 +20,7 @@ def execute(deps: Dependencies, rate: int, ignore_not_found: bool) -> None:
     SOURCE_KEY = "uuid"
     CHUNK_SIZE = 200
 
-    with DuckDBAdapter(deps.RAW_DB_PATH) as con:
+    with DuckDBAdapter(deps.RAW_DB_PATH, macro_path=deps.SQL_MACROS_PATH) as con:
         # 1 Create table to receive api data
 
         sql_api = DuckDbSQL(con, deps.SQL_API_PATH)

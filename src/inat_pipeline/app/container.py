@@ -36,6 +36,7 @@ class Dependencies:
         self.SQL_STAGE_PATH = self.QUERY_FOLDER / "stage"
         self.SQL_FEATURES_PATH = self.QUERY_FOLDER / "features"
         self.SQL_SCHEMA_PATH = self.QUERY_FOLDER / "schema"
+        self.SQL_MACROS_PATH = self.QUERY_FOLDER / "macros"
 
         self.optunaDB = "sqlite:///optuna.sqlite3"
         self.mlflowDB = self.project_root / "mlruns.db"
