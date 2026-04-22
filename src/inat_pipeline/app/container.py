@@ -2,6 +2,8 @@ import logging
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
+from .config import PipelineConfig
+
 
 @dataclass
 class Dependencies:
@@ -21,6 +23,7 @@ class Dependencies:
     git_branch: str
 
     def __post_init__(self):
+        self.config = PipelineConfig()
         self._DATA_FOLDER = self.project_root / "data"
         self._RAW_DATA_FOLDER = self._DATA_FOLDER / "raw"
         self._PROCESSED_DATA_FOLDER = self._DATA_FOLDER / "processed"

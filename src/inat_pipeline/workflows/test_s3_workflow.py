@@ -14,7 +14,7 @@ def execute(deps: Dependencies):
         try:
             res = con.execute(
                 f"""DESCRIBE SELECT *
-                FROM read_csv_auto('{s3_url}', header=true, sep='\\t', n_rows=1);"""
+                FROM read_csv_auto('{s3_url}', header=true, sep='\\t');"""
             )
             logger.info("Observations schema:")
             for row in res.fetchall():
@@ -25,9 +25,20 @@ def execute(deps: Dependencies):
             logger.info(f"Checking S3 file: {s3_url}")
             res = con.execute(
                 f"""DESCRIBE SELECT *
-                FROM read_csv_auto('{s3_url}', header=true, sep='\\t', n_rows=1);"""
+                FROM read_csv_auto('{s3_url}', header=true, sep='\\t');"""
             )
             logger.info("Taxa schema:")
+            for row in res.fetchall():
+                logger.info(f"  {row[0]}: {row[1]}")
+
+            # Check photos
+            s3_url = deps.S3_METADATA_URL + "photos.csv.gz"
+            logger.info(f"Checking S3 file: {s3_url}")
+            res = con.execute(
+                f"""DESCRIBE SELECT *
+                FROM read_csv_auto('{s3_url}', header=true, sep='\\t');"""
+            )
+            logger.info("Photos schema:")
             for row in res.fetchall():
                 logger.info(f"  {row[0]}: {row[1]}")
 
