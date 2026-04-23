@@ -1,4 +1,13 @@
 OBSERVATIONS_FIELDS = {
+    "annotations": {
+        "uuid": True,
+        "controlled_attribute_id": True,
+        "controlled_value_id": True,
+        "user_id": True,
+        "label": True,
+        "controlled_value": {"is_value": True},
+        "controlled_attribute": {"is_value": True},
+    },
     "comments_count": True,
     "community_taxon_id": True,
     "description": True,
