@@ -14,19 +14,18 @@ def execute(
     feature_set_name: str = "features",
 ):
     # Path to the specific feature set database
-    db_path = deps.FEATURES_FOLDER / f"features_{feature_set_name}.duckdb"
+    features_db_path = deps.FEATURES_FOLDER / f"features_{feature_set_name}.duckdb"
 
-    # Connect to RAW_DB as primary (read_only) and attach features DB as writable output
     with DuckDBAdapter(
-        deps.RAW_DB_PATH,
-        attach_path=db_path,
-        attach_alias="features_out",
-        read_only=True,
+        features_db_path,
         schema_path=deps.SQL_SCHEMA_PATH,
-        macro_path=deps.SQL_MACROS_PATH,
     ) as con:
-        # Transform data and create features
+        # Attach raw data to features db
+        con.attach_readonly_database(deps.RAW_DB_PATH, "raw_db")
+        con.create_proxy_schemas("raw_db")
+        con.load_macros(deps.SQL_MACROS_PATH)
 
+        # Transform data and create features
         sql_features = DuckDbSQL(con, deps.SQL_FEATURES_PATH)
         sql_split = DuckDbSQL(con, deps.QUERY_FOLDER / "split")
         con.execute("CREATE SCHEMA IF NOT EXISTS features")

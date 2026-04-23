@@ -56,8 +56,7 @@ class ApplicationService:
         """Initialize a new run with tracking."""
         with DuckDBAdapter(
             self.deps.RAW_DB_PATH,
-            macro_path=self.deps.SQL_MACROS_PATH,
-            schema_path=self.deps.SQL_SCHEMA_PATH,
+            schema_path=self.deps.SQL_SCHEMA_RAW_PATH,
         ) as con:
             self.tracker = LineageTracker(con)
             config = vars(args) if hasattr(args, "__dict__") else {}
@@ -73,7 +72,7 @@ class ApplicationService:
         """End the current run tracking."""
         if self.tracker:
             with DuckDBAdapter(
-                self.deps.RAW_DB_PATH, macro_path=self.deps.SQL_MACROS_PATH
+                self.deps.RAW_DB_PATH,
             ) as con:
                 self.tracker.con = con
                 self.tracker.end_run(status, error)
@@ -86,7 +85,7 @@ class ApplicationService:
             return task_fn(*args, **kwargs)
 
         with DuckDBAdapter(
-            self.deps.RAW_DB_PATH, macro_path=self.deps.SQL_MACROS_PATH
+            self.deps.RAW_DB_PATH,
         ) as con:
             self.tracker.con = con
             if not force and self.tracker.is_task_completed(task_name):
@@ -97,13 +96,22 @@ class ApplicationService:
                 return
 
             lineage_id = self.tracker.start_task(task_name)
-            try:
-                result = task_fn(*args, **kwargs)
+        # Connection is closed here, allowing task_fn to open its own connections
+        try:
+            result = task_fn(*args, **kwargs)
+            with DuckDBAdapter(
+                self.deps.RAW_DB_PATH,
+            ) as con:
+                self.tracker.con = con
                 self.tracker.end_task(lineage_id, status="COMPLETED")
-                return result
-            except Exception as e:
+            return result
+        except Exception as e:
+            with DuckDBAdapter(
+                self.deps.RAW_DB_PATH,
+            ) as con:
+                self.tracker.con = con
                 self.tracker.end_task(lineage_id, status="FAILED", error=str(e))
-                raise
+            raise
 
     def ingest_local(self, args):
         logger.info("Starting local ingest workflow")

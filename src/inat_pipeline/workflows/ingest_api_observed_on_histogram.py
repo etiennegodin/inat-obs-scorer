@@ -18,7 +18,9 @@ def execute(deps: Dependencies, rate: int, ignore_not_found: bool) -> None:
     TARGET_TABLE_NAME = "raw.obs_histogram_na_observed"
     SOURCE_KEY = "taxon_id"
 
-    with DuckDBAdapter(deps.RAW_DB_PATH, macro_path=deps.SQL_MACROS_PATH) as con:
+    with DuckDBAdapter(
+        deps.RAW_DB_PATH,
+    ) as con:
         # Extract species list to feed in taxa api module
         sql_api = DuckDbSQL(con, deps.SQL_API_PATH)
         logger.info(
