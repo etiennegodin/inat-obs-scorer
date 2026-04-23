@@ -10,24 +10,27 @@ logger = logging.getLogger(__name__)
 class BatchEndpointClient(BaseInatClient):
     """
     For endpoints like GET /observations/
-    - Sends chunk_size IDs as a comma-joined 'id' param
+    - Sends chunk_size IDs as a comma-joined 'id' string appended to the URL
     - Supports sparse fieldsets via ?fields=
     - Supports per_page pagination
     """
 
-    def _iter_requests(self, ids: list) -> Iterator[tuple[Any, dict]]:
+    def _iter_requests(self, ids: list) -> Iterator[tuple[Any, dict, str]]:
         for chunk in _chunked(ids, self.config.chunk_size):
             id_string = ",".join(str(id_) for id_ in chunk)
             logger.debug(id_string)
             # Get params from config
-            params = {**self.config.params, "id": id_string}
+            params = {**self.config.params}
 
             # Add fields string to params
             if self.config.fields:
                 params["fields"] = self.config.fields
 
+            # Append id_string to the base URL
+            url = f"{self.config.url}{id_string}"
+
             # Add first id of chunk as fallback id
-            yield chunk[0], params
+            yield chunk[0], params, url
 
 
 class ParametrizedEndpointClient(BaseInatClient):
@@ -44,7 +47,7 @@ class ParametrizedEndpointClient(BaseInatClient):
         )
         super().__init__(config, fetcher, writer)
 
-    def _iter_requests(self, ids: list) -> Iterator[tuple[Any, dict]]:
+    def _iter_requests(self, ids: list) -> Iterator[tuple[Any, dict, str]]:
         for id_ in ids:  # always 1 ID per request
             yield (
                 id_,
@@ -52,4 +55,5 @@ class ParametrizedEndpointClient(BaseInatClient):
                     **self.config.params,
                     self.config.id_param: id_,
                 },
+                self.config.url,
             )

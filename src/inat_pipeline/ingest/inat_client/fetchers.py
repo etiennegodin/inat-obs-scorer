@@ -31,6 +31,8 @@ class RateLimiterFetcher:
     async def fetch(self, session: aiohttp.ClientSession, url: str, params: dict):
         """Fetch data for multiple IDs in
         a single request using comma-separated ID string"""
+        logger.debug(url)
+        logger.debug(params)
 
         last_exc = None
 

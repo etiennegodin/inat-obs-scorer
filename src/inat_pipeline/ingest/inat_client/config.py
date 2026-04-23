@@ -16,7 +16,6 @@ class EndpointConfig:
     write_empty_rows: bool = False
 
     def __post_init__(self):
-        print("post")
         if self.id_param is None:
             self.url = (
                 f"https://api.inaturalist.org/v{self.api_version}/{self.endpoint}/"

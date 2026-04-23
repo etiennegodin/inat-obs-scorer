@@ -36,7 +36,7 @@ class BaseInatClient(ABC):
         self.queue = Queue()
 
     @abstractmethod
-    def _iter_requests(self, ids: list) -> Iterator[tuple[Any, dict]]:
+    def _iter_requests(self, ids: list) -> Iterator[tuple[Any, dict, str]]:
         """Yield one param-dict per HTTP request (before pagination)."""
         ...
 
@@ -51,9 +51,9 @@ class BaseInatClient(ABC):
             # Create fetchers with batched IDs
             fetch_tasks = [
                 asyncio.create_task(
-                    self._fetch_all_pages(session, source_id, base_params)
+                    self._fetch_all_pages(session, source_id, base_params, url)
                 )
-                for source_id, base_params in self._iter_requests(ids)
+                for source_id, base_params, url in self._iter_requests(ids)
             ]
 
             await tqdm_asyncio.gather(*fetch_tasks)  # all producers done
@@ -62,13 +62,19 @@ class BaseInatClient(ABC):
             await writer_task
 
     async def _fetch_all_pages(
-        self, session: aiohttp.ClientSession, source_id: Any, base_params: dict
+        self,
+        session: aiohttp.ClientSession,
+        source_id: Any,
+        base_params: dict,
+        url: str,
     ) -> None:
         """Producer: fetch all pages for one logical request, enqueue each page."""
         page = 1
+        logger.debug("source_id")
+        logger.debug(source_id)
         while True:
             params = {**base_params, "page": page, "per_page": self.config.per_page}
-            response = await self.fetcher.fetch(session, self.config.url, params)
+            response = await self.fetcher.fetch(session, url, params)
 
             results = response.get("results", [])
 
@@ -83,6 +89,8 @@ class BaseInatClient(ABC):
                         ]
                     )
                 logger.debug("No results for source_id %s", source_id)
+                logger.debug(response)
+                logger.debug(url)
                 break
             if isinstance(results, list):
                 # Try to find id in response, otherwise fall back on source_id
