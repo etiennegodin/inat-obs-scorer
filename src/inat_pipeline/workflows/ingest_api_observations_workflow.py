@@ -37,8 +37,7 @@ def execute(deps: Dependencies, rate: int, ignore_not_found: bool) -> None:
         if items:
             # Set up configs
             config = EndpointConfig(
-                "identifications/similar_species",
-                id_param="taxon_id",
+                "observations",
                 write_empty_rows=ignore_not_found,
                 fields=OBSERVATIONS_FIELDS,
                 chunk_size=CHUNK_SIZE,
