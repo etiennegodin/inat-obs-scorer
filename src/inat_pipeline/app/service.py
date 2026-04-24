@@ -20,6 +20,7 @@ from ..workflows import (
     features_workflow,
     ingest_api_workflow,
     ingest_local_workflow,
+    ingest_photos_workflow,
     ingest_s3_workflow,
     stage_workflow,
     test_s3_workflow,
@@ -147,6 +148,25 @@ class ApplicationService:
         except InatPipelineError as e:
             logger.error(f"Ingest S3 failed {e}")
             raise WorkflowError(f"Ingest S3 failed {e}") from e
+        except Exception as e:
+            logger.exception(e)
+            raise
+
+    def ingest_photos(self, args):
+        logger.info("Starting photos ingest workflow")
+        return self.track_task(
+            "ingest_photos",
+            self._ingest_photos_task,
+            force=getattr(args, "force", False),
+            args=args,
+        )
+
+    def _ingest_photos_task(self, args):
+        try:
+            ingest_photos_workflow.execute(self.deps, args.rate)
+        except InatPipelineError as e:
+            logger.error(f"Ingest photos failed {e}")
+            raise WorkflowError(f"Ingest photos failed {e}") from e
         except Exception as e:
             logger.exception(e)
             raise

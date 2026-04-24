@@ -36,6 +36,14 @@ def ingest_s3_cmd(args: Namespace, app: ApplicationService):
         return 1
 
 
+def ingest_photos_cmd(args: Namespace, app: ApplicationService):
+    try:
+        app.ingest_photos(args)
+    except InatPipelineError as e:
+        print(f"[red]✗ {e}[/red]")
+        return 1
+
+
 def ingest_s3_test_cmd(args: Namespace, app: ApplicationService):
     try:
         app.test_s3(args)
@@ -283,6 +291,16 @@ def create_parser() -> argparse.ArgumentParser:
     add_common_args(ingest_api_parser)
     add_ingest_api_args(ingest_api_parser)
     ingest_api_parser.set_defaults(func=ingest_api_cmd)
+
+    ingest_photos_parser = ingest_subparsers.add_parser(
+        "photos",
+        help="Ingests photos from inaturalist-open-data.s3.amazonaws.com",
+    )
+    add_common_args(ingest_photos_parser)
+    ingest_photos_parser.add_argument(
+        "--rate", "-r", default=30, type=int, help="Requests per min"
+    )
+    ingest_photos_parser.set_defaults(func=ingest_photos_cmd)
 
     # Features command
     process_parser = subparsers.add_parser("features", help="Creates features suite")

@@ -28,6 +28,7 @@ class Dependencies:
         self._RAW_DATA_FOLDER = self._DATA_FOLDER / "raw"
         self._PROCESSED_DATA_FOLDER = self._DATA_FOLDER / "processed"
 
+        self.PHOTO_PARENT_FOLDER = self._DATA_FOLDER / "photos"
         self.RAW_DB_PATH = self._DATA_FOLDER / "inat_raw.duckdb"
         self.FEATURES_FOLDER = self._DATA_FOLDER / "features"
         self.FEATURES_FOLDER.mkdir(parents=True, exist_ok=True)

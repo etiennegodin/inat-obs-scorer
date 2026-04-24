@@ -31,6 +31,14 @@ class IngestS3Params:
 
 
 @dataclass
+class IngestPhotosParams:
+    extension: str = "jpg"
+    size: str = "medium"
+    item_id: str = "photo_id"
+    label: str = "controlled_value_id"
+
+
+@dataclass
 class TrainingSplitParams:
     cutoff_date: date
     scraped_at: date
