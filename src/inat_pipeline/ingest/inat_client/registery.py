@@ -31,7 +31,7 @@ OBSERVATIONS_FIELDS = {
         "vision": True,
     },
     "identifications_count": True,
-    "observation_photos": True,
+    "photos": {"id": True, "url": True, "license_code": True},
     "outlinks": True,
     "owners_identification_from_vision": True,
     "place_ids": True,
