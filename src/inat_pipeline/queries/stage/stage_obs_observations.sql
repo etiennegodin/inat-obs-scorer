@@ -18,6 +18,13 @@ WITH unpacked AS (
                     "created_at":"VARCHAR",
                     "orcid":"NULL"
                 },
+                "annotations":[{
+                    "uuid":"VARCHAR",
+                    "controlled_attribute_id" : "UBIGINT",
+                    "controlled_value_id" :"UBIGINT",
+                    "user_id" : "UBIGINT",
+                    "label": "VARCHAR"
+                    }],
                 "description":"NULL",
                 "tags":["NULL"],
                 "observation_photos":[{"id":"UBIGINT"}],
