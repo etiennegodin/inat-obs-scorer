@@ -7,14 +7,6 @@ from typing import Any
 class IngestConfig:
     """Configuration for data ingestion stages."""
 
-    s3_conditions: dict[str, str] = field(
-        default_factory=lambda: {
-            "downloads": "1=1",
-            "taxa": "1=1",
-            "observers": "1=1",
-            "photos": "1=1",
-        }
-    )
     api_place_id: int = 6712
     api_rate: int = 30
     api_ignore_not_found: bool = True

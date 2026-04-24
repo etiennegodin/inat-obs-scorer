@@ -26,7 +26,8 @@ class IngestCSVParams:
 @dataclass
 class IngestS3Params:
     s3_path: str
-    condition: str = "1=1"
+    source_function: str = "read_csv_auto"
+    source_options: str = ", header=true, sep='\t', ignore_errors=true"
 
 
 @dataclass

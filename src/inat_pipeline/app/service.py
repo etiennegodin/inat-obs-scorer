@@ -132,21 +132,18 @@ class ApplicationService:
             logger.exception(e)
             raise
 
-    def ingest_s3(self, args, conditions: dict[str, str] | None = None):
+    def ingest_s3(self, args):
         logger.info("Starting S3 ingest workflow")
-        # Allow passing conditions explicitly or via args
-        conditions = conditions or getattr(args, "conditions", {})
         return self.track_task(
             "ingest_s3",
             self._ingest_s3_task,
             force=getattr(args, "force", False),
             args=args,
-            conditions=conditions,
         )
 
-    def _ingest_s3_task(self, args, conditions: dict[str, str] | None = None):
+    def _ingest_s3_task(self, args):
         try:
-            ingest_s3_workflow.execute(self.deps, conditions=conditions)
+            ingest_s3_workflow.execute(self.deps)
         except InatPipelineError as e:
             logger.error(f"Ingest S3 failed {e}")
             raise WorkflowError(f"Ingest S3 failed {e}") from e
