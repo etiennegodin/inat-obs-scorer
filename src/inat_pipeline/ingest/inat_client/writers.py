@@ -3,6 +3,7 @@ import json
 import logging
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
+from pathlib import Path
 from pprint import pprint
 from typing import Union
 
@@ -72,6 +73,34 @@ class DuckDbWriter:
         except Exception as e:
             logger.error("Failed to insert batch: %s", e)
             raise
+
+    def close(self):
+        self._executor.shutdown(wait=True)
+
+
+class LocalBinaryWriter:
+    """
+    Writes raw bytes to the local filesystem, organized by subfolders.
+    """
+
+    def __init__(self, parent_folder: Union[str, Path]):
+        self.parent_folder = Path(parent_folder)
+        self.parent_folder.mkdir(parents=True, exist_ok=True)
+        self._executor = ThreadPoolExecutor(max_workers=4)
+
+    async def write(self, data: bytes, subfolder: str, filename: str):
+        """Offload blocking file write to thread pool."""
+        loop = asyncio.get_running_loop()
+        await loop.run_in_executor(
+            self._executor, self._write_sync, data, subfolder, filename
+        )
+
+    def _write_sync(self, data: bytes, subfolder: str, filename: str):
+        target_dir = self.parent_folder / str(subfolder)
+        target_dir.mkdir(parents=True, exist_ok=True)
+        target_path = target_dir / filename
+        with open(target_path, "wb") as f:
+            f.write(data)
 
     def close(self):
         self._executor.shutdown(wait=True)
