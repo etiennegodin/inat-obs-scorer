@@ -25,6 +25,7 @@ htmlcov/
 *.md
 !notebooks/evaluation.md
 !README.md
+!docs/TECHNICAL.md
 *.duckdb
 
 obsidian/
